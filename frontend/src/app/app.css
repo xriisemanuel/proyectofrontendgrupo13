@@ -1,0 +1,52 @@
+/* src/app/app.component.css */
+.navbar {
+  display: flex; /* Utiliza flexbox para el diseño de la barra de navegación */
+  justify-content: space-between; /* Espacia los elementos a los extremos */
+  align-items: center; /* Alinea los elementos verticalmente al centro */
+  background-color: #333; /* Color de fondo oscuro */
+  padding: 10px 20px; /* Relleno interno */
+  color: white; /* Color de texto blanco */
+}
+
+.navbar-brand a {
+  color: white; /* Color de texto para el enlace de la marca */
+  text-decoration: none; /* Sin subrayado en el texto */
+  font-size: 24px; /* Tamaño de fuente más grande para la marca */
+  font-weight: bold; /* Texto en negrita */
+}
+
+.navbar-links {
+  display: flex; /* Utiliza flexbox para los enlaces de navegación */
+  align-items: center; /* Alinea los elementos verticalmente al centro */
+}
+
+.navbar-links a,
+.navbar-links button {
+  color: white; /* Color de texto blanco para enlaces y botones */
+  text-decoration: none; /* Sin subrayado en los enlaces */
+  margin-left: 15px; /* Margen a la izquierda para separar los elementos */
+  padding: 8px 12px; /* Relleno interno para enlaces y botones */
+  border-radius: 5px; /* Bordes redondeados */
+  transition: background-color 0.3s ease; /* Transición suave al cambiar el color de fondo */
+  background: none; /* Fondo transparente para los botones */
+  border: none; /* Sin borde para los botones */
+  cursor: pointer; /* Cambia el cursor a un puntero */
+  font-size: 16px; /* Tamaño de fuente */
+}
+
+.navbar-links a:hover,
+.navbar-links button:hover {
+  background-color: #555; /* Color de fondo al pasar el ratón */
+}
+
+.navbar-links span {
+  margin-left: 15px; /* Margen a la izquierda para el texto de bienvenida */
+  font-size: 16px; /* Tamaño de fuente */
+  color: #ccc; /* Color de texto gris claro */
+}
+
+.container {
+  padding: 20px; /* Relleno interno para el contenedor principal */
+  max-width: 1200px; /* Limita el ancho máximo del contenido */
+  margin: 20px auto; /* Centra el contenedor horizontalmente con margen superior/inferior */
+}
