@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { RegisterComponent } from './components/register/register';
 import { authGuard } from './guards/auth-guard';
 import { roleGuard } from './guards/role-guard';
 
