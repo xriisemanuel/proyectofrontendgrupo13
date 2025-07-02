@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-productos',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './productos.component.html',
   styleUrl: './productos.component.css'

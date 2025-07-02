@@ -1,1 +1,15 @@
-<p>categorias works!</p>
+<h2>Categorías disponibles</h2>
+
+<div *ngIf="categorias.length > 0; else sinCategorias">
+  <div *ngFor="let categoria of categorias">
+    <h3>{{ categoria.nombre }}</h3>
+    <p>{{ categoria.descripcion }}</p>
+    <img [src]="categoria.imagen" alt="{{ categoria.nombre }}" width="250">
+    <p><strong>Estado:</strong> {{ categoria.estado ? 'Activa' : 'Inactiva' }}</p>
+    <hr>
+  </div>
+</div>
+
+<ng-template #sinCategorias>
+  <p>No se encontraron categorías disponibles.</p>
+</ng-template>

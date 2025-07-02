@@ -1,7 +1,11 @@
 <h2>📦 Lista de productos PRUEBA nada mas</h2>
 <ul>
   <li *ngFor="let producto of productos">
-    <strong>{{ producto.nombreProducto }}</strong> - ${{ producto.precio }}
+    <strong>{{ producto.nombre }}</strong><br>
+    {{ producto.descripcion }}<br>
+    Precio: ${{ producto.precio }}<br>
+    Stock: {{ producto.stock }} unidades<br>
+    Disponible: {{ producto.disponible ? 'Sí' : 'No' }}<br>
+    <img [src]="producto.imagenes" alt="Imagen de producto" width="200">
   </li>
 </ul>
-git
