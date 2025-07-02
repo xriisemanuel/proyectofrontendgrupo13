@@ -1,0 +1,37 @@
+<div class="add-role-container">
+    <h2>Agregar Nuevo Rol</h2>
+    <p>Define un nuevo rol para los usuarios del sistema.</p>
+
+    <!-- Formulario Reactivo para agregar rol -->
+    <form [formGroup]="roleForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label for="nombre">Nombre del Rol:</label>
+            <input type="text" id="nombre" formControlName="nombre" placeholder="Ej: supervisor_cocina" required>
+            <!-- Mensaje de error de validación -->
+            <div *ngIf="roleForm.get('nombre')?.invalid && roleForm.get('nombre')?.touched" class="validation-error">
+                El nombre del rol es requerido.
+            </div>
+        </div>
+
+        <div class="form-group checkbox-group">
+            <input type="checkbox" id="estado" formControlName="estado">
+            <label for="estado">Activo</label>
+        </div>
+
+        <button type="submit" class="btn-primary" [disabled]="!roleForm.valid">
+            <i class="fas fa-plus-circle"></i> Crear Rol
+        </button>
+
+        <!-- Mensajes de éxito y error -->
+        <div *ngIf="successMessage" class="success-message">
+            {{ successMessage }}
+        </div>
+        <div *ngIf="errorMessage" class="error-message">
+            {{ errorMessage }}
+        </div>
+    </form>
+
+    <div class="back-link">
+        <a routerLink="/admin/dashboard"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+    </div>
+</div>

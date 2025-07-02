@@ -1,16 +1,16 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth-guard';
 import { roleGuard } from './guards/role-guard';
-
-import { Dashboard} from './components/dashboard/dashboard';
+import { Dashboard } from './components/dashboard/dashboard';
 import { AdminDashboard } from './components/admin-dashboard/admin-dashboard';
+import { LoginComponent } from './components/login/login';
 
 
 
 export const routes: Routes = [
     {
         path: '',
-        redirectTo: './components/dashboard',
+        redirectTo: './components/login/login',
         pathMatch: 'full'
     },
     {
@@ -26,7 +26,26 @@ export const routes: Routes = [
         component: Dashboard,
         canActivate: [authGuard] // Solo usuarios autenticados
     },
-
+    // Gestión de Roles (para Admin)
+    {
+        path: 'admin/roles/add',
+        loadComponent: () => import('./components/admin/add-role/add-role').then(m => m.AddRole),
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['admin'] }
+    },
+    {
+        path: 'admin/roles/manage',
+        loadComponent: () => import('./components/admin/manage-roles/manage-roles').then(m => m.ManageRoles),
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['admin'] }
+    },
+//admin/roles/update
+    {
+        path: 'admin/roles/update/:roleId',
+        loadComponent: () => import('./components/admin/update-rol/update-rol').then(m => m.UpdateRol),
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['admin'] }
+    },
     // Rutas protegidas por rol (AuthGuard y RoleGuard)
     {
         path: 'admin/dashboard',
@@ -34,5 +53,5 @@ export const routes: Routes = [
         canActivate: [authGuard, roleGuard], // Requiere autenticación Y rol 'admin'
         data: { roles: ['admin'] } // Pasa los roles permitidos a RoleGuard
     },
-    { path: '**', redirectTo: '/dashboard' }
+    { path: '**', redirectTo: './components/login/login' } // Redirige cualquier ruta desconocida al login
 ];

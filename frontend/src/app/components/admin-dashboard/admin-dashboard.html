@@ -1,1 +1,98 @@
-<p>admin-dashboard works!</p>
+<div class="admin-dashboard-container">
+  <h2>Bienvenido, Administrador {{ currentUser?.usuario?.username }}!</h2>
+  <p>Este es tu panel de control central para gestionar la aplicación.</p>
+
+  <!-- Sección Principal de Gestión de Roles -->
+  <div class="role-management-section">
+    <h3>Gestión de Roles</h3>
+    <div class="role-cards">
+      <a routerLink="/admin/roles/add" class="role-card add-role-card">
+        <i class="fas fa-plus-circle"></i>
+        <h4>Agregar Nuevo Rol</h4>
+        <p>Define nuevos roles y permisos en el sistema.</p>
+      </a>
+      <a routerLink="/admin/roles/manage" class="role-card manage-role-card">
+        <i class="fas fa-users-cog"></i>
+        <h4>Administrar Roles Existentes</h4>
+        <p>Edita o elimina roles, asigna permisos.</p>
+      </a>
+    </div>
+  </div>
+
+  <!-- Sección de Resumen General (Widgets/Tarjetas) -->
+  <div class="summary-cards">
+    <div class="card">
+      <h3>Pedidos Pendientes</h3>
+      <p class="metric">{{ summaryData.pedidosPendientes }}</p>
+      <span class="description">En espera de preparación o envío.</span>
+    </div>
+    <div class="card">
+      <h3>Pedidos Completados Hoy</h3>
+      <p class="metric">{{ summaryData.pedidosCompletadosHoy }}</p>
+      <span class="description">Pedidos finalizados en el día.</span>
+    </div>
+    <div class="card">
+      <h3>Nuevos Usuarios (Semana)</h3>
+      <p class="metric">{{ summaryData.nuevosUsuariosSemana }}</p>
+      <span class="description">Registros de clientes recientes.</span>
+    </div>
+    <div class="card alert-card">
+      <h3>Productos Agotados</h3>
+      <p class="metric">{{ summaryData.productosAgotados }}</p>
+      <span class="description">¡Revisar inventario!</span>
+    </div>
+    <div class="card">
+      <h3>Repartidores Activos</h3>
+      <p class="metric">{{ summaryData.repartidoresActivos }}</p>
+      <span class="description">Actualmente en servicio.</span>
+    </div>
+    <div class="card">
+      <h3>Ingresos Hoy</h3>
+      <p class="metric">${{ summaryData.ingresosHoy }}</p>
+      <span class="description">Total de ventas del día.</span>
+    </div>
+  </div>
+
+  <!-- Sección de Navegación Rápida (Otros enlaces de gestión) -->
+  <div class="quick-links">
+    <h3>Otras Gestiones</h3>
+    <div class="link-group">
+      <a routerLink="/admin/usuarios" class="quick-link-btn">
+        <i class="fas fa-users"></i> Gestión de Usuarios
+      </a>
+      <a routerLink="/admin/productos" class="quick-link-btn">
+        <i class="fas fa-box"></i> Gestión de Productos
+      </a>
+      <a routerLink="/admin/pedidos" class="quick-link-btn">
+        <i class="fas fa-clipboard-list"></i> Gestión de Pedidos
+      </a>
+      <a routerLink="/admin/clientes" class="quick-link-btn">
+        <i class="fas fa-user-friends"></i> Gestión de Clientes
+      </a>
+      <a routerLink="/admin/repartidores" class="quick-link-btn">
+        <i class="fas fa-motorcycle"></i> Gestión de Repartidores
+      </a>
+      <a routerLink="/admin/reportes" class="quick-link-btn">
+        <i class="fas fa-chart-line"></i> Reportes
+      </a>
+      <a routerLink="/admin/configuracion" class="quick-link-btn">
+        <i class="fas fa-cogs"></i> Configuración
+      </a>
+    </div>
+  </div>
+
+  <!-- Sección de Actividad Reciente o Tablas Clave -->
+  <div class="recent-activity">
+    <h3>Últimos Pedidos</h3>
+    <div class="table-placeholder">
+      <!-- Aquí iría una tabla real con los últimos pedidos, filtros y paginación -->
+      <p>Tabla de últimos pedidos pendientes o en curso...</p>
+      <ul>
+        <li>Pedido #1001 - Cliente: Juan Pérez - Estado: En preparación</li>
+        <li>Pedido #1002 - Cliente: María García - Estado: En camino</li>
+        <li>Pedido #1003 - Cliente: Pedro López - Estado: Pendiente</li>
+      </ul>
+      <a routerLink="/admin/pedidos" class="view-all-link">Ver todos los pedidos</a>
+    </div>
+  </div>
+</div>

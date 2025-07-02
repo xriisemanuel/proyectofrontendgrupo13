@@ -5,6 +5,7 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { jwtInterceptor } from './interceptors/jwt-interceptor'; 
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -16,7 +17,10 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([
         jwtInterceptor
       ]),
-      withFetch()
-    )
+      withFetch(),
+      
+    ),
+    FormsModule,
+    ReactiveFormsModule,
   ]
 };

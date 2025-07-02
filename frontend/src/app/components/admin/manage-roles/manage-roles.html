@@ -1,0 +1,57 @@
+<div class="manage-roles-container">
+    <h2>Administrar Roles</h2>
+    <p>Gestiona los roles existentes en el sistema. Puedes editar su estado o eliminarlos.</p>
+
+    <div class="actions-header">
+        <a routerLink="/admin/roles/add" class="btn-add-new">
+            <i class="fas fa-plus-circle"></i> Agregar Nuevo Rol
+        </a>
+    </div>
+
+    <div *ngIf="successMessage" class="success-message">
+        {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+    </div>
+
+    <div class="roles-table-container">
+        <table class="roles-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre del Rol</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let role of roles">
+                    <td>{{ role._id }}</td>
+                    <td>{{ role.nombre }}</td>
+                    <td>
+                        <span [class.active-status]="role.estado" [class.inactive-status]="!role.estado">
+                            {{ role.estado ? 'Activo' : 'Inactivo' }}
+                        </span>
+                    </td>
+                    <td class="actions-cell">
+                        <button (click)="editRole(role._id)" class="btn-action btn-edit">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button (click)="deleteRole(role._id)" class="btn-action btn-delete">
+                            <i class="fas fa-trash-alt"></i> Eliminar
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div *ngIf="roles.length === 0" class="no-roles-message">
+        No hay roles para mostrar.
+    </div>
+
+    <div class="back-link">
+        <a routerLink="/admin/dashboard"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+    </div>
+</div>
