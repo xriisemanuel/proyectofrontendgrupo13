@@ -1,0 +1,55 @@
+<div class="add-repartidor-container">
+    <h2>Agregar Nuevo Perfil de Repartidor</h2>
+    <p>Crea un perfil de repartidor para un usuario existente con el rol 'repartidor'.</p>
+
+    <form [formGroup]="repartidorForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label for="usuarioId">ID de Usuario Asociado:</label>
+            <input type="text" id="usuarioId" formControlName="usuarioId" placeholder="Ej: 60c72b1f8e6c7d001c8a1234"
+                required>
+            <div *ngIf="repartidorForm.get('usuarioId')?.invalid && repartidorForm.get('usuarioId')?.touched"
+                class="validation-error">
+                El ID de usuario es obligatorio.
+            </div>
+        </div>
+
+        <!-- Los campos 'nombre', 'apellido', 'telefono', 'email' han sido eliminados de este formulario.
+         Estos datos se gestionan directamente en el modelo de Usuario. -->
+
+        <div class="form-group">
+            <label for="estado">Estado:</label>
+            <select id="estado" formControlName="estado" required>
+                <option *ngFor="let estado of estadosRepartidor" [value]="estado">{{ estado | titlecase }}</option>
+            </select>
+            <div *ngIf="repartidorForm.get('estado')?.invalid && repartidorForm.get('estado')?.touched"
+                class="validation-error">
+                El estado es obligatorio.
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="vehiculo">Vehículo:</label>
+            <input type="text" id="vehiculo" formControlName="vehiculo" placeholder="Ej: Moto (Honda CB 125F)">
+        </div>
+
+        <div class="form-group">
+            <label for="numeroLicencia">Número de Licencia:</label>
+            <input type="text" id="numeroLicencia" formControlName="numeroLicencia" placeholder="Ej: AR123456789">
+        </div>
+
+        <button type="submit" class="btn-primary" [disabled]="!repartidorForm.valid">
+            <i class="fas fa-user-plus"></i> Crear Perfil de Repartidor
+        </button>
+
+        <div *ngIf="successMessage" class="success-message">
+            {{ successMessage }}
+        </div>
+        <div *ngIf="errorMessage" class="error-message">
+            {{ errorMessage }}
+        </div>
+    </form>
+
+    <div class="back-link">
+        <a routerLink="/admin/dashboard"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+    </div>
+</div>

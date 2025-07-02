@@ -1,6 +1,5 @@
 <div class="register-container">
   <h2>Registrarse</h2>
-  <!-- Formulario de registro. ngSubmit llama al método onSubmit del componente. -->
   <form (ngSubmit)="onSubmit()">
     <div class="form-group">
       <label for="username">Usuario:</label>
@@ -27,27 +26,26 @@
       <input type="text" id="apellido" [(ngModel)]="apellido" name="apellido" required>
     </div>
 
-    <!-- Este div está oculto por defecto para que los usuarios se registren como 'cliente' -->
-    <!-- Si quisieras que el usuario elija su rol al registrarse (ej. para un admin inicial), podrías mostrarlo. -->
-    <div class="form-group" *ngIf="false">
+    <!-- Campo de selección de Rol -->
+    <div class="form-group">
       <label for="rolName">Rol:</label>
-      <select id="rolName" [(ngModel)]="rolName" name="rolName">
-        <option value="cliente">Cliente</option>
-        <!-- Puedes añadir más roles aquí si los usuarios pueden registrarse con ellos -->
-        <!-- <option value="admin">Administrador</option> -->
+      <select id="rolName" [(ngModel)]="rolName" name="rolName" required>
+        <option *ngFor="let rol of roles" [value]="rol.nombre">{{ rol.nombre | titlecase }}</option>
       </select>
+      <div *ngIf="!rolName && (username || password || email || telefono || nombre || apellido)"
+        class="validation-error">
+        Por favor, seleccione un rol.
+      </div>
     </div>
 
     <button type="submit" class="btn-primary">Registrar</button>
-    <!-- Muestra el mensaje de error si existe -->
+
     <div *ngIf="errorMessage" class="error-message">
       {{ errorMessage }}
     </div>
-    <!-- Muestra el mensaje de éxito si el registro fue exitoso -->
     <div *ngIf="isSuccessful" class="success-message">
       Registro exitoso. Ahora puedes <a routerLink="/login">iniciar sesión</a>.
     </div>
   </form>
   <p>¿Ya tienes cuenta? <a routerLink="/login">Inicia Sesión</a></p>
 </div>
-

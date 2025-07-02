@@ -10,7 +10,7 @@ import { LoginComponent } from './components/login/login';
 export const routes: Routes = [
     {
         path: '',
-        redirectTo: './components/login/login',
+        redirectTo: './login',
         pathMatch: 'full'
     },
     {
@@ -26,6 +26,9 @@ export const routes: Routes = [
         component: Dashboard,
         canActivate: [authGuard] // Solo usuarios autenticados
     },
+
+
+
     // Gestión de Roles (para Admin)
     {
         path: 'admin/roles/add',
@@ -39,19 +42,42 @@ export const routes: Routes = [
         canActivate: [authGuard, roleGuard],
         data: { roles: ['admin'] }
     },
-//admin/roles/update
     {
-        path: 'admin/roles/update/:roleId',
+        path: 'admin/roles/update/:id',
         loadComponent: () => import('./components/admin/update-rol/update-rol').then(m => m.UpdateRol),
         canActivate: [authGuard, roleGuard],
         data: { roles: ['admin'] }
     },
-    // Rutas protegidas por rol (AuthGuard y RoleGuard)
+
+
+
+    // rutas para el REPARTIDOR
+    {
+        path: 'admin/repartidores/add',
+        loadComponent: () => import('./components/admin/add-repartidor/add-repartidor').then(m => m.AddRepartidor),
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['admin'] }
+    },
+    {
+        path: 'admin/repartidores/manage',
+        loadComponent: () => import('./components/admin/manage-repartidores/manage-repartidores').then(m => m.ManageRepartidores),
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['repartidor','admin'] }
+    },
+    // {
+    //     path: 'admin/repartidores/update/:id',
+    //     loadComponent: () => import('./components/admin/update-repartidor/update-repartidor').then(m => m.UpdateRepartidor),
+    //     canActivate: [authGuard, roleGuard],
+    //     data: { roles: ['repartidor','admin'] }
+    // },
+
+
+
     {
         path: 'admin/dashboard',
         component: AdminDashboard,
         canActivate: [authGuard, roleGuard], // Requiere autenticación Y rol 'admin'
         data: { roles: ['admin'] } // Pasa los roles permitidos a RoleGuard
     },
-    { path: '**', redirectTo: './components/login/login' } // Redirige cualquier ruta desconocida al login
+    { path: '**', redirectTo: './login' } // Redirige cualquier ruta desconocida al login
 ];

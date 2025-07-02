@@ -19,6 +19,23 @@
     </div>
   </div>
 
+  <!-- Sección Principal de Gestión de Repartidores -->
+  <div class="role-management-section"> <!-- Reutilizamos la misma clase de sección para consistencia -->
+    <h3>Gestión de Repartidores</h3>
+    <div class="role-cards">
+      <a routerLink="/admin/repartidores/add" class="role-card add-repartidor-card">
+        <i class="fas fa-user-plus"></i> <!-- Ícono para agregar repartidor -->
+        <h4>Agregar Nuevo Repartidor</h4>
+        <p>Registra nuevos perfiles de repartidores.</p>
+      </a>
+      <a routerLink="/admin/repartidores/manage" class="role-card manage-repartidor-card">
+        <i class="fas fa-motorcycle"></i> <!-- Ícono para gestionar repartidores -->
+        <h4>Gestionar Repartidores</h4>
+        <p>Visualiza, edita y elimina repartidores existentes.</p>
+      </a>
+    </div>
+  </div>
+
   <!-- Sección de Resumen General (Widgets/Tarjetas) -->
   <div class="summary-cards">
     <div class="card">
@@ -69,9 +86,10 @@
       <a routerLink="/admin/clientes" class="quick-link-btn">
         <i class="fas fa-user-friends"></i> Gestión de Clientes
       </a>
-      <a routerLink="/admin/repartidores" class="quick-link-btn">
+      <!-- Los enlaces de Repartidores ya están en la sección principal, podrías eliminarlos de aquí si quieres -->
+      <!-- <a routerLink="/admin/repartidores" class="quick-link-btn">
         <i class="fas fa-motorcycle"></i> Gestión de Repartidores
-      </a>
+      </a> -->
       <a routerLink="/admin/reportes" class="quick-link-btn">
         <i class="fas fa-chart-line"></i> Reportes
       </a>

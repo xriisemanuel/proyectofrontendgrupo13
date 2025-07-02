@@ -1,38 +1,59 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth'; // Importa tu servicio de autenticación
 import { Router } from '@angular/router'; // Para la redirección
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { Role } from '../../services/role'; // <--- ¡NUEVA IMPORTACIÓN! Para obtener los roles
+import { CommonModule } from '@angular/common'; // Necesario para directivas como ngFor
+import { FormsModule } from '@angular/forms'; // Necesario para ngModel
 
 @Component({
-  selector: 'app-register', // Selector para usar este componente en el HTML
-  imports: [FormsModule, CommonModule], // Importaciones de módulos Angular necesarios (vacío aquí, pero puedes agregar módulos si es necesario)
-  templateUrl: './register.html', // Archivo HTML asociado
-  styleUrls: ['./register.css'] // Archivo CSS asociado
+  selector: 'app-register',
+  templateUrl: './register.html',
+  styleUrls: ['./register.css'],
+  imports: [CommonModule, FormsModule] // <--- Importa CommonModule y FormsModule
 })
 export class RegisterComponent implements OnInit {
-  // Propiedades para los inputs del formulario de registro
   username = '';
   password = '';
   email = '';
   telefono = '';
   nombre = '';
   apellido = '';
-  rolName = 'cliente'; // Rol por defecto al registrar (puedes hacer que sea seleccionable)
-  errorMessage = ''; // Mensaje de error
-  isSuccessful = false; // Indica si el registro fue exitoso
+  rolName = ''; // Inicialmente vacío, se llenará con el primer rol disponible (no cliente) o por defecto.
+  errorMessage = '';
+  isSuccessful = false;
+  roles: any[] = []; // <--- Propiedad para almacenar los roles disponibles
 
-  // Inyecta AuthService y Router
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private roleService: Role // <--- ¡NUEVA INYECCIÓN!
+  ) { }
 
   ngOnInit(): void {
-    // No hay lógica compleja en OnInit para el registro, solo inicialización.
+    // Carga los roles disponibles al inicializar el componente
+    this.loadRoles();
   }
 
-  // Método que se ejecuta al enviar el formulario de registro
+  loadRoles(): void {
+    this.roleService.getRoles().subscribe({
+      next: (data) => {
+        // Filtra el rol 'cliente' si no quieres que sea seleccionable en este formulario de registro
+        this.roles = data.filter(role => role.nombre !== 'cliente');
+        if (this.roles.length > 0) {
+          this.rolName = this.roles[0].nombre; // Establece el primer rol como valor por defecto
+        }
+        console.log('Roles cargados:', this.roles);
+      },
+      error: (err) => {
+        console.error('Error al cargar los roles:', err);
+        this.errorMessage = 'Error al cargar los roles disponibles. Intente de nuevo más tarde.';
+      }
+    });
+  }
+
   onSubmit(): void {
-    this.errorMessage = ''; // Limpia mensajes de error anteriores
-    this.isSuccessful = false; // Restablece el estado de éxito
+    this.errorMessage = '';
+    this.isSuccessful = false;
 
     // Llama al método register del AuthService con todos los datos del formulario
     this.authService.register(
@@ -40,20 +61,20 @@ export class RegisterComponent implements OnInit {
       this.password,
       this.email,
       this.telefono,
-      this.rolName, // Se envía el nombre del rol (ej. 'cliente')
+      this.rolName, // Se envía el nombre del rol seleccionado
       this.nombre,
       this.apellido
     ).subscribe({
       next: data => {
-        console.log('Registro exitoso:', data); // Muestra los datos de respuesta en consola
-        this.isSuccessful = true; // Actualiza el estado a exitoso
+        console.log('Registro exitoso:', data);
+        this.isSuccessful = true;
         // Opcional: Redirige al usuario a la página de login después de un registro exitoso
-        this.router.navigate(['/login']);
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000); // Redirige después de 2 segundos
       },
       error: err => {
-        // Manejo de errores en caso de que el registro falle
         console.error('Error de registro:', err);
-        // Extrae el mensaje de error de la respuesta del backend, o usa un mensaje genérico
         this.errorMessage = err.error?.mensaje || 'Error al registrar. Intente de nuevo.';
       }
     });
