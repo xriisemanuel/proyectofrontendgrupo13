@@ -1,38 +1,21 @@
 <h2 class="mt-4">Categorías disponibles - SUBTE</h2>
+<div class="mb-3 text-end">
+  <span class="text-decoration-underline text-primary" style="cursor: pointer;" (click)="verTodosLosProductos()">
+    Ver todos los productos →
+  </span>
+</div>
+
 
 <!-- Botón para agregar nueva categoría -->
 <div class="d-flex justify-content-end mb-3">
   <button class="btn btn-success" (click)="irAFormulario()">Agregar categoría</button>
 </div>
-<div class="input-group mb-3">
-  <input type="text" [(ngModel)]="busqueda" placeholder="Buscar categoría..." class="form-control">
-  <button class="btn btn-outline-secondary" (click)="filtrarCategorias()">Buscar</button>
-</div>
-
-<!-- Resultado de búsqueda -->
-<div *ngIf="categoriasFiltradas.length > 0">
-  <div *ngFor="let categoria of categoriasFiltradas">
-    <!-- Tarjeta o bloque visual -->
-    <div class="card mb-2">
-      <div class="card-body">
-        <h5 class="card-title">{{ categoria.nombre }}</h5>
-        <p class="card-text">{{ categoria.descripcion }}</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Sin resultados -->
-<div *ngIf="busqueda && categoriasFiltradas.length === 0" class="text-muted">
-  No se encontraron categorías con ese nombre.
-</div>
-
 
 <!-- Lista de categorías en cards -->
 <div *ngIf="categorias.length > 0; else sinCategorias">
   <div class="row">
     <div class="col-md-4 mb-4" *ngFor="let categoria of categorias">
-      <div class="card h-100 shadow">
+      <div class="card h-100 shadow" (click)="verProductosPorCategoria(categoria._id)" style="cursor: pointer;">
         <img [src]="categoria.imagen" class="card-img-top" alt="{{ categoria.nombre }}"
           style="height: 200px; object-fit: cover;">
         <div class="card-body d-flex flex-column">

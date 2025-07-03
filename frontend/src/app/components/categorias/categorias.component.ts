@@ -12,35 +12,18 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./categorias.component.css']
 })
 export class CategoriasComponent implements OnInit {
-   busqueda = '';
+
   categorias: any[] = [];
-  categoriasFiltradas: any[] = [];
 
   constructor(
     private categoriaService: CategoriaService,
     private router: Router
   ) {}
 
-
 ngOnInit(): void {
   this.categoriaService.getCategorias().subscribe(data => {
     this.categorias = data;
-    this.categoriasFiltradas = [];
   });
-}
-
-filtrarCategorias(): void {
-  const texto = this.busqueda.trim().toLowerCase();
-
-  if (!texto) {
-    this.categoriasFiltradas = [];
-    return;
-  }
-
-  this.categoriasFiltradas = this.categorias.filter(c =>
-    c.nombre?.toLowerCase().includes(texto) ||
-    c.descripcion?.toLowerCase().includes(texto)
-  );
 }
 
   // Navegar al formulario de categoría
@@ -62,7 +45,15 @@ filtrarCategorias(): void {
     });
   }
 }
+verTodosLosProductos(): void {
+  this.router.navigate(['/productos']);
+}
+
   mensajeModal = '';
+
+  verProductosPorCategoria(categoriaId: string): void {
+  this.router.navigate(['/productos'], { queryParams: { categoriaId } });
+}
 
 mostrarModal(mensaje: string): void {
   this.mensajeModal = mensaje;

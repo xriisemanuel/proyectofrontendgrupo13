@@ -3,7 +3,7 @@ import { ProductoService } from '../../services/producto.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CategoriaService } from '../../services/categoria.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-productos',
@@ -17,30 +17,60 @@ export class ProductosComponent implements OnInit {
   productos: any[] = [];
   productosFiltrados: any[] = [];
   mensajeModal = '';
+  categoriaSeleccionadaId: string | null = null;
+  categoriaSeleccionadaNombre = '';
 
   constructor(
     private productoService: ProductoService,
     private categoriaService: CategoriaService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
- ngOnInit(): void {
-  this.productoService.getProductos().subscribe(data => {
-    this.categoriaService.getCategorias().subscribe(categorias => {
-      // 🔍 Aseguramos coincidencia correcta entre ObjectId y string
-      this.productos = data.map(prod => {
-        const categoria = categorias.find(c =>
-          String(c._id) === String(prod.categoriaId)
-        );
-        return {
-          ...prod,
-          categoriaNombre: categoria?.nombre || 'Sin categoría'
-        };
-      });
+  ngOnInit(): void {
+    this.categoriaSeleccionadaId = this.route.snapshot.queryParamMap.get('categoriaId');
 
-      this.productosFiltrados = [];
+    this.productoService.getProductos().subscribe(data => {
+      this.categoriaService.getCategorias().subscribe(categorias => {
+        this.productos = data.map(prod => {
+          const categoria = categorias.find(c =>
+            String(c._id) === String(prod.categoriaId?._id || prod.categoriaId)
+          );
+
+          return {
+            ...prod,
+            categoriaNombre: categoria?.nombre || 'Sin categoría',
+            categoriaRealId: categoria?._id || prod.categoriaId?._id || prod.categoriaId
+          };
+        });
+
+        if (this.categoriaSeleccionadaId) {
+          const nombreCategoria = categorias.find(c =>
+            String(c._id) === this.categoriaSeleccionadaId
+          )?.nombre;
+
+          this.categoriaSeleccionadaNombre = nombreCategoria ?? '';
+          this.productosFiltrados = this.productos.filter(p =>
+            String(p.categoriaRealId) === this.categoriaSeleccionadaId
+          );
+        } else {
+          this.productosFiltrados = [];
+        }
+      });
     });
-  });
+  }
+verTodos(): void {
+  this.busqueda = '';
+  this.categoriaSeleccionadaId = null;
+  this.categoriaSeleccionadaNombre = '';
+  this.productosFiltrados = [];
+
+  // Navega sin query params
+  this.router.navigate(['/productos']);
+}
+
+volverACategorias(): void {
+  this.router.navigate(['/categorias']);
 }
 
   filtrarProductos(): void {
