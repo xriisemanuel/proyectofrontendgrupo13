@@ -1,15 +1,76 @@
-<h2>Categorías disponibles</h2>
+<h2 class="mt-4">Categorías disponibles - SUBTE</h2>
 
-<div *ngIf="categorias.length > 0; else sinCategorias">
-  <div *ngFor="let categoria of categorias">
-    <h3>{{ categoria.nombre }}</h3>
-    <p>{{ categoria.descripcion }}</p>
-    <img [src]="categoria.imagen" alt="{{ categoria.nombre }}" width="250">
-    <p><strong>Estado:</strong> {{ categoria.estado ? 'Activa' : 'Inactiva' }}</p>
-    <hr>
+<!-- Botón para agregar nueva categoría -->
+<div class="d-flex justify-content-end mb-3">
+  <button class="btn btn-success" (click)="irAFormulario()">Agregar categoría</button>
+</div>
+<div class="input-group mb-3">
+  <input type="text" [(ngModel)]="busqueda" placeholder="Buscar categoría..." class="form-control">
+  <button class="btn btn-outline-secondary" (click)="filtrarCategorias()">Buscar</button>
+</div>
+
+<!-- Resultado de búsqueda -->
+<div *ngIf="categoriasFiltradas.length > 0">
+  <div *ngFor="let categoria of categoriasFiltradas">
+    <!-- Tarjeta o bloque visual -->
+    <div class="card mb-2">
+      <div class="card-body">
+        <h5 class="card-title">{{ categoria.nombre }}</h5>
+        <p class="card-text">{{ categoria.descripcion }}</p>
+      </div>
+    </div>
   </div>
 </div>
 
+<!-- Sin resultados -->
+<div *ngIf="busqueda && categoriasFiltradas.length === 0" class="text-muted">
+  No se encontraron categorías con ese nombre.
+</div>
+
+
+<!-- Lista de categorías en cards -->
+<div *ngIf="categorias.length > 0; else sinCategorias">
+  <div class="row">
+    <div class="col-md-4 mb-4" *ngFor="let categoria of categorias">
+      <div class="card h-100 shadow">
+        <img [src]="categoria.imagen" class="card-img-top" alt="{{ categoria.nombre }}"
+          style="height: 200px; object-fit: cover;">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{ categoria.nombre }}</h5>
+          <p class="card-text">{{ categoria.descripcion }}</p>
+          <p>
+            <strong>Estado:</strong>
+            <span class="badge" [ngClass]="categoria.estado ? 'bg-success' : 'bg-secondary'">
+              {{ categoria.estado ? 'Activa' : 'Inactiva' }}
+            </span>
+          </p>
+          <div class="mt-auto d-flex justify-content-between">
+            <button class="btn btn-primary btn-sm" (click)="editarCategoria(categoria)">Modificar</button>
+            <button class="btn btn-danger btn-sm" (click)="eliminarCategoria(categoria._id)">Eliminar</button>
+          </div>
+
+          <!-- Modal de éxito -->
+          <div class="modal fade" id="modalExito" tabindex="-1">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                  <h5 class="modal-title">¡Éxito!</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                  <p>{{ mensajeModal }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Template en caso de no haber categorías -->
 <ng-template #sinCategorias>
   <p>No se encontraron categorías disponibles.</p>
 </ng-template>
