@@ -22,19 +22,24 @@
       <div class="col-md-4 mb-4"
            *ngFor="let producto of (busqueda ? productosFiltrados : productos)">
         <div class="card h-100 shadow">
-          <img [src]="producto.imagen" class="card-img-top" alt="{{ producto.nombre }}"
+          <!-- Imagen principal (opcionalmente más imágenes debajo) -->
+          <img [src]="producto.imagenes[0]" class="card-img-top" alt="{{ producto.nombre }}"
                style="height: 200px; object-fit: cover;">
+
           <div class="card-body d-flex flex-column">
             <h5 class="card-title">{{ producto.nombre }}</h5>
             <p class="card-text">{{ producto.descripcion }}</p>
             <p><strong>Precio:</strong> ${{ producto.precio }}</p>
-            <p><strong>Categoría:</strong> {{ producto.categoriaNombre }}</p>
+            <p><strong>Stock:</strong> {{ producto.stock }}</p>
+            <p><strong>Popularidad:</strong> {{ producto.popularidad }}</p>
+           <p><strong>Categoría:</strong> {{ producto.categoriaId?.nombre }}</p>
             <p>
-              <strong>Estado:</strong>
-              <span class="badge" [ngClass]="producto.estado ? 'bg-success' : 'bg-secondary'">
-                {{ producto.estado ? 'Activo' : 'Inactivo' }}
+              <strong>Disponible:</strong>
+              <span class="badge" [ngClass]="producto.disponible ? 'bg-success' : 'bg-danger'">
+                {{ producto.disponible ? 'Sí' : 'No' }}
               </span>
             </p>
+
             <div class="mt-auto d-flex justify-content-between">
               <button class="btn btn-primary btn-sm" (click)="editarProducto(producto)">Modificar</button>
               <button class="btn btn-danger btn-sm" (click)="eliminarProducto(producto._id)">Eliminar</button>
@@ -45,7 +50,7 @@
     </div>
   </div>
 
-  <!-- Sin resultados -->
+  <!-- Sin productos -->
   <ng-template #sinProductos>
     <p class="text-muted">No se encontraron productos disponibles.</p>
   </ng-template>

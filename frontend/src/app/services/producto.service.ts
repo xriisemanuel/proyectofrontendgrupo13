@@ -32,6 +32,5 @@ actualizarProducto(id: string, data: any): Observable<any> {
 eliminarProducto(id: string): Observable<any> {
   return this.http.delete<any>(`${this.apiURL}/${id}`);
 }
-
 }
 

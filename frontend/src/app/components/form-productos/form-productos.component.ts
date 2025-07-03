@@ -7,19 +7,22 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-form-productos',
-  imports: [FormsModule, CommonModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './form-productos.component.html',
   styleUrl: './form-productos.component.css'
 })
-export class FormProductoComponent implements OnInit{
+export class FormProductoComponent implements OnInit {
   producto: any = {
     nombre: '',
     descripcion: '',
-    imagen: '',
-    precio: null,
-    estado: true,
-    categoria: ''
+    precio: 0,
+    stock: 0,
+    imagenes: [''],
+    popularidad: 0,
+    categoriaId: ''
   };
+
   categorias: any[] = [];
   modoEdicion = false;
   productoId = '';
@@ -30,17 +33,21 @@ export class FormProductoComponent implements OnInit{
     private categoriaService: CategoriaService,
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.cargarCategorias();
 
+    // Si hay ID en la URL, estamos editando
     this.productoId = this.route.snapshot.paramMap.get('id') ?? '';
     this.modoEdicion = !!this.productoId;
 
     if (this.modoEdicion) {
       this.productoService.getProductoPorId(this.productoId).subscribe(data => {
-        this.producto = data;
+        this.producto = { ...data };
+        if (!this.producto.imagenes || this.producto.imagenes.length === 0) {
+          this.producto.imagenes = [''];
+        }
       });
     }
   }
@@ -52,23 +59,49 @@ export class FormProductoComponent implements OnInit{
   }
 
   guardar(): void {
-    if (this.modoEdicion) {
-      this.productoService.actualizarProducto(this.productoId, this.producto).subscribe(() => {
-        this.mostrarModal('Producto actualizado correctamente');
-        setTimeout(() => this.router.navigate(['/productos']), 2000);
-      });
-    } else {
-      this.productoService.crearProducto(this.producto).subscribe(() => {
-        this.mostrarModal('Producto creado correctamente');
-        setTimeout(() => this.router.navigate(['/productos']), 2000);
-      });
-    }
+    const operacion = this.modoEdicion
+      ? this.productoService.actualizarProducto(this.productoId, this.producto)
+      : this.productoService.crearProducto(this.producto);
+
+    operacion.subscribe(() => {
+      const mensaje = this.modoEdicion
+        ? 'Producto actualizado correctamente'
+        : 'Producto creado correctamente';
+
+      this.mostrarModal(mensaje);
+      setTimeout(() => this.router.navigate(['productos']), 2000);
+    });
   }
 
-  mostrarModal(mensaje: string): void {
-    this.mensajeModal = mensaje;
-    const modal = new (window as any).bootstrap.Modal(document.getElementById('modalExito'));
-    modal.show();
+  agregarImagen(): void {
+    this.producto.imagenes.push('');
   }
+
+  quitarImagen(index: number): void {
+    this.producto.imagenes.splice(index, 1);
+  }
+
+mostrarModal(mensaje: string): void {
+  this.mensajeModal = mensaje;
+  const modalEl = document.getElementById('modalExito');
+  const modal = new (window as any).bootstrap.Modal(modalEl);
+  modal.show();
+
+  // Cierre automático con fade después de 2 segundos
+  setTimeout(() => {
+    modal.hide();
+  }, 1000);
+
+  // Limpieza del overlay/backdrop
+  modalEl?.addEventListener('hidden.bs.modal', () => {
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach(b => b.remove());
+  });
+}
+
 
 }
+//if (!this.producto.categoriaId) {
+      //alert('Seleccioná una categoría antes de guardar');
+      //return;
+    //}

@@ -5,92 +5,95 @@
     <!-- Nombre -->
     <div class="mb-3">
       <label class="form-label">Nombre</label>
-      <input type="text"
-             [(ngModel)]="producto.nombre"
-             name="nombre"
-             required
-             #nombre="ngModel"
-             [class.is-invalid]="form.submitted && nombre.invalid"
+      <input type="text" [(ngModel)]="producto.nombre" name="nombre"
+             required minlength="3" maxlength="100"
+             #nombre="ngModel" [class.is-invalid]="form.submitted && nombre.invalid"
              class="form-control">
       <div *ngIf="form.submitted && nombre.invalid" class="invalid-feedback">
-        El nombre es obligatorio.
+        Ingresá un nombre válido (mínimo 3 caracteres).
       </div>
     </div>
 
     <!-- Descripción -->
     <div class="mb-3">
       <label class="form-label">Descripción</label>
-      <textarea [(ngModel)]="producto.descripcion"
-                name="descripcion"
-                required
-                #descripcion="ngModel"
-                [class.is-invalid]="form.submitted && descripcion.invalid"
-                class="form-control"></textarea>
-      <div *ngIf="form.submitted && descripcion.invalid" class="invalid-feedback">
-        La descripción es obligatoria.
-      </div>
-    </div>
-
-    <!-- Imagen -->
-    <div class="mb-3">
-      <label class="form-label">URL de imagen</label>
-      <input type="text"
-             [(ngModel)]="producto.imagen"
-             name="imagen"
-             required
-             #imagen="ngModel"
-             [class.is-invalid]="form.submitted && imagen.invalid"
-             class="form-control">
-      <div *ngIf="form.submitted && imagen.invalid" class="invalid-feedback">
-        La imagen es obligatoria.
-      </div>
+      <textarea [(ngModel)]="producto.descripcion" name="descripcion"
+                maxlength="500" class="form-control"></textarea>
     </div>
 
     <!-- Precio -->
     <div class="mb-3">
       <label class="form-label">Precio</label>
-      <input type="number"
-             [(ngModel)]="producto.precio"
-             name="precio"
-             required
-             min="1"
-             #precio="ngModel"
-             [class.is-invalid]="form.submitted && precio.invalid"
+      <input type="number" [(ngModel)]="producto.precio" name="precio"
+             required min="0"
+             #precio="ngModel" [class.is-invalid]="form.submitted && precio.invalid"
              class="form-control">
       <div *ngIf="form.submitted && precio.invalid" class="invalid-feedback">
-        El precio debe ser mayor a $1.
+        El precio debe ser mayor o igual a $0.
       </div>
     </div>
 
-    <!-- Estado -->
+    <!-- Stock -->
     <div class="mb-3">
-      <label class="form-label">Estado</label>
-      <select [(ngModel)]="producto.estado" name="estado" class="form-select">
-        <option [value]="true">Activo</option>
-        <option [value]="false">Inactivo</option>
-      </select>
+      <label class="form-label">Stock</label>
+      <input type="number" [(ngModel)]="producto.stock" name="stock"
+             required min="0"
+             #stock="ngModel" [class.is-invalid]="form.submitted && stock.invalid"
+             class="form-control">
+      <div *ngIf="form.submitted && stock.invalid" class="invalid-feedback">
+        El stock no puede ser negativo.
+      </div>
+    </div>
+
+    <!-- Imágenes (múltiples URLs) -->
+    <div class="mb-3">
+      <label class="form-label">Imágenes (URLs)</label>
+      <div *ngFor="let url of producto.imagenes; let i = index" class="input-group mb-2">
+        <input [(ngModel)]="producto.imagenes[i]" name="imagen{{i}}" class="form-control">
+        <button type="button" class="btn btn-danger" (click)="quitarImagen(i)">✖</button>
+      </div>
+      <button type="button" class="btn btn-outline-primary" (click)="agregarImagen()">Agregar otra imagen</button>
+    </div>
+
+    <!-- Popularidad -->
+    <div class="mb-3">
+      <label class="form-label">Popularidad</label>
+      <input type="number" [(ngModel)]="producto.popularidad" name="popularidad"
+             min="0" class="form-control">
+    </div>
+
+    <!-- Disponible (solo lectura, calculado desde el backend) -->
+    <div class="mb-3">
+      <label class="form-label">¿Disponible?</label>
+      <input type="text"
+             [value]="producto.stock > 0 ? 'Sí' : 'No'" readonly
+             class="form-control bg-light">
     </div>
 
     <!-- Categoría -->
-    <div class="mb-3">
-      <label class="form-label">Categoría</label>
-      <select [(ngModel)]="producto.categoria" name="categoria" required #categoria="ngModel"
-              [class.is-invalid]="form.submitted && categoria.invalid" class="form-select">
-        <option *ngFor="let cat of categorias" [value]="cat._id">{{ cat.nombre }}</option>
-      </select>
-      <div *ngIf="form.submitted && categoria.invalid" class="invalid-feedback">
-        Seleccioná una categoría.
-      </div>
-    </div>
+     <label class="form-label">Categoría</label>
+   <select
+   
+  [(ngModel)]="producto.categoriaId"
+  name="categoriaId"
+  required
+  #categoriaId="ngModel"
+  [class.is-invalid]="form.submitted && categoriaId.invalid"
+  class="form-select"
+>
+  <option value="" disabled selected>Seleccionar categoría</option>
+  <option *ngFor="let cat of categorias" [value]="cat._id">{{ cat.nombre }}</option>
+</select>
+
 
     <!-- Botón Guardar -->
-    <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+    <button type="submit" class="btn btn-primary">
       {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
     </button>
   </form>
 
   <!-- Modal de éxito -->
-  <div class="modal fade" id="modalExito" tabindex="-1">
+ <div class="modal fade" id="modalExito" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header bg-success text-white">
