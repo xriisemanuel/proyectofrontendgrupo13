@@ -18,6 +18,20 @@ export class ProductoService {
     return this.http.post<any>(this.apiURL, data);
   }
 
-  // Otros métodos como editar, eliminar, obtener por ID, etc., los agregamos después
+  // Obtener un producto por ID
+getProductoPorId(id: string): Observable<any> {
+  return this.http.get<any>(`${this.apiURL}/${id}`);
+}
+
+// Actualizar producto
+actualizarProducto(id: string, data: any): Observable<any> {
+  return this.http.put<any>(`${this.apiURL}/${id}`, data);
+}
+
+// Eliminar producto
+eliminarProducto(id: string): Observable<any> {
+  return this.http.delete<any>(`${this.apiURL}/${id}`);
+}
+
 }
 
