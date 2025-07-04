@@ -42,16 +42,16 @@ form {
 }
 
 /* Imágenes */
-.imagen-preview {
-  width: 100%;
-  max-height: 200px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-}
 
 /* Modal mensajes */
 .modal-body p {
   font-size: 1rem;
   margin-bottom: 0;
+}
+
+.imagen-preview {
+  width: 100%;
+  max-height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
 }

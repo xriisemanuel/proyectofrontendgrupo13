@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CategoriaService } from '../../services/categoria.service';
 import { ProductoService } from '../../services/producto.service';
+import { UnplashService } from '../../services/unplash.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -27,10 +28,12 @@ export class FormProductoComponent implements OnInit {
   modoEdicion = false;
   productoId = '';
   mensajeModal = '';
+  imagenSugerida = '';
 
   constructor(
     private productoService: ProductoService,
     private categoriaService: CategoriaService,
+    private unsplashService: UnplashService,
     private router: Router,
     private route: ActivatedRoute
   ) { }
@@ -80,6 +83,25 @@ export class FormProductoComponent implements OnInit {
   quitarImagen(index: number): void {
     this.producto.imagenes.splice(index, 1);
   }
+
+  //API GENERAR URL UNPLASH
+buscarImagenSugerida(): void {
+  if (!this.producto.nombre) return;
+
+  this.unsplashService.buscarImagen(this.producto.nombre).subscribe(res => {
+    const url = res.results[0]?.urls?.regular || '';
+    this.imagenSugerida = url;
+  });
+}
+
+agregarImagenSugerida(): void {
+  if (this.imagenSugerida && !this.producto.imagenes.includes(this.imagenSugerida)) {
+    this.producto.imagenes.push(this.imagenSugerida);
+  }
+}
+
+
+
 
 mostrarModal(mensaje: string): void {
   this.mensajeModal = mensaje;
