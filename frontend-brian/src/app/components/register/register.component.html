@@ -1,0 +1,36 @@
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+  <div>
+    <label>Nombre:</label>
+    <input formControlName="nombre" required />
+  </div>
+  <div>
+    <label>Apellido:</label>
+    <input formControlName="apellido" required />
+  </div>
+  <div>
+    <label>Usuario:</label>
+    <input formControlName="username" required />
+  </div>
+  <div>
+    <label>Email:</label>
+    <input formControlName="email" type="email" required />
+  </div>
+  <div>
+    <label>Teléfono:</label>
+    <input formControlName="telefono" required />
+  </div>
+  <div>
+    <label>Contraseña:</label>
+    <input formControlName="password" type="password" required />
+  </div>
+  <div>
+    <label>Rol:</label>
+    <select formControlName="rolName" required>
+      <option *ngFor="let rol of roles" [value]="rol">{{ rol }}</option>
+    </select>
+  </div>
+  <div>
+    <button type="submit" [disabled]="!registerForm.valid">Registrar</button>
+  </div>
+  <div *ngIf="mensaje">{{ mensaje }}</div>
+</form>

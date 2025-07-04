@@ -1,0 +1,37 @@
+<form [formGroup]="comboForm" (ngSubmit)="onSubmit()">
+  <div>
+    <label>Nombre:</label>
+    <input formControlName="nombre" required minlength="3" maxlength="100" />
+  </div>
+  <div>
+    <label>Descripción:</label>
+    <input formControlName="descripcion" maxlength="500" />
+  </div>
+  <div>
+    <label>Productos:</label>
+    <select formControlName="productosIds" multiple required>
+      <option *ngFor="let producto of productos" [value]="producto._id">{{ producto.nombre }}</option>
+    </select>
+  </div>
+  <div>
+    <label>Precio Combo:</label>
+    <input type="number" formControlName="precioCombo" required min="0" />
+  </div>
+  <div>
+    <label>Descuento (%):</label>
+    <input type="number" formControlName="descuento" min="0" max="100" />
+  </div>
+  <div>
+    <label>Imagen (URL):</label>
+    <input formControlName="imagen" />
+  </div>
+  <div>
+    <label>Estado:</label>
+    <select formControlName="estado">
+      <option [value]="true">Activo</option>
+      <option [value]="false">Inactivo</option>
+    </select>
+  </div>
+  <button type="submit" [disabled]="!comboForm.valid">Agregar Combo</button>
+  <div *ngIf="mensaje">{{ mensaje }}</div>
+</form>

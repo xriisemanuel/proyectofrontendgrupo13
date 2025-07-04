@@ -1,0 +1,18 @@
+<h2>Lista de Ofertas</h2>
+<table *ngIf="ofertas.length > 0">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Descripción</th>
+      <th>Descuento (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let oferta of ofertas">
+      <td>{{ oferta.nombre }}</td>
+      <td>{{ oferta.descripcion }}</td>
+      <td>{{ oferta.descuento }}</td>
+    </tr>
+  </tbody>
+</table>
+<div *ngIf="ofertas.length === 0">No hay ofertas para mostrar.</div>

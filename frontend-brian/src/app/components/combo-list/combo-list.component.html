@@ -1,0 +1,18 @@
+<h2>Lista de Combos</h2>
+<table *ngIf="combos.length > 0">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Descripción</th>
+      <th>Precio</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let combo of combos">
+      <td>{{ combo.nombre }}</td>
+      <td>{{ combo.descripcion }}</td>
+      <td>{{ combo.precioCombo | currency:'USD' }}</td>
+    </tr>
+  </tbody>
+</table>
+<div *ngIf="combos.length === 0">No hay combos para mostrar.</div>

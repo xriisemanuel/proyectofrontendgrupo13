@@ -1,0 +1,43 @@
+<form [formGroup]="ofertaForm" (ngSubmit)="onSubmit()">
+  <div>
+    <label>Nombre:</label>
+    <input formControlName="nombre" required minlength="3" maxlength="100" />
+  </div>
+  <div>
+    <label>Descripción:</label>
+    <input formControlName="descripcion" maxlength="500" />
+  </div>
+  <div>
+    <label>Descuento (%):</label>
+    <input type="number" formControlName="descuento" required min="0" max="100" />
+  </div>
+  <div>
+    <label>Fecha de inicio:</label>
+    <input type="date" formControlName="fechaInicio" required />
+  </div>
+  <div>
+    <label>Fecha de fin:</label>
+    <input type="date" formControlName="fechaFin" required />
+  </div>
+  <div>
+    <label>Productos aplicables:</label>
+    <select formControlName="productosAplicables" multiple>
+      <option *ngFor="let producto of productos" [value]="producto._id">{{ producto.nombre }}</option>
+    </select>
+  </div>
+  <div>
+    <label>Categorías aplicables:</label>
+    <select formControlName="categoriasAplicables" multiple>
+      <option *ngFor="let categoria of categorias" [value]="categoria._id">{{ categoria.nombre }}</option>
+    </select>
+  </div>
+  <div>
+    <label>Estado:</label>
+    <select formControlName="estado">
+      <option [value]="true">Activo</option>
+      <option [value]="false">Inactivo</option>
+    </select>
+  </div>
+  <button type="submit" [disabled]="!ofertaForm.valid">Agregar Oferta</button>
+  <div *ngIf="mensaje">{{ mensaje }}</div>
+</form>
