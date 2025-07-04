@@ -98,10 +98,9 @@ mostrarModal(mensaje: string): void {
     backdrops.forEach(b => b.remove());
   });
 }
-
+volver(): void {
+  const esEdicion = this.route.snapshot.paramMap.get('id');
+  this.router.navigate([esEdicion ? '/productos' : '/productos']);
+}
 
 }
-//if (!this.producto.categoriaId) {
-      //alert('Seleccioná una categoría antes de guardar');
-      //return;
-    //}

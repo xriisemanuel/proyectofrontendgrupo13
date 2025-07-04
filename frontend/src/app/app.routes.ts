@@ -5,15 +5,15 @@ import { FormularioCategoriaComponent } from './components/form-categorias/form-
 import { FormProductoComponent } from './components/form-productos/form-productos.component';
 
 export const routes: Routes = [
-    { path: '', redirectTo: 'categorias', pathMatch: 'full' },
+  { path: '', redirectTo: 'categorias', pathMatch: 'full' },
 
-    // { path: '', redirectTo: 'productos', pathMatch: 'full' },
+  // { path: '', redirectTo: 'productos', pathMatch: 'full' },
   { path: 'productos', component: ProductosComponent },
   { path: 'categorias', component: CategoriasComponent },
   { path: 'categorias/formulario', component: FormularioCategoriaComponent },
-{ path: 'categorias/editar/:id', component: FormularioCategoriaComponent },
-{path: 'productos/formulario',component: FormProductoComponent},
-{ path: 'productos/editar/:id', component: FormProductoComponent }
+  { path: 'categorias/editar/:id', component: FormularioCategoriaComponent },
+  { path: 'productos/formulario', component: FormProductoComponent },
+  { path: 'productos/editar/:id', component: FormProductoComponent }
 
 
 ];

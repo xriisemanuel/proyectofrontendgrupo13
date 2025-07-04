@@ -1,0 +1,45 @@
+/* Contenedor */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-bottom: 2rem;
+}
+
+/* Título y subtítulo */
+h2 {
+  font-weight: 600;
+  color: #212529;
+}
+
+h5 {
+  color: #495057;
+}
+
+/* Card de producto */
+.card {
+  border-radius: 8px;
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Imagen del producto */
+.card-img-top {
+  border-radius: 8px 8px 0 0;
+  object-fit: cover;
+}
+
+/* Badge disponible */
+.badge {
+  font-size: 0.75rem;
+  padding: 6px 10px;
+}
+
+/* Producto inactivo */
+.opacity-50 {
+  filter: grayscale(60%);
+  opacity: 0.6;
+  pointer-events: auto;
+}

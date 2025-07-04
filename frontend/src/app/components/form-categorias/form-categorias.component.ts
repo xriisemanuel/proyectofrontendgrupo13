@@ -70,4 +70,8 @@ mostrarModal(mensaje: string): void {
     this.router.navigate(['/categorias']); // Navegamos a la vista principal
   }, 2000);
 }
+volver(): void {
+  const esEdicion = this.route.snapshot.paramMap.get('id');
+  this.router.navigate([esEdicion ? '/categorias' : '/categorias']);
+}
 }

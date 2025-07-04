@@ -14,6 +14,7 @@ import { FormsModule } from '@angular/forms';
 export class CategoriasComponent implements OnInit {
 
   categorias: any[] = [];
+  categoriaInactivaNombre = '';
 
   constructor(
     private categoriaService: CategoriaService,
@@ -60,5 +61,13 @@ mostrarModal(mensaje: string): void {
   const modal = new (window as any).bootstrap.Modal(document.getElementById('modalExito'));
   modal.show();
 }
+
+mostrarModalInactivo(nombre: string): void {
+   console.log('Modal disparado para:', nombre);
+  this.categoriaInactivaNombre = nombre;
+  const modal = new (window as any).bootstrap.Modal(document.getElementById('modalInactivo'));
+  modal.show();
+}
+
 
 }

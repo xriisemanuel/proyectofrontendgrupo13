@@ -1,5 +1,9 @@
 <div class="container mt-4">
   <h3>{{ modoEdicion ? 'Editar Categoría' : 'Crear Nueva Categoría' }}</h3>
+  <div class="mb-3 text-end">
+  <button class="btn btn-outline-secondary btn-sm" (click)="volver()">← Volver</button>
+</div>
+
 
   <form #form="ngForm" (ngSubmit)="form.valid && guardar()" class="mt-3">
 

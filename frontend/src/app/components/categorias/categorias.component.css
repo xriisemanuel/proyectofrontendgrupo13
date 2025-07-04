@@ -1,0 +1,45 @@
+/* Contenedor general */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-bottom: 2rem;
+}
+
+/* Título principal */
+h2 {
+  font-weight: 600;
+  color: #343a40;
+}
+
+/* Card de categoría */
+.card {
+  border-radius: 8px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: scale(1.02);
+}
+
+/* Imagen */
+.card-img-top {
+  border-radius: 8px 8px 0 0;
+}
+
+/* Botones */
+.btn-sm {
+  font-size: 0.85rem;
+}
+
+/* Texto de estado */
+.badge {
+  font-size: 0.75rem;
+  padding: 5px 8px;
+}
+
+/* Opacidad para categorías inactivas */
+.opacity-50 {
+  filter: grayscale(70%);
+  opacity: 0.7;
+  pointer-events: auto;
+}

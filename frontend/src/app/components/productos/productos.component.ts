@@ -19,13 +19,14 @@ export class ProductosComponent implements OnInit {
   mensajeModal = '';
   categoriaSeleccionadaId: string | null = null;
   categoriaSeleccionadaNombre = '';
+  productoInactivoNombre = '';
 
   constructor(
     private productoService: ProductoService,
     private categoriaService: CategoriaService,
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.categoriaSeleccionadaId = this.route.snapshot.queryParamMap.get('categoriaId');
@@ -59,19 +60,19 @@ export class ProductosComponent implements OnInit {
       });
     });
   }
-verTodos(): void {
-  this.busqueda = '';
-  this.categoriaSeleccionadaId = null;
-  this.categoriaSeleccionadaNombre = '';
-  this.productosFiltrados = [];
+  verTodos(): void {
+    this.busqueda = '';
+    this.categoriaSeleccionadaId = null;
+    this.categoriaSeleccionadaNombre = '';
+    this.productosFiltrados = [];
 
-  // Navega sin query params
-  this.router.navigate(['/productos']);
-}
+    // Navega sin query params
+    this.router.navigate(['/productos']);
+  }
 
-volverACategorias(): void {
-  this.router.navigate(['/categorias']);
-}
+  volverACategorias(): void {
+    this.router.navigate(['/categorias']);
+  }
 
   filtrarProductos(): void {
     const texto = this.busqueda.trim().toLowerCase();
@@ -111,4 +112,11 @@ volverACategorias(): void {
     const modal = new (window as any).bootstrap.Modal(document.getElementById('modalExito'));
     modal.show();
   }
+
+  mostrarModalProductoInactivo(nombre: string): void {
+    this.productoInactivoNombre = nombre;
+    const modal = new (window as any).bootstrap.Modal(document.getElementById('modalProductoInactivo'));
+    modal.show();
+  }
+
 }

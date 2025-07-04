@@ -33,7 +33,11 @@
     <div class="row">
       <div class="col-md-4 mb-4"
            *ngFor="let producto of (categoriaSeleccionadaId || busqueda ? productosFiltrados : productos)">
-        <div class="card h-100 shadow">
+        <div class="card h-100 shadow"
+     [class.opacity-50]="!producto.disponible"
+     (click)="producto.disponible ? editarProducto(producto) : mostrarModalProductoInactivo(producto.nombre)"
+     style="cursor: pointer;">
+
           <!-- Imagen principal (opcionalmente más imágenes debajo) -->
           <img [src]="producto.imagenes[0]" class="card-img-top" alt="{{ producto.nombre }}"
                style="height: 200px; object-fit: cover;">
@@ -82,6 +86,22 @@
         <div class="modal-body">
           <p>{{ mensajeModal }}</p>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para producto inactivo -->
+<div class="modal fade" id="modalProductoInactivo" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Producto inactivo</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p>El producto <strong>{{ productoInactivoNombre }}</strong> no está disponible actualmente.</p>
+        <p>No se puede modificar ni visualizar detalles.</p>
       </div>
     </div>
   </div>
