@@ -1,0 +1,163 @@
+.manage-by-role-container {
+    max-width: 900px;
+    margin: 50px auto;
+    padding: 35px;
+    border-radius: 15px;
+    background-color: #ffffff;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    text-align: center;
+}
+
+h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 2.2em;
+    font-weight: 700;
+}
+
+p {
+    color: #555;
+    margin-bottom: 40px;
+    font-size: 1.1em;
+}
+
+.role-selection-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    /* Espacio entre las tarjetas */
+    margin-bottom: 50px;
+}
+
+.role-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 280px;
+    /* Ancho fijo para las tarjetas */
+    height: 200px;
+    /* Altura fija */
+    background-color: #f8f9fa;
+    /* Fondo claro para las tarjetas */
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    color: #2c3e50;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    border: 2px solid #e9ecef;
+    /* Borde sutil */
+}
+
+.role-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: #007bff;
+    /* Borde azul al pasar el ratón */
+}
+
+.role-card i {
+    font-size: 4em;
+    /* Íconos grandes */
+    margin-bottom: 15px;
+    color: #007bff;
+    /* Color azul por defecto para los íconos */
+}
+
+.role-card h4 {
+    font-size: 1.6em;
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.role-card p {
+    font-size: 1em;
+    color: #666;
+    margin-bottom: 0;
+}
+
+/* Colores específicos para los íconos de las tarjetas */
+.roles-card i {
+    color: #6f42c1;
+    /* Púrpura para roles */
+}
+
+.repartidores-card i {
+    color: #fd7e14;
+    /* Naranja para repartidores */
+}
+
+/* Puedes añadir más estilos para otras tarjetas de rol aquí */
+.clientes-card i {
+    color: #20c997;
+    /* Verde azulado para clientes */
+}
+
+.cocina-card i {
+    color: #dc3545;
+    /* Rojo para cocina */
+}
+
+.ventas-card i {
+    color: #17a2b8;
+    /* Cyan para ventas */
+}
+
+
+.back-link {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.back-link a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.back-link a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+.back-link a i {
+    margin-right: 5px;
+}
+
+/* Media Queries para Responsividad */
+@media (max-width: 768px) {
+    .manage-by-role-container {
+        padding: 20px;
+        margin: 20px auto;
+    }
+
+    .role-selection-cards {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .role-card {
+        width: 90%;
+        /* Ocupa más ancho en pantallas pequeñas */
+        height: auto;
+        padding: 15px;
+    }
+
+    .role-card i {
+        font-size: 3em;
+    }
+
+    .role-card h4 {
+        font-size: 1.4em;
+    }
+
+    .role-card p {
+        font-size: 0.9em;
+    }
+}

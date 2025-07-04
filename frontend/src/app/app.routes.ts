@@ -48,13 +48,18 @@ export const routes: Routes = [
         canActivate: [authGuard, roleGuard],
         data: { roles: ['admin'] }
     },
-
-
-
-    // rutas para el REPARTIDOR
     {
-        path: 'admin/repartidores/add',
-        loadComponent: () => import('./components/admin/add-repartidor/add-repartidor').then(m => m.AddRepartidor),
+        path: 'admin/users/manage-by-role',
+        loadComponent: () => import('./components/admin/manage-users/manage-users').then(m => m.ManageUsers),
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['admin'] }
+    },
+
+
+    // rutas para REPARTIDOR
+    {
+        path: 'admin/users/create',
+        loadComponent: () => import('./components/admin/create-user/create-user').then(m => m.CreateUserWithRoleComponent),
         canActivate: [authGuard, roleGuard],
         data: { roles: ['admin'] }
     },
@@ -62,16 +67,27 @@ export const routes: Routes = [
         path: 'admin/repartidores/manage',
         loadComponent: () => import('./components/admin/manage-repartidores/manage-repartidores').then(m => m.ManageRepartidores),
         canActivate: [authGuard, roleGuard],
-        data: { roles: ['repartidor','admin'] }
+        data: { roles: ['repartidor', 'admin'] }
     },
     // {
     //     path: 'admin/repartidores/update/:id',
-    //     loadComponent: () => import('./components/admin/update-repartidor/update-repartidor').then(m => m.UpdateRepartidor),
+    //     loadComponent: () => import('./components/admin/update-repartidor/update-repartidor').then(m => m.Up),
     //     canActivate: [authGuard, roleGuard],
     //     data: { roles: ['repartidor','admin'] }
     // },
 
-
+    // --- NUEVAS RUTAS PARA CLIENTES ---
+    {
+        path: 'admin/clientes/manage', // Ruta para listar y gestionar clientes
+        loadComponent: () => import('./components/admin/manage-clientes/manage-clientes').then(m => m.ManageClientes),
+        title: 'Gestión de Clientes'
+    },
+    // {
+    //     path: 'clientes/update/:id', // Ruta para actualizar un cliente específico
+    //     loadComponent: () => import('./components/admin/update-cliente/update-cliente.component').then(m => m.UpdateClienteComponent),
+    //     title: 'Actualizar Cliente'
+    // },
+    // --- FIN NUEVAS RUTAS PARA CLIENTES ---
 
     {
         path: 'admin/dashboard',

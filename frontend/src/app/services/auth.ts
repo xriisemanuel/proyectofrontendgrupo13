@@ -1,5 +1,5 @@
-import { Injectable, PLATFORM_ID, Inject } from '@angular/core'; // <--- Importa PLATFORM_ID y Inject
-import { isPlatformBrowser } from '@angular/common'; // <--- Importa isPlatformBrowser
+import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -13,18 +13,15 @@ const AUTH_API = API_BASE_URL + '/auth/';
 export class AuthService {
   private currentUserSubject: BehaviorSubject<any>;
   public currentUser: Observable<any>;
-  private isBrowser: boolean; // <--- Nueva propiedad para saber si estamos en el navegador
+  private isBrowser: boolean;
 
-  // Inyecta PLATFORM_ID en el constructor
   constructor(
     private http: HttpClient,
-    @Inject(PLATFORM_ID) private platformId: Object // <--- Inyección de PLATFORM_ID
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    // Determina si el código se está ejecutando en un navegador
     this.isBrowser = isPlatformBrowser(this.platformId);
 
     let initialUser = null;
-    // Solo intenta acceder a localStorage si estamos en el navegador
     if (this.isBrowser) {
       const storedUser = localStorage.getItem('user');
       initialUser = storedUser ? JSON.parse(storedUser) : null;
@@ -37,8 +34,42 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
-  // Método para el registro de usuarios
-  register(username: string, password: string, email: string, telefono: string, rolName: string, nombre: string, apellido: string): Observable<any> {
+  /**
+   * Registers a new user with their specific role profile.
+   * This method now accepts all potential fields for different roles,
+   * which the backend will handle conditionally.
+   * @param username User's chosen username.
+   * @param password User's password.
+   * @param email User's email.
+   * @param telefono User's phone number (optional).
+   * @param rolName The name of the role (e.g., 'cliente', 'repartidor').
+   * @param nombre User's first name.
+   * @param apellido User's last name.
+   * @param direccionCliente Client's address (optional, for 'cliente' role).
+   * @param fechaNacimientoCliente Client's date of birth (optional, for 'cliente' role).
+   * @param preferenciasAlimentariasCliente Client's dietary preferences (optional, for 'cliente' role).
+   * @param puntosCliente Client's loyalty points (optional, for 'cliente' role).
+   * @param vehiculoRepartidor Delivery person's vehicle (optional, for 'repartidor' role).
+   * @param numeroLicenciaRepartidor Delivery person's license number (optional, for 'repartidor' role).
+   * @returns An Observable with the backend response.
+   */
+  register(
+    username: string,
+    password: string,
+    email: string,
+    telefono: string,
+    rolName: string,
+    nombre: string,
+    apellido: string,
+    // Campos específicos de cliente
+    direccionCliente?: string,
+    fechaNacimientoCliente?: string, // Asumiendo formato de string para input de fecha
+    preferenciasAlimentariasCliente?: string[], // Nuevo campo para preferencias
+    puntosCliente?: number, // Nuevo campo para puntos
+    // Campos específicos de repartidor
+    vehiculoRepartidor?: string,
+    numeroLicenciaRepartidor?: string
+  ): Observable<any> {
     return this.http.post(AUTH_API + 'register', {
       username,
       password,
@@ -46,53 +77,72 @@ export class AuthService {
       telefono,
       rolName,
       nombre,
-      apellido
+      apellido,
+      // Pass all optional fields to the backend; it will handle them based on rolName
+      direccionCliente,
+      fechaNacimientoCliente,
+      preferenciasAlimentariasCliente, // Enviar al backend
+      puntosCliente, // Enviar al backend
+      vehiculoRepartidor,
+      numeroLicenciaRepartidor
     });
   }
 
-  // Método para el inicio de sesión
+  /**
+   * Handles user login.
+   * @param username User's username.
+   * @param password User's password.
+   * @returns An Observable with the login response including token and user data.
+   */
   login(username: string, password: string): Observable<any> {
     return this.http.post<any>(AUTH_API + 'login', { username, password })
       .pipe(map(response => {
-        // Guarda el token y los datos del usuario en localStorage solo si estamos en el navegador
         if (this.isBrowser && response && response.token) {
           localStorage.setItem('user', JSON.stringify(response));
-          this.currentUserSubject.next(response); // Actualiza el BehaviorSubject
+          this.currentUserSubject.next(response);
         }
         return response;
       }));
   }
 
-  // Método para cerrar sesión
+  /**
+   * Logs out the current user.
+   */
   logout() {
-    // Elimina del localStorage solo si estamos en el navegador
     if (this.isBrowser) {
       localStorage.removeItem('user');
     }
-    this.currentUserSubject.next(null); // Limpia el usuario actual
+    this.currentUserSubject.next(null);
   }
 
-  // Método para obtener el token JWT del usuario actual
+  /**
+   * Gets the current user's JWT token.
+   * @returns The JWT token string or null if not authenticated.
+   */
   getToken(): string | null {
-    // Accede a localStorage solo si estamos en el navegador
     if (this.isBrowser) {
       const user = this.currentUserSubject.value;
       return user && user.token ? user.token : null;
     }
-    return null; // Si no estamos en el navegador, no hay token
+    return null;
   }
 
-  // Método para obtener el rol del usuario actual
+  /**
+   * Gets the current user's role.
+   * @returns The role name string or null if not authenticated or role not found.
+   */
   getRole(): string | null {
-    // Accede a localStorage solo si estamos en el navegador
     if (this.isBrowser) {
       const user = this.currentUserSubject.value;
       return user && user.usuario && user.usuario.rol ? user.usuario.rol : null;
     }
-    return null; // Si no estamos en el navegador, no hay rol
+    return null;
   }
 
-  // Método para verificar si el usuario está autenticado
+  /**
+   * Checks if the user is currently authenticated.
+   * @returns True if authenticated, false otherwise.
+   */
   isAuthenticated(): boolean {
     return !!this.getToken();
   }

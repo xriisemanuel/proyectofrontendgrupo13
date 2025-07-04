@@ -2,41 +2,27 @@
   <h2>Bienvenido, Administrador {{ currentUser?.usuario?.username }}!</h2>
   <p>Este es tu panel de control central para gestionar la aplicación.</p>
 
-  <!-- Sección Principal de Gestión de Roles -->
-  <div class="role-management-section">
-    <h3>Gestión de Roles</h3>
-    <div class="role-cards">
-      <a routerLink="/admin/roles/add" class="role-card add-role-card">
-        <i class="fas fa-plus-circle"></i>
-        <h4>Agregar Nuevo Rol</h4>
-        <p>Define nuevos roles y permisos en el sistema.</p>
+  <!-- Sección Principal de Gestión de Usuarios -->
+  <div class="user-management-section">
+    <h3>Gestión de Usuarios</h3>
+    <div class="user-management-cards">
+      <!-- Tarjeta 1: Crear Nuevo Usuario (Formulario Adaptable) -->
+      <a routerLink="/admin/users/create" class="management-card create-user-card">
+        <i class="fas fa-user-plus"></i>
+        <h4>Crear Nuevo Usuario</h4>
+        <p>Registra un nuevo usuario y su perfil de rol asociado (adaptable).</p>
       </a>
-      <a routerLink="/admin/roles/manage" class="role-card manage-role-card">
+
+      <!-- Tarjeta 2: Gestionar Usuarios Creados (Llevará a la vista de selección por rol) -->
+      <a routerLink="/admin/users/manage-by-role" class="management-card manage-users-card">
         <i class="fas fa-users-cog"></i>
-        <h4>Administrar Roles Existentes</h4>
-        <p>Edita o elimina roles, asigna permisos.</p>
+        <h4>Gestionar Usuarios Creados</h4>
+        <p>Visualiza, edita y elimina usuarios existentes por rol.</p>
       </a>
     </div>
   </div>
 
-  <!-- Sección Principal de Gestión de Repartidores -->
-  <div class="role-management-section"> <!-- Reutilizamos la misma clase de sección para consistencia -->
-    <h3>Gestión de Repartidores</h3>
-    <div class="role-cards">
-      <a routerLink="/admin/repartidores/add" class="role-card add-repartidor-card">
-        <i class="fas fa-user-plus"></i> <!-- Ícono para agregar repartidor -->
-        <h4>Agregar Nuevo Repartidor</h4>
-        <p>Registra nuevos perfiles de repartidores.</p>
-      </a>
-      <a routerLink="/admin/repartidores/manage" class="role-card manage-repartidor-card">
-        <i class="fas fa-motorcycle"></i> <!-- Ícono para gestionar repartidores -->
-        <h4>Gestionar Repartidores</h4>
-        <p>Visualiza, edita y elimina repartidores existentes.</p>
-      </a>
-    </div>
-  </div>
-
-  <!-- Sección de Resumen General (Widgets/Tarjetas) -->
+  <!-- Sección de Resumen General (Widgets/Tarjetas) - Se mantiene para una visión rápida -->
   <div class="summary-cards">
     <div class="card">
       <h3>Pedidos Pendientes</h3>
@@ -70,13 +56,11 @@
     </div>
   </div>
 
-  <!-- Sección de Navegación Rápida (Otros enlaces de gestión) -->
+  <!-- Sección de Navegación Rápida (Otros enlaces de gestión) - Se mantiene o se adapta según necesidad -->
   <div class="quick-links">
     <h3>Otras Gestiones</h3>
     <div class="link-group">
-      <a routerLink="/admin/usuarios" class="quick-link-btn">
-        <i class="fas fa-users"></i> Gestión de Usuarios
-      </a>
+      <!-- Aquí puedes mantener enlaces a otras secciones de gestión que no sean de usuario/rol directo -->
       <a routerLink="/admin/productos" class="quick-link-btn">
         <i class="fas fa-box"></i> Gestión de Productos
       </a>
@@ -86,24 +70,25 @@
       <a routerLink="/admin/clientes" class="quick-link-btn">
         <i class="fas fa-user-friends"></i> Gestión de Clientes
       </a>
-      <!-- Los enlaces de Repartidores ya están en la sección principal, podrías eliminarlos de aquí si quieres -->
-      <!-- <a routerLink="/admin/repartidores" class="quick-link-btn">
-        <i class="fas fa-motorcycle"></i> Gestión de Repartidores
-      </a> -->
       <a routerLink="/admin/reportes" class="quick-link-btn">
         <i class="fas fa-chart-line"></i> Reportes
       </a>
       <a routerLink="/admin/configuracion" class="quick-link-btn">
         <i class="fas fa-cogs"></i> Configuración
       </a>
+      <a routerLink="/admin/roles/manage" class="quick-link-btn">
+        <i class="fas fa-users-cog"></i> Gestión de Roles
+      </a>
+      <a routerLink="/admin/repartidores/manage" class="quick-link-btn">
+        <i class="fas fa-motorcycle"></i> Gestión de Repartidores
+      </a>
     </div>
   </div>
 
-  <!-- Sección de Actividad Reciente o Tablas Clave -->
+  <!-- Sección de Actividad Reciente o Tablas Clave - Se mantiene -->
   <div class="recent-activity">
     <h3>Últimos Pedidos</h3>
     <div class="table-placeholder">
-      <!-- Aquí iría una tabla real con los últimos pedidos, filtros y paginación -->
       <p>Tabla de últimos pedidos pendientes o en curso...</p>
       <ul>
         <li>Pedido #1001 - Cliente: Juan Pérez - Estado: En preparación</li>

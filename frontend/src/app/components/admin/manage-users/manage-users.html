@@ -1,0 +1,45 @@
+<div class="manage-by-role-container">
+  <h2>Gestionar Usuarios por Rol</h2>
+  <p>Selecciona un tipo de usuario para ver y administrar sus perfiles.</p>
+
+  <div class="role-selection-cards">
+    <!-- Tarjeta para Gestión de Roles -->
+    <a routerLink="/admin/roles/manage" class="role-card roles-card">
+      <i class="fas fa-users-cog"></i>
+      <h4>Gestión de Roles</h4>
+      <p>Administra los roles definidos en el sistema.</p>
+    </a>
+
+    <!-- Tarjeta para Gestión de Repartidores -->
+    <a routerLink="/admin/repartidores/manage" class="role-card repartidores-card">
+      <i class="fas fa-motorcycle"></i>
+      <h4>Gestión de Repartidores</h4>
+      <p>Visualiza y administra los perfiles de los repartidores.</p>
+    </a>
+
+    <!-- Tarjeta para Gestión de Clientes -->
+    <a routerLink="/admin/clientes/manage" class="role-card clientes-card">
+      <i class="fas fa-user-friends"></i>
+      <h4>Gestión de Clientes</h4>
+      <p>Administra los perfiles de los clientes.</p>
+    </a>
+
+    <!-- Aquí se añadirían más tarjetas para otros roles como Supervisor Cocina, Supervisor Ventas
+         cuando implementemos sus respectivas vistas de gestión. Por ejemplo:
+    <a routerLink="/admin/cocina/manage" class="role-card cocina-card">
+      <i class="fas fa-utensils"></i>
+      <h4>Gestión de Supervisores de Cocina</h4>
+      <p>Administra los perfiles de los supervisores de cocina.</p>
+    </a>
+    <a routerLink="/admin/ventas/manage" class="role-card ventas-card">
+      <i class="fas fa-chart-line"></i>
+      <h4>Gestión de Supervisores de Ventas</h4>
+      <p>Administra los perfiles de los supervisores de ventas.</p>
+    </a>
+    -->
+  </div>
+
+  <div class="back-link">
+    <a routerLink="/admin/dashboard"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+  </div>
+</div>

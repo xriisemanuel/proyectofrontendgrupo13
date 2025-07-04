@@ -1,19 +1,19 @@
-import { Component, OnInit, OnDestroy } from '@angular/core'; // Importa OnDestroy
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { RepartidorService } from '../../../services/repartidor'; // Asegúrate de que la ruta sea correcta
+import { RepartidorService, IRepartidor } from '../../../services/repartidor'; // Importa el servicio y la interfaz IRepartidor
 import { CommonModule } from '@angular/common'; // Necesario para directivas como ngIf, ngFor
-import { Subject } from 'rxjs'; // Importa Subject
-import { takeUntil } from 'rxjs/operators'; // Importa takeUntil
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-manage-repartidores',
-  templateUrl: './manage-repartidores.html', // Asegúrate de que el nombre del archivo sea .component.html
-  styleUrls: ['./manage-repartidores.css'], // Asegúrate de que el nombre del archivo sea .component.css
-  standalone: true, // Indica que es un componente standalone
-  imports: [RouterLink, CommonModule] // Importa RouterLink y CommonModule
+  templateUrl: './manage-repartidores.html',
+  styleUrls: ['./manage-repartidores.css'],
+  standalone: true,
+  imports: [RouterLink, CommonModule]
 })
-export class ManageRepartidores implements OnInit, OnDestroy { // Cambiado a ManageRepartidoresComponent para consistencia
-  repartidores: any[] = [];
+export class ManageRepartidores implements OnInit, OnDestroy {
+  repartidores: IRepartidor[] = []; // Tipado con la interfaz IRepartidor
   errorMessage: string = '';
   successMessage: string = '';
   isLoading: boolean = true; // Para mostrar un spinner mientras se cargan los datos

@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../core/constants'; // Importa la URL base de tu API
 
 // Define la interfaz para un Rol (opcional pero recomendado para tipado)
-interface RoleInterface {
+export interface RoleInterface {
   _id?: string; // El ID es opcional al crear
   nombre: string;
   estado: boolean;
