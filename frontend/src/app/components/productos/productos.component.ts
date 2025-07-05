@@ -22,6 +22,7 @@ export class ProductosComponent implements OnInit {
   categoriaSeleccionadaId: string | null = null;
   categoriaSeleccionadaNombre = '';
   productoInactivoNombre = '';
+  productoAgregadoNombre = '';
   
   constructor(
     private productoService: ProductoService,
@@ -83,19 +84,21 @@ export class ProductosComponent implements OnInit {
   }
 
   filtrarProductos(): void {
-    const texto = this.busqueda.trim().toLowerCase();
+  const texto = this.busqueda.trim().toLowerCase();
 
-    if (!texto) {
-      this.productosFiltrados = [];
-      return;
-    }
+  this.productosFiltrados = this.productos.filter(p => {
+    const coincideTexto = p.nombre?.toLowerCase().includes(texto) ||
+                          p.descripcion?.toLowerCase().includes(texto) ||
+                          p.categoriaNombre?.toLowerCase().includes(texto);
 
-    this.productosFiltrados = this.productos.filter(p =>
-      p.nombre?.toLowerCase().includes(texto) ||
-      p.descripcion?.toLowerCase().includes(texto) ||
-      p.categoriaNombre?.toLowerCase().includes(texto)
-    );
-  }
+    const coincideCategoria = this.categoriaSeleccionadaId
+      ? String(p.categoriaRealId) === this.categoriaSeleccionadaId
+      : true;
+
+    return coincideTexto && coincideCategoria;
+  });
+}
+
 
   irAFormulario(): void {
     this.router.navigate(['productos/formulario']);
@@ -126,5 +129,17 @@ export class ProductosComponent implements OnInit {
     const modal = new (window as any).bootstrap.Modal(document.getElementById('modalProductoInactivo'));
     modal.show();
   }
+
+agregarAlCarrito(producto: any): void {
+    // Lógica provisional: podrías guardar en localStorage o usar un servicio
+  const carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
+  carrito.push(producto);
+  localStorage.setItem('carrito', JSON.stringify(carrito));
+
+  this.productoAgregadoNombre = producto.nombre;
+
+  const modal = new (window as any).bootstrap.Modal(document.getElementById('modalCarrito'));
+  modal.show();
+}
   
 }

@@ -1,7 +1,7 @@
 <div class="container mt-4">
   <h3>{{ modoEdicion ? 'Editar Producto' : 'Crear Nuevo Producto' }}</h3>
   <div class="mb-3 text-end">
-    <button class="btn btn-outline-secondary btn-sm" (click)="volver()">← Volver</button>
+    <button class="btn btn-outline-secondary btn-sm" (click)="volver()"><i class="bi bi-arrow-left-circle"></i> Volver</button>
   </div>
 
   <form #form="ngForm" (ngSubmit)="guardar()" class="mt-3">
