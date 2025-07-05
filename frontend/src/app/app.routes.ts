@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth-guard';
 import { roleGuard } from './guards/role-guard';
 import { AdminDashboard } from './components/admin-dashboard/admin-dashboard';
+import { KitchenDashboard } from './components/kitchen-dashboard/kitchen-dashboard';
 
 export const routes: Routes = [
     {
@@ -133,5 +134,12 @@ export const routes: Routes = [
         data: { roles: ['admin'] }
     },
 
+     // Rutas para el Supervisor de Cocina
+  {
+    path: 'admin/kitchen/dashboard',
+    component: KitchenDashboard,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin', 'supervisor_cocina'] } // Acceso para admin y supervisor_cocina
+  },
     { path: '**', redirectTo: './login' } // Redirige cualquier ruta desconocida al login
 ];
