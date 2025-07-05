@@ -3,11 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface Categoria {
-  _id: string;
+  _id?: string;
   nombre: string;
   descripcion?: string;
-  imagen?: string;
-  estado?: boolean;
 }
 
 @Injectable({

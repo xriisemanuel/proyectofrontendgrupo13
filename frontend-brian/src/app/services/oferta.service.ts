@@ -7,10 +7,11 @@ export interface Oferta {
   nombre: string;
   descripcion?: string;
   descuento: number;
-  fechaInicio: string;
-  fechaFin: string;
-  productosAplicables?: string[];
-  categoriasAplicables?: string[];
+  fechaInicio: Date;
+  fechaFin: Date;
+  productosAplicables: any[];
+  categoriasAplicables: any[];
+  imagen?: string;
   estado?: boolean;
 }
 
@@ -26,7 +27,29 @@ export class OfertaService {
     return this.http.get<Oferta[]>(this.apiUrl);
   }
 
-  addOferta(oferta: Oferta): Observable<Oferta> {
-    return this.http.post<Oferta>(this.apiUrl, oferta);
+  buscarOfertas(termino: string): Observable<Oferta[]> {
+    const url = `${this.apiUrl}?buscar=${encodeURIComponent(termino)}`;
+    console.log('Llamando a la API:', url);
+    return this.http.get<Oferta[]>(url);
   }
-}
+
+  crearOferta(oferta: Oferta): Observable<any> {
+    return this.http.post<any>(this.apiUrl, oferta);
+  }
+
+  editarOferta(id: string, oferta: Oferta): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, oferta);
+  }
+
+  eliminarOferta(id: string): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${id}`);
+  }
+
+  activarOferta(id: string): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/${id}/activar`, {});
+  }
+
+  desactivarOferta(id: string): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/${id}/desactivar`, {});
+  }
+} 

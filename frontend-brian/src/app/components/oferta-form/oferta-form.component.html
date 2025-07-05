@@ -1,43 +1,138 @@
+<h3>Crear Nueva Oferta</h3>
+
 <form [formGroup]="ofertaForm" (ngSubmit)="onSubmit()">
   <div>
-    <label>Nombre:</label>
-    <input formControlName="nombre" required minlength="3" maxlength="100" />
+    <label for="nombre">Nombre *</label>
+    <input 
+      type="text" 
+      id="nombre" 
+      formControlName="nombre"
+      placeholder="Nombre de la oferta"
+    />
+    <div *ngIf="getError('nombre')" class="error">{{ getError('nombre') }}</div>
   </div>
+
   <div>
-    <label>Descripción:</label>
-    <input formControlName="descripcion" maxlength="500" />
+    <label for="descripcion">Descripción</label>
+    <textarea 
+      id="descripcion" 
+      formControlName="descripcion"
+      placeholder="Descripción de la oferta"
+      rows="3"
+    ></textarea>
+    <div *ngIf="getError('descripcion')" class="error">{{ getError('descripcion') }}</div>
   </div>
+
   <div>
-    <label>Descuento (%):</label>
-    <input type="number" formControlName="descuento" required min="0" max="100" />
+    <label for="descuento">Descuento (%) *</label>
+    <input 
+      type="number" 
+      id="descuento" 
+      formControlName="descuento"
+      placeholder="0-100"
+      min="0"
+      max="100"
+    />
+    <div *ngIf="getError('descuento')" class="error">{{ getError('descuento') }}</div>
   </div>
+
   <div>
-    <label>Fecha de inicio:</label>
-    <input type="date" formControlName="fechaInicio" required />
+    <label for="fechaInicio">Fecha de Inicio *</label>
+    <input 
+      type="datetime-local" 
+      id="fechaInicio" 
+      formControlName="fechaInicio"
+    />
+    <div *ngIf="getError('fechaInicio')" class="error">{{ getError('fechaInicio') }}</div>
   </div>
+
   <div>
-    <label>Fecha de fin:</label>
-    <input type="date" formControlName="fechaFin" required />
+    <label for="fechaFin">Fecha de Fin *</label>
+    <input 
+      type="datetime-local" 
+      id="fechaFin" 
+      formControlName="fechaFin"
+    />
+    <div *ngIf="getError('fechaFin')" class="error">{{ getError('fechaFin') }}</div>
   </div>
+
   <div>
-    <label>Productos aplicables:</label>
-    <select formControlName="productosAplicables" multiple>
-      <option *ngFor="let producto of productos" [value]="producto._id">{{ producto.nombre }}</option>
-    </select>
+    <label for="imagen">URL de Imagen</label>
+    <input 
+      type="url" 
+      id="imagen" 
+      formControlName="imagen"
+      placeholder="https://ejemplo.com/imagen.jpg"
+    />
   </div>
+
   <div>
-    <label>Categorías aplicables:</label>
-    <select formControlName="categoriasAplicables" multiple>
-      <option *ngFor="let categoria of categorias" [value]="categoria._id">{{ categoria.nombre }}</option>
-    </select>
+    <label for="estado">Estado</label>
+    <input 
+      type="checkbox" 
+      id="estado" 
+      formControlName="estado"
+    />
+    <span>Activa</span>
   </div>
+
   <div>
-    <label>Estado:</label>
-    <select formControlName="estado">
-      <option [value]="true">Activo</option>
-      <option [value]="false">Inactivo</option>
-    </select>
+    <label>Productos Aplicables</label>
+    <div *ngIf="productos.length > 0" class="seleccion-multiple">
+      <div *ngFor="let producto of productos" class="item-seleccionable">
+        <input 
+          type="checkbox" 
+          [id]="'producto-' + producto._id"
+          [checked]="isProductoSeleccionado(producto._id)"
+          (change)="toggleProducto(producto._id)"
+        />
+        <label [for]="'producto-' + producto._id">
+          {{ producto.nombre }} - ${{ producto.precio }}
+        </label>
+      </div>
+    </div>
+    <div *ngIf="productos.length === 0">
+      <p>Cargando productos...</p>
+    </div>
+    <div *ngIf="productosSeleccionados.length > 0">
+      <small>Seleccionados: {{ productosSeleccionados.length }} producto(s)</small>
+    </div>
   </div>
-  <button type="submit" [disabled]="!ofertaForm.valid">Agregar Oferta</button>
-  <div *ngIf="mensaje">{{ mensaje }}</div>
+
+  <div>
+    <label>Categorías Aplicables</label>
+    <div *ngIf="categorias.length > 0" class="seleccion-multiple">
+      <div *ngFor="let categoria of categorias" class="item-seleccionable">
+        <input 
+          type="checkbox" 
+          [id]="'categoria-' + categoria._id"
+          [checked]="isCategoriaSeleccionada(categoria._id)"
+          (change)="toggleCategoria(categoria._id || '')"
+        />
+        <label [for]="'categoria-' + categoria._id">
+          {{ categoria.nombre }}
+        </label>
+      </div>
+    </div>
+    <div *ngIf="categorias.length === 0">
+      <p>Cargando categorías...</p>
+    </div>
+    <div *ngIf="categoriasSeleccionadas.length > 0">
+      <small>Seleccionadas: {{ categoriasSeleccionadas.length }} categoría(s)</small>
+    </div>
+  </div>
+
+  <button type="submit" [disabled]="ofertaForm.invalid">Crear Oferta</button>
 </form>
+
+<div *ngIf="mensaje" class="mensaje-exito">{{ mensaje }}</div>
+<div *ngIf="error" class="mensaje-error">{{ error }}</div>
+
+<div>
+  <h4>Debug - Estado del Formulario:</h4>
+  <pre>{{ ofertaForm.value | json }}</pre>
+  <pre>Válido: {{ ofertaForm.valid }}</pre>
+  <pre>Errores: {{ ofertaForm.errors | json }}</pre>
+  <pre>Productos seleccionados: {{ productosSeleccionados | json }}</pre>
+  <pre>Categorías seleccionadas: {{ categoriasSeleccionadas | json }}</pre>
+</div> 

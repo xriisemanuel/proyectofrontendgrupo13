@@ -1,18 +1,282 @@
 <h2>Lista de Combos</h2>
-<table *ngIf="combos.length > 0">
+
+<!-- Campo de búsqueda -->
+<div class="busqueda-container">
+  <input 
+    type="text" 
+    [(ngModel)]="terminoBusqueda" 
+    (input)="filtrarCombos()"
+    placeholder="Buscar combos por nombre, descripción o productos..."
+    class="campo-busqueda"
+  />
+  <button (click)="limpiarBusqueda()" class="btn-limpiar">Limpiar</button>
+</div>
+
+<table *ngIf="combosFiltrados.length > 0">
   <thead>
     <tr>
       <th>Nombre</th>
       <th>Descripción</th>
+      <th>Productos</th>
       <th>Precio</th>
+      <th>Descuento</th>
+      <th>Imagen</th>
+      <th>Estado</th>
+      <th>Acciones</th>
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let combo of combos">
+    <tr *ngFor="let combo of combosFiltrados">
       <td>{{ combo.nombre }}</td>
       <td>{{ combo.descripcion }}</td>
+      <td>{{ obtenerNombresProductos(combo.productosIds) }}</td>
       <td>{{ combo.precioCombo | currency:'USD' }}</td>
+      <td>{{ combo.descuento }}%</td>
+      <td>
+        <img 
+          *ngIf="combo.imagen && esUrlValida(combo.imagen)" 
+          [src]="combo.imagen" 
+          [alt]="combo.nombre"
+          class="imagen-combo"
+          (error)="onErrorImagen($event)"
+          (load)="onLoadImagen($event)"
+        />
+        <span *ngIf="!combo.imagen || !esUrlValida(combo.imagen)" class="sin-imagen">
+          {{ !combo.imagen ? 'Sin imagen' : 'URL inválida' }}
+        </span>
+      </td>
+      <td>
+        <span [class]="combo.estado ? 'activo' : 'inactivo'">
+          {{ combo.estado ? 'Activo' : 'Inactivo' }}
+        </span>
+      </td>
+      <td>
+        <button (click)="obtenerCombo(combo._id!)">Ver</button>
+        <button (click)="editarCombo(combo._id!)">Editar</button>
+        <button (click)="eliminarCombo(combo._id!)">Eliminar</button>
+        <button *ngIf="!combo.estado" (click)="activarCombo(combo._id!)">Activar</button>
+        <button *ngIf="combo.estado" (click)="desactivarCombo(combo._id!)">Desactivar</button>
+      </td>
     </tr>
   </tbody>
 </table>
-<div *ngIf="combos.length === 0">No hay combos para mostrar.</div>
+<div *ngIf="combosFiltrados.length === 0">No hay combos para mostrar.</div>
+
+<!-- Modal de edición de combo -->
+<div *ngIf="mostrarModal" class="modal-overlay">
+  <div class="modal-content">
+    <h3>Editar Combo</h3>
+    <form [formGroup]="comboForm" (ngSubmit)="guardarEdicion()">
+      <div>
+        <label>Nombre:</label>
+        <input formControlName="nombre" required minlength="3" maxlength="100" />
+      </div>
+      <div>
+        <label>Descripción:</label>
+        <input formControlName="descripcion" maxlength="500" />
+      </div>
+      <div>
+        <label>Productos (selecciona múltiples):</label>
+        <select formControlName="productosIds" multiple required size="6" style="width: 100%; min-height: 120px;">
+          <option *ngFor="let producto of productos" [value]="producto._id">{{ producto.nombre }} - ${{ producto.precio }}</option>
+        </select>
+        <small>Mantén presionado Ctrl (Cmd en Mac) para seleccionar múltiples productos</small>
+      </div>
+      <div>
+        <label>Precio Combo:</label>
+        <input type="number" formControlName="precioCombo" required min="0" />
+      </div>
+      <div>
+        <label>Descuento (%):</label>
+        <input type="number" formControlName="descuento" min="0" max="100" />
+      </div>
+      <div>
+        <label>Imagen (URL):</label>
+        <input formControlName="imagen" />
+      </div>
+      <div>
+        <label>Estado:</label>
+        <select formControlName="estado">
+          <option [value]="true">Activo</option>
+          <option [value]="false">Inactivo</option>
+        </select>
+      </div>
+      <button type="submit" [disabled]="!comboForm.valid">Guardar Cambios</button>
+      <button type="button" (click)="cerrarModal()">Cancelar</button>
+      <div *ngIf="mensaje">{{ mensaje }}</div>
+    </form>
+  </div>
+</div>
+
+<!-- Opcional: estilos básicos para el modal -->
+<style>
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .modal-content {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    min-width: 300px;
+    max-width: 90vw;
+  }
+  
+  .activo {
+    color: green;
+    font-weight: bold;
+  }
+  
+  .inactivo {
+    color: red;
+    font-weight: bold;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+  
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+  
+  button {
+    margin: 2px;
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    opacity: 0.8;
+  }
+  
+  select[multiple] {
+    border: 2px solid #007bff;
+    border-radius: 4px;
+    padding: 8px;
+    background-color: #f8f9fa;
+  }
+  
+  select[multiple] option {
+    padding: 4px 8px;
+    margin: 2px 0;
+    border-radius: 2px;
+  }
+  
+  select[multiple] option:checked {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  select[multiple] option:hover {
+    background-color: #e9ecef;
+  }
+  
+  small {
+    color: #6c757d;
+    font-size: 0.875em;
+    display: block;
+    margin-top: 4px;
+  }
+  
+  .busqueda-container {
+    margin: 20px 0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .campo-busqueda {
+    flex: 1;
+    padding: 10px 15px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  
+  .campo-busqueda:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  }
+  
+  .btn-limpiar {
+    padding: 10px 20px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+  }
+  
+  .btn-limpiar:hover {
+    background-color: #5a6268;
+  }
+  
+  .imagen-combo {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #ddd;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  
+  .imagen-combo:hover {
+    transform: scale(1.1);
+    border-color: #007bff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+  
+  .sin-imagen {
+    color: #6c757d;
+    font-style: italic;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    background-color: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+  }
+  
+  .error-imagen {
+    color: #dc3545;
+    font-size: 0.8em;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    background-color: #f8d7da;
+    border: 2px dashed #dc3545;
+    border-radius: 8px;
+  }
+  
+  /* Ajustar el ancho de la columna de imagen */
+  th:nth-child(6), td:nth-child(6) {
+    width: 100px;
+    text-align: center;
+  }
+</style>

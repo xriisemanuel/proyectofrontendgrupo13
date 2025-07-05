@@ -16,6 +16,7 @@ export interface Combo {
 @Injectable({
   providedIn: 'root'
 })
+
 export class ComboService {
   private apiUrl = 'http://localhost:3000/api/combos';
 
@@ -27,5 +28,25 @@ export class ComboService {
 
   addCombo(combo: Combo): Observable<Combo> {
     return this.http.post<Combo>(this.apiUrl, combo);
+  }
+
+  getComboById(id: string): Observable<Combo> {
+    return this.http.get<Combo>(`${this.apiUrl}/${id}`);
+  }
+
+  updateCombo(id: string, combo: Combo): Observable<Combo> {
+    return this.http.put<Combo>(`${this.apiUrl}/${id}`, combo);
+  }
+
+  deleteCombo(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
+  }
+
+  activarCombo(id: string): Observable<Combo> {
+    return this.http.patch<Combo>(`${this.apiUrl}/${id}/activar`, {});
+  }
+
+  desactivarCombo(id: string): Observable<Combo> {
+    return this.http.patch<Combo>(`${this.apiUrl}/${id}/desactivar`, {});
   }
 }

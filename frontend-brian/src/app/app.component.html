@@ -1,16 +1,18 @@
 <ng-container *ngIf="authService.isLoggedIn(); else login">
   <h1>Gestión de Combos y Ofertas</h1>
-  <section>
+    <section>
     <h2>Agregar Combo</h2>
     <app-combo-form></app-combo-form>
     <app-combo-list></app-combo-list>
   </section>
   <hr />
   <section>
-    <h2>Agregar Oferta</h2>
+    <h2>Ofertas</h2>
     <app-oferta-form></app-oferta-form>
     <app-oferta-list></app-oferta-list>
   </section>
+  <hr />
+ 
   <button (click)="logout()">Cerrar sesión</button>
 </ng-container>
 <ng-template #login>
