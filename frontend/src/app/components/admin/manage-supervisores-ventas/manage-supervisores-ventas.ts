@@ -47,7 +47,7 @@ export class ManageSupervisoresVentasComponent implements OnInit, OnDestroy {
       next: (data) => {
         // Filtra los usuarios para mostrar solo aquellos con el rol 'supervisor_ventas'
         this.supervisoresVentas = data.filter(usuario =>
-          usuario.rolId && usuario.rolId.nombre === 'supervisor_ventas'
+          usuario.rolId && usuario.rolId.nombre === 'supervisor_venta'
         );
         this.isLoading = false;
         console.log('Supervisores de Ventas cargados:', this.supervisoresVentas);

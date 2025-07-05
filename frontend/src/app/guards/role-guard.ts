@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { AuthService } from '../services/auth'; // Importa tu servicio de autenticación
+import { AuthService } from '../services/auth'; // Ruta corregida
 
 @Injectable({
   providedIn: 'root'
 })
-export class roleGuard implements CanActivate {
+export class roleGuard implements CanActivate { // Mantengo el nombre de clase como 'roleGuard'
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) { }
 
   canActivate(
     route: ActivatedRouteSnapshot,
@@ -32,8 +32,32 @@ export class roleGuard implements CanActivate {
     } else {
       // Si el rol no está permitido, redirige a una página de acceso denegado o al dashboard principal
       console.warn(`Acceso denegado: Usuario con rol '${userRole}' intentó acceder a ruta protegida con roles: ${expectedRoles.join(', ')}`);
-      // Redirige a un dashboard genérico o a una página de error 403
-      this.router.navigate(['/dashboard']); // Puedes cambiar esto a una ruta de "Acceso Denegado"
+      // Redirige a un dashboard genérico si está logueado, o al login si no
+      if (this.authService.isAuthenticated()) {
+        const currentUserRole = this.authService.getRole();
+        switch (currentUserRole) {
+          case 'admin':
+            this.router.navigate(['/admin/dashboard']);
+            break;
+          case 'cliente':
+            this.router.navigate(['/cliente/dashboard']);
+            break;
+          case 'repartidor':
+            this.router.navigate(['/repartidor/dashboard']);
+            break;
+          case 'supervisor_cocina':
+            this.router.navigate(['/cocina/dashboard']);
+            break;
+          case 'supervisor_ventas':
+            this.router.navigate(['/ventas/dashboard']);
+            break;
+          default:
+            this.router.navigate(['/dashboard']); // Dashboard genérico
+            break;
+        }
+      } else {
+        this.router.navigate(['/login']); // Si no está autenticado, al login
+      }
       return false; // Deniega el acceso
     }
   }
