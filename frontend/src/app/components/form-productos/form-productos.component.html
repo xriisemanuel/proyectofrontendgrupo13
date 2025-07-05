@@ -19,6 +19,13 @@
         Sugerir imagen desde Unsplash
       </button>
     </div>
+    <!-- Botón para generar ingredientes -->
+    <div class="mb-3">
+      <button type="button" class="btn btn-outline-success btn-sm" (click)="generarReceta(producto.nombre)">
+        Generar ingredientes desde TheMealDB 🍳
+      </button>
+    </div>
+
 
     <!-- Sugerencia imagen Unplash -->
     <div *ngIf="imagenSugerida" class="mb-3">
@@ -30,11 +37,37 @@
       </button>
     </div>
 
+    <!-- Ingredientes sugeridos como lista -->
+    <ul *ngIf="ingredientesSugeridos.length > 0" class="list-group mb-3">
+      <li *ngFor="let ing of ingredientesSugeridos" class="list-group-item">{{ ing }}</li>
+    </ul>
+
+
+    <!-- Botón para usar la receta como descripción -->
+    <button type="button" class="btn btn-outline-primary btn-sm" *ngIf="recetaSugerida"
+      (click)="usarRecetaComoDescripcion()">
+      Usar receta como descripción ✍️
+    </button>
+
     <!-- Descripción -->
     <div class="mb-3">
       <label class="form-label">Descripción</label>
       <textarea [(ngModel)]="producto.descripcion" name="descripcion" maxlength="500" class="form-control"></textarea>
+      <p class="text-success" *ngIf="producto.descripcion?.length > 0">
+        ✅ Descripción generada automáticamente. Podés editarla si querés.
+      </p>
     </div>
+    <button type="button" class="btn btn-outline-danger btn-sm mt-2" *ngIf="producto.descripcion?.length > 0"
+      (click)="limpiarDescripcion()">
+      ❌ Descartar descripción sugerida
+    </button>
+
+
+
+    <!-- Si no se encuentra receta -->
+    <p *ngIf="recetaSugerida === null" class="text-muted">
+      No se encontró una receta sugerida.
+    </p>
 
     <!-- Precio -->
     <div class="mb-3">

@@ -5,6 +5,8 @@ import { UnplashService } from '../../services/unplash.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { OpenfoodService } from '../../services/openfood.service';
+
 
 @Component({
   selector: 'app-form-productos',
@@ -29,13 +31,16 @@ export class FormProductoComponent implements OnInit {
   productoId = '';
   mensajeModal = '';
   imagenSugerida = '';
+  recetaSugerida: any = null;
+ingredientesSugeridos: string[] = [];
 
   constructor(
     private productoService: ProductoService,
     private categoriaService: CategoriaService,
     private unsplashService: UnplashService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private openFoodService: OpenfoodService
   ) { }
 
   ngOnInit(): void {
@@ -100,9 +105,6 @@ agregarImagenSugerida(): void {
   }
 }
 
-
-
-
 mostrarModal(mensaje: string): void {
   this.mensajeModal = mensaje;
   const modalEl = document.getElementById('modalExito');
@@ -124,5 +126,67 @@ volver(): void {
   const esEdicion = this.route.snapshot.paramMap.get('id');
   this.router.navigate([esEdicion ? '/productos' : '/productos']);
 }
+
+//API DESCRIPCION
+generarReceta(nombreOriginal: string): void {
+  const nombreTraducido = this.traducirNombre(nombreOriginal);
+
+  this.openFoodService.buscarReceta(nombreTraducido).subscribe(res => {
+    const receta = res.meals ? res.meals[0] : null;
+    this.recetaSugerida = receta;
+    this.ingredientesSugeridos = [];
+
+    if (receta) {
+      for (let i = 1; i <= 20; i++) {
+        const ing = receta['strIngredient' + i];
+        const med = receta['strMeasure' + i];
+        if (ing && ing.trim()) {
+          this.ingredientesSugeridos.push(`${ing.trim()} ${med ? '- ' + med.trim() : ''}`);
+        }
+      }
+    }
+  });
+}
+
+traducirNombre(nombre: string): string {
+  const traducciones: Record<string, string> = {
+    'milanesa': 'breaded cutlet',
+    'tarta': 'pie',
+    'ensalada': 'salad',
+    'empanada': 'turnover',
+    'tortilla': 'omelette'
+  };
+
+  return traducciones[nombre.toLowerCase()] || nombre;
+}
+
+
+usarRecetaComoDescripcion(): void {
+  // Validación previa
+  if (!this.recetaSugerida?.strMeal || !this.ingredientesSugeridos.length) return;
+
+  // Resetea la descripción por si el botón se presionó varias veces
+  this.producto.descripcion = '';
+
+  let descripcion = `Receta sugerida: ${this.recetaSugerida.strMeal}\n`;
+  descripcion += `Categoría: ${this.recetaSugerida.strCategory}\n`;
+  descripcion += `Origen: ${this.recetaSugerida.strArea}\n\n`;
+
+  descripcion += 'Ingredientes:\n';
+  this.ingredientesSugeridos.forEach(ing => {
+    descripcion += `- ${ing}\n`;
+  });
+
+  if (this.recetaSugerida.strInstructions) {
+    descripcion += `\nInstrucciones:\n${this.recetaSugerida.strInstructions}`;
+  }
+
+  this.producto.descripcion = descripcion;
+}
+
+limpiarDescripcion(): void {
+  this.producto.descripcion = '';
+}
+
 
 }

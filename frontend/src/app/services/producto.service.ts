@@ -8,7 +8,10 @@ import { Observable } from 'rxjs';
 export class ProductoService {
   private apiURL = 'http://localhost:3000/api/productos';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, 
+  ) {}
+
+  infoNutricional: any = null;
 
   getProductos(): Observable<any[]> {
     return this.http.get<any[]>(this.apiURL);
@@ -32,5 +35,6 @@ actualizarProducto(id: string, data: any): Observable<any> {
 eliminarProducto(id: string): Observable<any> {
   return this.http.delete<any>(`${this.apiURL}/${id}`);
 }
+
 }
 

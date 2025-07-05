@@ -2,10 +2,10 @@
   <h2>Productos disponibles - SUBTE</h2>
 
   <div class="mb-3">
-  <button class="btn btn-outline-primary btn-sm" (click)="volverACategorias()">
-    ← Volver a categorías
-  </button>
-</div>
+    <button class="btn btn-outline-primary btn-sm" (click)="volverACategorias()">
+      ← Volver a categorías
+    </button>
+  </div>
 
 
   <div *ngIf="categoriaSeleccionadaNombre" class="mb-3">
@@ -20,27 +20,23 @@
 
   <!-- Buscador reactivo -->
   <div class="input-group mb-4">
-    <input type="text"
-           [(ngModel)]="busqueda"
-           (ngModelChange)="filtrarProductos()"
-           placeholder="Buscar producto..."
-           class="form-control">
+    <input type="text" [(ngModel)]="busqueda" (ngModelChange)="filtrarProductos()" placeholder="Buscar producto..."
+      class="form-control">
     <span class="input-group-text"><i class="bi bi-search"></i></span>
   </div>
 
   <!-- Resultado filtrado o completo -->
- <div *ngIf="(categoriaSeleccionadaId || busqueda) ? productosFiltrados.length > 0 : productos.length > 0; else sinProductos">
+  <div
+    *ngIf="(categoriaSeleccionadaId || busqueda) ? productosFiltrados.length > 0 : productos.length > 0; else sinProductos">
     <div class="row">
       <div class="col-md-4 mb-4"
-           *ngFor="let producto of (categoriaSeleccionadaId || busqueda ? productosFiltrados : productos)">
-        <div class="card h-100 shadow"
-     [class.opacity-50]="!producto.disponible"
-     (click)="producto.disponible ? editarProducto(producto) : mostrarModalProductoInactivo(producto.nombre)"
-     style="cursor: pointer;">
-
+        *ngFor="let producto of (categoriaSeleccionadaId || busqueda ? productosFiltrados : productos)">
+        <div class="card h-100 shadow" [class.opacity-50]="!producto.disponible"
+          (click)="producto.disponible ? editarProducto(producto) : mostrarModalProductoInactivo(producto.nombre)"
+          style="cursor: pointer;">
           <!-- Imagen principal (opcionalmente más imágenes debajo) -->
           <img [src]="producto.imagenes[0]" class="card-img-top" alt="{{ producto.nombre }}"
-               style="height: 200px; object-fit: cover;">
+            style="height: 200px; object-fit: cover;">
 
           <div class="card-body d-flex flex-column">
             <h5 class="card-title">{{ producto.nombre }}</h5>
@@ -48,7 +44,7 @@
             <p><strong>Precio:</strong> ${{ producto.precio }}</p>
             <p><strong>Stock:</strong> {{ producto.stock }}</p>
             <p><strong>Popularidad:</strong> {{ producto.popularidad }}</p>
-           <p><strong>Categoría:</strong> {{ producto.categoriaId?.nombre }}</p>
+            <p><strong>Categoría:</strong> {{ producto.categoriaId?.nombre }}</p>
             <p>
               <strong>Disponible:</strong>
               <span class="badge" [ngClass]="producto.disponible ? 'bg-success' : 'bg-danger'">
@@ -68,12 +64,12 @@
 
   <!-- Sin productos -->
   <ng-template #sinProductos>
-  <p class="text-muted">
-    {{ categoriaSeleccionadaNombre
+    <p class="text-muted">
+      {{ categoriaSeleccionadaNombre
       ? 'No hay productos relacionados a esta categoría aún.'
       : 'No se encontraron productos disponibles.' }}
-  </p>
-</ng-template>
+    </p>
+  </ng-template>
 
   <!-- Modal de éxito -->
   <div class="modal fade" id="modalExito" tabindex="-1">

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { CategoriaService } from '../../services/categoria.service';
 import { ActivatedRoute, Router } from '@angular/router';
 
+
 @Component({
   selector: 'app-productos',
   standalone: true,
@@ -12,6 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   templateUrl: './productos.component.html',
   styleUrl: './productos.component.css'
 })
+
 export class ProductosComponent implements OnInit {
   busqueda = '';
   productos: any[] = [];
@@ -20,12 +22,12 @@ export class ProductosComponent implements OnInit {
   categoriaSeleccionadaId: string | null = null;
   categoriaSeleccionadaNombre = '';
   productoInactivoNombre = '';
-
+  
   constructor(
     private productoService: ProductoService,
     private categoriaService: CategoriaService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {
@@ -59,6 +61,12 @@ export class ProductosComponent implements OnInit {
         }
       });
     });
+
+    document.addEventListener('hidden.bs.modal', () => {
+    const active = document.activeElement as HTMLElement;
+    if (active) active.blur();
+  });
+
   }
   verTodos(): void {
     this.busqueda = '';
@@ -118,5 +126,5 @@ export class ProductosComponent implements OnInit {
     const modal = new (window as any).bootstrap.Modal(document.getElementById('modalProductoInactivo'));
     modal.show();
   }
-
+  
 }
