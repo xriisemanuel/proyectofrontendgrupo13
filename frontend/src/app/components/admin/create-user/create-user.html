@@ -7,6 +7,14 @@
     </div>
 
     <form *ngIf="!isLoading" [formGroup]="userForm" (ngSubmit)="onSubmit()">
+        <!-- Mensajes de éxito y error -->
+        <div *ngIf="successMessage" class="success-message">
+            {{ successMessage }}
+        </div>
+        <div *ngIf="errorMessage" class="error-message">
+            {{ errorMessage }}
+        </div>
+
         <!-- Selección de Rol -->
         <div class="form-group">
             <label for="rolName">Rol del Usuario:</label>
@@ -25,11 +33,9 @@
             <div class="form-group">
                 <label for="username">Nombre de Usuario:</label>
                 <input type="text" id="username" formControlName="username" placeholder="Ej: jdoe" required>
-                <div *ngIf="userForm.get('username')?.invalid && userForm.get('username')?.touched"
-                    class="validation-error">
-                    <span *ngIf="userForm.get('username')?.errors?.['required']">El nombre de usuario es
-                        obligatorio.</span>
-                    <span *ngIf="userForm.get('username')?.errors?.['minlength']">Mínimo 3 caracteres.</span>
+                <div *ngIf="f['username'].invalid && f['username'].touched" class="validation-error">
+                    <span *ngIf="f['username'].errors?.['required']">El nombre de usuario es obligatorio.</span>
+                    <span *ngIf="f['username'].errors?.['minlength']">Mínimo 3 caracteres.</span>
                 </div>
             </div>
 
@@ -37,27 +43,25 @@
                 <label for="password">Contraseña:</label>
                 <input type="password" id="password" formControlName="password" placeholder="Mínimo 6 caracteres"
                     required>
-                <div *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched"
-                    class="validation-error">
-                    <span *ngIf="userForm.get('password')?.errors?.['required']">La contraseña es obligatoria.</span>
-                    <span *ngIf="userForm.get('password')?.errors?.['minlength']">Mínimo 6 caracteres.</span>
+                <div *ngIf="f['password'].invalid && f['password'].touched" class="validation-error">
+                    <span *ngIf="f['password'].errors?.['required']">La contraseña es obligatoria.</span>
+                    <span *ngIf="f['password'].errors?.['minlength']">Mínimo 6 caracteres.</span>
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="email">Email:</label>
                 <input type="email" id="email" formControlName="email" placeholder="Ej: usuario@example.com" required>
-                <div *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched" class="validation-error">
-                    <span *ngIf="userForm.get('email')?.errors?.['required']">El email es obligatorio.</span>
-                    <span *ngIf="userForm.get('email')?.errors?.['email']">Formato de email inválido.</span>
+                <div *ngIf="f['email'].invalid && f['email'].touched" class="validation-error">
+                    <span *ngIf="f['email'].errors?.['required']">El email es obligatorio.</span>
+                    <span *ngIf="f['email'].errors?.['email']">Formato de email inválido.</span>
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="nombre">Nombre:</label>
                 <input type="text" id="nombre" formControlName="nombre" placeholder="Ej: Juan" required>
-                <div *ngIf="userForm.get('nombre')?.invalid && userForm.get('nombre')?.touched"
-                    class="validation-error">
+                <div *ngIf="f['nombre'].invalid && f['nombre'].touched" class="validation-error">
                     El nombre es obligatorio.
                 </div>
             </div>
@@ -65,8 +69,7 @@
             <div class="form-group">
                 <label for="apellido">Apellido:</label>
                 <input type="text" id="apellido" formControlName="apellido" placeholder="Ej: Pérez" required>
-                <div *ngIf="userForm.get('apellido')?.invalid && userForm.get('apellido')?.touched"
-                    class="validation-error">
+                <div *ngIf="f['apellido'].invalid && f['apellido'].touched" class="validation-error">
                     El apellido es obligatorio.
                 </div>
             </div>
@@ -74,6 +77,9 @@
             <div class="form-group">
                 <label for="telefono">Teléfono:</label>
                 <input type="tel" id="telefono" formControlName="telefono" placeholder="Ej: +5491123456789">
+                <div *ngIf="f['telefono'].invalid && f['telefono'].touched" class="validation-error">
+                    El teléfono es requerido y debe tener un formato válido (ej. +54911...).
+                </div>
             </div>
         </div>
 
@@ -88,7 +94,7 @@
                         <label for="direccionCliente">Dirección:</label>
                         <input type="text" id="direccionCliente" formControlName="direccionCliente"
                             placeholder="Ej: Av. Principal 123">
-                        <div *ngIf="userForm.get('direccionCliente')?.invalid && userForm.get('direccionCliente')?.touched"
+                        <div *ngIf="f['direccionCliente'].invalid && f['direccionCliente'].touched"
                             class="validation-error">
                             La dirección es obligatoria para clientes.
                         </div>
@@ -115,7 +121,7 @@
                         <label for="vehiculoRepartidor">Vehículo:</label>
                         <input type="text" id="vehiculoRepartidor" formControlName="vehiculoRepartidor"
                             placeholder="Ej: Moto (Honda CB 125F)">
-                        <div *ngIf="userForm.get('vehiculoRepartidor')?.invalid && userForm.get('vehiculoRepartidor')?.touched"
+                        <div *ngIf="f['vehiculoRepartidor'].invalid && f['vehiculoRepartidor'].touched"
                             class="validation-error">
                             El vehículo es obligatorio para repartidores.
                         </div>
@@ -124,7 +130,7 @@
                         <label for="numeroLicenciaRepartidor">Número de Licencia:</label>
                         <input type="text" id="numeroLicenciaRepartidor" formControlName="numeroLicenciaRepartidor"
                             placeholder="Ej: AR123456789">
-                        <div *ngIf="userForm.get('numeroLicenciaRepartidor')?.invalid && userForm.get('numeroLicenciaRepartidor')?.touched"
+                        <div *ngIf="f['numeroLicenciaRepartidor'].invalid && f['numeroLicenciaRepartidor'].touched"
                             class="validation-error">
                             El número de licencia es obligatorio para repartidores.
                         </div>
@@ -151,6 +157,6 @@
     </form>
 
     <div class="back-link">
-        <a routerLink="/admin/dashboard"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+        <a routerLink="/admin/users/manage-by-role"><i class="fas fa-arrow-left"></i> Volver a Gestión por Rol</a>
     </div>
 </div>

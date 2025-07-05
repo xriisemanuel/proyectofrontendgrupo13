@@ -1,72 +1,74 @@
 <div class="manage-repartidores-container">
-    <h2>Gestionar Repartidores</h2>
-    <p>Administra los perfiles de los repartidores registrados en el sistema.</p>
+  <h2>Gestión de Repartidores</h2>
+  <p>Lista de repartidores registrados en el sistema.</p>
 
-    <div class="action-buttons">
-        <a routerLink="/admin/users/create" class="btn-add-new">
-            <i class="fas fa-user-plus"></i> Agregar Nuevo Repartidor
-        </a>
-    </div>
+  <div class="action-buttons">
+    <!-- El botón para añadir repartidor lleva al formulario de creación adaptable -->
+    <a routerLink="/admin/users/create" class="btn btn-primary">
+      <i class="fas fa-user-plus"></i> Añadir Nuevo Repartidor
+    </a>
+    <button (click)="loadRepartidores()" class="btn btn-secondary">
+      <i class="fas fa-sync-alt"></i> Actualizar Lista
+    </button>
+  </div>
 
-    <div *ngIf="isLoading" class="loading-spinner">
-        Cargando repartidores...
-    </div>
+  <div *ngIf="isLoading" class="loading-spinner">
+    <i class="fas fa-spinner fa-spin"></i> Cargando repartidores...
+  </div>
 
-    <div *ngIf="!isLoading && errorMessage" class="error-message">
-        {{ errorMessage }}
-    </div>
+  <div *ngIf="errorMessage" class="error-message">
+    <i class="fas fa-exclamation-triangle"></i> {{ errorMessage }}
+  </div>
 
-    <div *ngIf="!isLoading && successMessage" class="success-message">
-        {{ successMessage }}
-    </div>
+  <div *ngIf="!isLoading && repartidores.length === 0 && !errorMessage" class="no-data-message">
+    <i class="fas fa-info-circle"></i> No hay repartidores registrados en el sistema.
+  </div>
 
-    <div *ngIf="!isLoading && repartidores.length === 0 && !errorMessage" class="no-data-message">
-        <p>No hay repartidores registrados en el sistema.</p>
-    </div>
+  <div *ngIf="!isLoading && repartidores.length > 0" class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Nombre Completo</th>
+          <th>Email</th>
+          <th>Teléfono</th>
+          <th>Estado Usuario</th>
+          <th>Estado Repartidor</th>
+          <th>Vehículo</th>
+          <th>Licencia</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let repartidor of repartidores">
+          <td>{{ repartidor.username }}</td>
+          <td>{{ repartidor.nombre }} {{ repartidor.apellido }}</td>
+          <td>{{ repartidor.email }}</td>
+          <td>{{ repartidor.telefono || 'N/A' }}</td>
+          <td>
+            <span [class.active-status]="repartidor.estado" [class.inactive-status]="!repartidor.estado">
+              {{ repartidor.estado ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <!-- Accede a las propiedades del perfil de repartidor a través de repartidor.repartidorId -->
+          <td>{{ repartidor.repartidorId?.estado || 'N/A' }}</td>
+          <td>{{ repartidor.repartidorId?.vehiculo || 'N/A' }}</td>
+          <td>{{ repartidor.repartidorId?.numeroLicencia || 'N/A' }}</td>
+          <td class="action-cell">
+            <button (click)="editRepartidor(repartidor._id)" class="btn btn-edit" title="Editar">
+              <i class="fas fa-edit"></i>Editar
+            </button>
+            <button (click)="deleteRepartidor(repartidor._id, repartidor.username)" class="btn btn-delete"
+              title="Eliminar">
+              <i class="fas fa-trash-alt"></i>Eliminar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-    <div *ngIf="!isLoading && repartidores.length > 0" class="repartidores-table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>ID Repartidor</th> <!-- ID del perfil de Repartidor -->
-                    <th>ID Usuario</th> <!-- ID del Usuario asociado -->
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>Teléfono</th>
-                    <th>Email</th>
-                    <th>Estado</th>
-                    <th>Vehículo</th>
-                    <th>Licencia</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let repartidor of repartidores">
-                    <td>{{ repartidor._id }}</td> <!-- ID del perfil de Repartidor -->
-                    <td>{{ repartidor.usuarioId?._id || 'N/A' }}</td> <!-- ID del Usuario asociado -->
-                    <td>{{ repartidor.usuarioId?.nombre || 'N/A' }}</td>
-                    <td>{{ repartidor.usuarioId?.apellido || 'N/A' }}</td>
-                    <td>{{ repartidor.usuarioId?.telefono || 'N/A' }}</td>
-                    <td>{{ repartidor.usuarioId?.email || 'N/A' }}</td>
-                    <td>{{ repartidor.estado | titlecase }}</td>
-                    <td>{{ repartidor.vehiculo || 'N/A' }}</td>
-                    <td>{{ repartidor.numeroLicencia || 'N/A' }}</td>
-                    <td class="actions-cell">
-                        <button (click)="editRepartidor(repartidor._id)" class="btn-action btn-edit"
-                            title="Editar Repartidor">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button (click)="deleteRepartidor(repartidor._id)" class="btn-action btn-delete"
-                            title="Eliminar Repartidor">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <div class="back-link">
-        <a routerLink="/admin/users/manage-by-role"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
-    </div>
+  <div class="back-link">
+    <a routerLink="/admin/users/manage-by-role"><i class="fas fa-arrow-left"></i> Volver a Gestión por Rol</a>
+  </div>
 </div>

@@ -1,14 +1,17 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../../services/auth'; // Para registrar el usuario
-import { Role, RoleInterface } from '../../../services/role'; // Para obtener los roles
 import { CommonModule } from '@angular/common'; // Necesario para directivas como ngIf, ngFor
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import Swal from 'sweetalert2';
+
+// Importa AuthService para el registro y UsuarioService para obtener roles
+import { AuthService } from '../../../services/auth'; // Ruta corregida
+import { UsuarioService, IRol } from '../../../services/usuario'; // Ruta e interfaz corregidas
 
 @Component({
-  selector: 'app-create-user-with-role',
+  selector: 'app-create-user-with-role', // Mantengo el nombre original si ya lo usas en otros lugares
   templateUrl: './create-user.html',
   styleUrls: ['./create-user.css'],
   standalone: true,
@@ -16,7 +19,7 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class CreateUserWithRoleComponent implements OnInit, OnDestroy {
   userForm: FormGroup;
-  roles: RoleInterface[] = []; // Lista de roles disponibles
+  roles: IRol[] = []; // Lista de roles disponibles
   selectedRoleName: string = ''; // El nombre del rol seleccionado actualmente
   errorMessage: string = '';
   successMessage: string = '';
@@ -27,7 +30,7 @@ export class CreateUserWithRoleComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private roleService: Role,
+    private usuarioService: UsuarioService, // Usar UsuarioService para obtener roles
     private router: Router
   ) {
     // Inicializa el formulario con los campos comunes a todos los usuarios
@@ -43,22 +46,22 @@ export class CreateUserWithRoleComponent implements OnInit, OnDestroy {
       // Campos específicos para el rol 'cliente' (inicialmente deshabilitados)
       direccionCliente: [{ value: '', disabled: true }],
       fechaNacimientoCliente: [{ value: '', disabled: true }],
-      preferenciasAlimentariasCliente: [{ value: '', disabled: true }], // Nuevo campo
-      puntosCliente: [{ value: 0, disabled: true }], // Nuevo campo
+      preferenciasAlimentariasCliente: [{ value: '', disabled: true }],
+      puntosCliente: [{ value: 0, disabled: true }],
 
       // Campos específicos para el rol 'repartidor' (inicialmente deshabilitados)
       vehiculoRepartidor: [{ value: '', disabled: true }],
       numeroLicenciaRepartidor: [{ value: '', disabled: true }]
     });
-  }
-
-  ngOnInit(): void {
-    this.loadRoles(); // Carga los roles al inicializar el componente
 
     // Suscribirse a los cambios del campo 'rolName' para adaptar el formulario
     this.userForm.get('rolName')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(roleName => {
       this.onRoleChange(roleName);
     });
+  }
+
+  ngOnInit(): void {
+    this.loadRoles(); // Carga los roles al inicializar el componente
   }
 
   ngOnDestroy(): void {
@@ -70,8 +73,9 @@ export class CreateUserWithRoleComponent implements OnInit, OnDestroy {
    * Carga los roles disponibles desde el backend.
    */
   loadRoles(): void {
-    this.roleService.getRoles().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (data) => {
+    this.isLoading = true;
+    this.usuarioService.getRoles().pipe(takeUntil(this.destroy$)).subscribe({ // Usar usuarioService.getRoles()
+      next: (data: IRol[]) => {
         this.roles = data.filter(rol => rol.estado); // Solo roles activos
         this.isLoading = false;
         console.log('Roles cargados:', this.roles);
@@ -149,7 +153,7 @@ export class CreateUserWithRoleComponent implements OnInit, OnDestroy {
     this.successMessage = '';
 
     // Asegurarse de que todos los campos relevantes estén habilitados para obtener sus valores
-    // (aunque ya los habilitamos en onRoleChange, es una buena práctica para el envío)
+    // Esto es crucial para que `this.userForm.value` incluya los campos específicos de rol
     this.userForm.get('direccionCliente')?.enable();
     this.userForm.get('fechaNacimientoCliente')?.enable();
     this.userForm.get('preferenciasAlimentariasCliente')?.enable();
@@ -186,11 +190,9 @@ export class CreateUserWithRoleComponent implements OnInit, OnDestroy {
       ).pipe(takeUntil(this.destroy$)).subscribe({
         next: (response) => {
           this.successMessage = response.mensaje || 'Usuario y perfil de rol creado exitosamente!';
+          Swal.fire('¡Creado!', this.successMessage, 'success');
           console.log('Respuesta del backend:', response);
-          this.userForm.reset({
-            rolName: '', // Reinicia el select de rol
-            estado: true // Si tuvieras un campo de estado general para el usuario
-          });
+          this.userForm.reset(); // Limpiar el formulario
           this.selectedRoleName = ''; // Limpia el rol seleccionado para ocultar campos específicos
           // Opcional: Redirigir a la gestión de usuarios o a otro lugar
           setTimeout(() => {
@@ -200,13 +202,18 @@ export class CreateUserWithRoleComponent implements OnInit, OnDestroy {
         error: (err) => {
           console.error('Error al crear usuario y perfil:', err);
           this.errorMessage = err.error?.mensaje || 'Error al crear usuario y perfil. Intente de nuevo.';
+          Swal.fire('Error', this.errorMessage, 'error');
         }
       });
     } else {
       this.errorMessage = 'Por favor, complete todos los campos requeridos y válidos.';
       this.userForm.markAllAsTouched(); // Marca todos los campos como tocados para mostrar errores
       // Después de marcar como tocados, deshabilita los campos específicos de nuevo si no son del rol seleccionado
+      // Esto es importante para que la UI se vea correcta después de un intento fallido de envío
       this.onRoleChange(this.selectedRoleName);
     }
   }
+
+  // Getter para facilitar el acceso a los controles del formulario en el HTML
+  get f() { return this.userForm.controls; }
 }

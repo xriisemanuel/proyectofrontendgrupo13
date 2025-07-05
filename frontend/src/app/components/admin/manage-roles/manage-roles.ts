@@ -43,7 +43,7 @@ export class ManageRoles implements OnInit {
   editRole(roleId: string): void {
     // Lógica para navegar a una pantalla de edición de rol
     console.log('Navegando para editar rol con ID:', roleId);
-    this.router.navigate(['/admin/roles/update', roleId]); // Asumiendo una ruta de edición
+    this.router.navigate(['/admin/users/update', roleId]); // Asumiendo una ruta de edición
   }
 
   deleteRole(roleId: string): void {

@@ -1,27 +1,28 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { RepartidorService, IRepartidor } from '../../../services/repartidor'; // Importa el servicio y la interfaz IRepartidor
+import { UsuarioService, IUsuario } from '../../../services/usuario'; // Usar UsuarioService
 import { CommonModule } from '@angular/common'; // Necesario para directivas como ngIf, ngFor
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import Swal from 'sweetalert2'; // Para alertas bonitas
 
 @Component({
   selector: 'app-manage-repartidores',
   templateUrl: './manage-repartidores.html',
   styleUrls: ['./manage-repartidores.css'],
   standalone: true,
-  imports: [RouterLink, CommonModule]
+  imports: [CommonModule, RouterLink] // Añade CommonModule y RouterLink
 })
-export class ManageRepartidores implements OnInit, OnDestroy {
-  repartidores: IRepartidor[] = []; // Tipado con la interfaz IRepartidor
+export class ManageRepartidoresComponent implements OnInit, OnDestroy {
+  repartidores: IUsuario[] = [];
   errorMessage: string = '';
   successMessage: string = '';
-  isLoading: boolean = true; // Para mostrar un spinner mientras se cargan los datos
+  isLoading: boolean = true;
 
-  private destroy$ = new Subject<void>(); // Subject para desuscribirse de observables
+  private destroy$ = new Subject<void>(); // Para desuscribirse de observables
 
   constructor(
-    private repartidorService: RepartidorService,
+    private usuarioService: UsuarioService, // Inyectar UsuarioService
     private router: Router
   ) { }
 
@@ -30,61 +31,73 @@ export class ManageRepartidores implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroy$.next(); // Emite un valor para que todos los observables se desuscriban
-    this.destroy$.complete(); // Completa el Subject
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   /**
-   * Carga la lista de repartidores desde el backend.
-   * Los datos del usuario asociado (nombre, apellido, email, telefono)
-   * se obtendrán a través de la población del campo 'usuarioId' en el backend.
+   * Carga la lista de usuarios y luego filtra los que tienen el rol 'repartidor'.
    */
   loadRepartidores(): void {
+    this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
-    this.isLoading = true; // Inicia el estado de carga
 
-    this.repartidorService.getRepartidores().pipe(takeUntil(this.destroy$)).subscribe({
+    this.usuarioService.getUsuarios().pipe(takeUntil(this.destroy$)).subscribe({ // Usar getUsuarios()
       next: (data) => {
-        this.repartidores = data;
-        this.isLoading = false; // Finaliza el estado de carga
-        console.log('Repartidores cargados desde el backend (con usuario poblado):', this.repartidores);
+        // Filtra los usuarios para mostrar solo aquellos con el rol 'repartidor'
+        this.repartidores = data.filter(usuario =>
+          usuario.rolId && usuario.rolId.nombre === 'repartidor'
+        );
+        this.isLoading = false;
+        console.log('Repartidores cargados:', this.repartidores);
       },
       error: (err) => {
-        console.error('Error al cargar los repartidores:', err);
-        this.errorMessage = err.error?.mensaje || 'Error al cargar los repartidores desde el servidor.';
-        this.isLoading = false; // Finaliza el estado de carga incluso con error
+        console.error('Error al cargar repartidores:', err);
+        this.errorMessage = err.error?.mensaje || 'Error al cargar la lista de repartidores.';
+        this.isLoading = false;
       }
     });
   }
 
   /**
-   * Navega a la pantalla de edición de un repartidor.
-   * @param repartidorId El ID del repartidor a editar (el _id del perfil de repartidor).
+   * Navega al componente de edición genérico para un repartidor específico.
+   * @param id El ID del usuario (repartidor) a editar.
    */
-  editRepartidor(repartidorId: string): void {
-    console.log('Navegando para editar repartidor con ID:', repartidorId);
-    this.router.navigate(['/admin/repartidores/update', repartidorId]); // Asumiendo una ruta de actualización
+  editRepartidor(id: string): void {
+    this.router.navigate(['/admin/users/update', id]); // Usa la ruta genérica de actualización de usuario
   }
 
   /**
-   * Elimina un repartidor después de la confirmación del usuario.
-   * @param repartidorId El ID del repartidor a eliminar (el _id del perfil de repartidor).
+   * Elimina un repartidor (usuario) después de confirmación.
+   * @param id El ID del usuario (repartidor) a eliminar.
+   * @param username El nombre de usuario para el mensaje de confirmación.
    */
-  deleteRepartidor(repartidorId: string): void {
-    // Reemplazar `confirm` con un modal personalizado en un entorno de producción
-    if (confirm('¿Estás seguro de que quieres eliminar este repartidor? Esta acción no se puede deshacer.')) {
-      this.repartidorService.deleteRepartidor(repartidorId).pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          this.successMessage = response.mensaje || 'Repartidor eliminado exitosamente!';
-          console.log('Repartidor eliminado:', response);
-          this.loadRepartidores(); // Recarga la lista después de eliminar
-        },
-        error: (err) => {
-          console.error('Error al eliminar el repartidor:', err);
-          this.errorMessage = err.error?.mensaje || 'Error al eliminar el repartidor. Asegúrese de que no tenga pedidos asociados.';
-        }
-      });
-    }
+  deleteRepartidor(id: string, username: string): void {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: `Estás a punto de eliminar al repartidor: ${username}. ¡Esta acción no se puede deshacer!`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.usuarioService.deleteUsuario(id).pipe(takeUntil(this.destroy$)).subscribe({ // Usar deleteUsuario()
+          next: (response) => {
+            this.successMessage = response.mensaje || 'Repartidor eliminado exitosamente.';
+            Swal.fire('¡Eliminado!', this.successMessage, 'success');
+            this.loadRepartidores(); // Recarga la lista después de la eliminación
+          },
+          error: (err) => {
+            console.error('Error al eliminar repartidor:', err);
+            this.errorMessage = err.error?.mensaje || 'Error al eliminar el repartidor.';
+            Swal.fire('Error', this.errorMessage, 'error');
+          }
+        });
+      }
+    });
   }
 }

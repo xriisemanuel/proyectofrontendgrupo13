@@ -1,4 +1,4 @@
-<div *ngIf="!isLoggedIn" class="login-container">
+<div class="login-container">
   <h2>Iniciar Sesión</h2>
   <!-- Formulario de login. ngSubmit llama al método onSubmit del componente. -->
   <form (ngSubmit)="onSubmit()">
@@ -20,9 +20,3 @@
   </form>
   <p>¿No tienes cuenta? <a routerLink="/register">Regístrate aquí</a></p>
 </div>
-
-<!-- Mensaje si el usuario ya está logueado y es redirigido -->
-<div *ngIf="isLoggedIn" class="logged-in-message">
-  <p>Ya has iniciado sesión. Redirigiendo...</p>
-</div>
-

@@ -1,0 +1,69 @@
+<div class="manage-supervisores-ventas-container">
+    <h2>Gestión de Supervisores de Ventas</h2>
+    <p>Visualiza y administra los perfiles de los usuarios con rol "Supervisor de Ventas".</p>
+
+    <div class="action-buttons">
+        <!-- El botón para añadir un nuevo supervisor de ventas debería llevar a un formulario genérico de creación de usuario
+         donde se le asigne el rol 'supervisor_ventas' -->
+        <a routerLink="/admin/users/create" class="btn-add-new">
+            <i class="fas fa-user-plus"></i> Añadir Nuevo Supervisor de Ventas
+        </a>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-spinner">
+        Cargando supervisores de ventas...
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+    </div>
+
+    <div *ngIf="successMessage" class="success-message">
+        {{ successMessage }}
+    </div>
+
+    <div *ngIf="!isLoading && supervisoresVentas.length > 0" class="table-responsive">
+        <table class="supervisores-ventas-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Nombre Completo</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let supervisor of supervisoresVentas">
+                    <td>{{ supervisor.username }}</td>
+                    <td>{{ supervisor.nombre }} {{ supervisor.apellido }}</td>
+                    <td>{{ supervisor.email }}</td>
+                    <td>{{ supervisor.telefono || 'N/A' }}</td>
+                    <td>
+                        <span [class.active-status]="supervisor.estado" [class.inactive-status]="!supervisor.estado">
+                            {{ supervisor.estado ? 'Activo' : 'Inactivo' }}
+                        </span>
+                    </td>
+                    <td class="actions-cell">
+                        <button (click)="editSupervisorVentas(supervisor._id)" class="btn-action btn-edit">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button (click)="deleteSupervisorVentas(supervisor._id, supervisor.username)"
+                            class="btn-action btn-delete">
+                            <i class="fas fa-trash-alt"></i> Eliminar
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div *ngIf="!isLoading && supervisoresVentas.length === 0 && !errorMessage" class="no-data-message">
+        No hay supervisores de ventas registrados.
+    </div>
+
+    <div class="back-link">
+        <a routerLink="/admin/users/manage-by-role"><i class="fas fa-arrow-left"></i> Volver a Gestión por Rol</a>
+    </div>
+</div>

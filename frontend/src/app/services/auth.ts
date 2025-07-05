@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { API_BASE_URL } from '../core/constants';
+import { IUsuario, IRol } from './usuario'; // Ruta corregida a usuario.service.ts
 
 const AUTH_API = API_BASE_URL + '/auth/';
 
@@ -24,6 +25,7 @@ export class AuthService {
     let initialUser = null;
     if (this.isBrowser) {
       const storedUser = localStorage.getItem('user');
+      console.log('AuthService constructor: Usuario almacenado en localStorage:', storedUser);
       initialUser = storedUser ? JSON.parse(storedUser) : null;
     }
     this.currentUserSubject = new BehaviorSubject<any>(initialUser);
@@ -34,25 +36,6 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
-  /**
-   * Registers a new user with their specific role profile.
-   * This method now accepts all potential fields for different roles,
-   * which the backend will handle conditionally.
-   * @param username User's chosen username.
-   * @param password User's password.
-   * @param email User's email.
-   * @param telefono User's phone number (optional).
-   * @param rolName The name of the role (e.g., 'cliente', 'repartidor').
-   * @param nombre User's first name.
-   * @param apellido User's last name.
-   * @param direccionCliente Client's address (optional, for 'cliente' role).
-   * @param fechaNacimientoCliente Client's date of birth (optional, for 'cliente' role).
-   * @param preferenciasAlimentariasCliente Client's dietary preferences (optional, for 'cliente' role).
-   * @param puntosCliente Client's loyalty points (optional, for 'cliente' role).
-   * @param vehiculoRepartidor Delivery person's vehicle (optional, for 'repartidor' role).
-   * @param numeroLicenciaRepartidor Delivery person's license number (optional, for 'repartidor' role).
-   * @returns An Observable with the backend response.
-   */
   register(
     username: string,
     password: string,
@@ -61,12 +44,10 @@ export class AuthService {
     rolName: string,
     nombre: string,
     apellido: string,
-    // Campos específicos de cliente
     direccionCliente?: string,
-    fechaNacimientoCliente?: string, // Asumiendo formato de string para input de fecha
-    preferenciasAlimentariasCliente?: string[], // Nuevo campo para preferencias
-    puntosCliente?: number, // Nuevo campo para puntos
-    // Campos específicos de repartidor
+    fechaNacimientoCliente?: string,
+    preferenciasAlimentariasCliente?: string[],
+    puntosCliente?: number,
     vehiculoRepartidor?: string,
     numeroLicenciaRepartidor?: string
   ): Observable<any> {
@@ -78,39 +59,32 @@ export class AuthService {
       rolName,
       nombre,
       apellido,
-      // Pass all optional fields to the backend; it will handle them based on rolName
       direccionCliente,
       fechaNacimientoCliente,
-      preferenciasAlimentariasCliente, // Enviar al backend
-      puntosCliente, // Enviar al backend
+      preferenciasAlimentariasCliente,
+      puntosCliente,
       vehiculoRepartidor,
       numeroLicenciaRepartidor
     });
   }
 
-  /**
-   * Handles user login.
-   * @param username User's username.
-   * @param password User's password.
-   * @returns An Observable with the login response including token and user data.
-   */
   login(username: string, password: string): Observable<any> {
     return this.http.post<any>(AUTH_API + 'login', { username, password })
       .pipe(map(response => {
+        console.log('AuthService login: Respuesta del backend:', response);
         if (this.isBrowser && response && response.token) {
           localStorage.setItem('user', JSON.stringify(response));
           this.currentUserSubject.next(response);
+          console.log('AuthService login: Usuario guardado en localStorage y BehaviorSubject.');
         }
         return response;
       }));
   }
 
-  /**
-   * Logs out the current user.
-   */
   logout() {
     if (this.isBrowser) {
       localStorage.removeItem('user');
+      console.log('AuthService logout: Usuario eliminado de localStorage.');
     }
     this.currentUserSubject.next(null);
   }
@@ -122,6 +96,7 @@ export class AuthService {
   getToken(): string | null {
     if (this.isBrowser) {
       const user = this.currentUserSubject.value;
+      console.log('AuthService getToken: currentUserSubject.value:', user);
       return user && user.token ? user.token : null;
     }
     return null;
@@ -134,7 +109,10 @@ export class AuthService {
   getRole(): string | null {
     if (this.isBrowser) {
       const user = this.currentUserSubject.value;
-      return user && user.usuario && user.usuario.rol ? user.usuario.rol : null;
+      console.log('AuthService getRole: currentUserSubject.value para rol:', user);
+      const role = user && user.usuario && user.usuario.rol ? user.usuario.rol : null;
+      console.log('AuthService getRole: Rol extraído:', role);
+      return role;
     }
     return null;
   }
@@ -144,6 +122,8 @@ export class AuthService {
    * @returns True if authenticated, false otherwise.
    */
   isAuthenticated(): boolean {
-    return !!this.getToken();
+    const authenticated = !!this.getToken();
+    console.log('AuthService isAuthenticated: ', authenticated);
+    return authenticated;
   }
 }

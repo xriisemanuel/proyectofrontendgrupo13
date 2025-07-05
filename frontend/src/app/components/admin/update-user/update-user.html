@@ -1,0 +1,111 @@
+<div class="update-user-container">
+    <h2>Editar Usuario</h2>
+    <p *ngIf="userRole">Modifica los datos del perfil del usuario con rol: <strong>{{ userRole | uppercase }}</strong>.
+    </p>
+    <p *ngIf="!userRole">Modifica los datos del perfil del usuario.</p>
+
+    <div *ngIf="isLoading" class="loading-spinner">
+        Cargando datos del usuario...
+    </div>
+
+    <div *ngIf="!isLoading && errorMessage && !dataLoaded" class="error-message">
+        {{ errorMessage }}
+    </div>
+
+    <form *ngIf="!isLoading && dataLoaded" [formGroup]="userForm" (ngSubmit)="onSubmit()">
+        <!-- Campos comunes a todos los usuarios -->
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" formControlName="username" required>
+            <div *ngIf="f['username'].invalid && f['username'].touched" class="validation-error">
+                El username es requerido y debe tener al menos 3 caracteres.
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" formControlName="email" required>
+            <div *ngIf="f['email'].invalid && f['email'].touched" class="validation-error">
+                El email es requerido y debe ser un formato válido.
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" formControlName="nombre" required>
+            <div *ngIf="f['nombre'].invalid && f['nombre'].touched" class="validation-error">
+                El nombre es requerido.
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="apellido">Apellido:</label>
+            <input type="text" id="apellido" formControlName="apellido" required>
+            <div *ngIf="f['apellido'].invalid && f['apellido'].touched" class="validation-error">
+                El apellido es requerido.
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="telefono">Teléfono:</label>
+            <input type="tel" id="telefono" formControlName="telefono">
+        </div>
+
+        <div class="form-group checkbox-group">
+            <input type="checkbox" id="estado" formControlName="estado">
+            <label for="estado">Activo</label>
+        </div>
+
+        <!-- Campos específicos para el rol 'cliente' -->
+        <ng-container *ngIf="userRole === 'cliente'">
+            <hr>
+            <h3>Datos de Cliente</h3>
+            <div class="form-group">
+                <label for="direccionCliente">Dirección:</label>
+                <input type="text" id="direccionCliente" formControlName="direccionCliente">
+            </div>
+            <div class="form-group">
+                <label for="fechaNacimientoCliente">Fecha de Nacimiento:</label>
+                <input type="date" id="fechaNacimientoCliente" formControlName="fechaNacimientoCliente">
+            </div>
+            <div class="form-group">
+                <label for="preferenciasAlimentariasCliente">Preferencias Alimentarias (separadas por coma):</label>
+                <input type="text" id="preferenciasAlimentariasCliente"
+                    formControlName="preferenciasAlimentariasCliente" placeholder="Ej: vegetariano, sin gluten">
+            </div>
+            <div class="form-group">
+                <label for="puntosCliente">Puntos de Fidelidad:</label>
+                <input type="number" id="puntosCliente" formControlName="puntosCliente">
+            </div>
+        </ng-container>
+
+        <!-- Campos específicos para el rol 'repartidor' -->
+        <ng-container *ngIf="userRole === 'repartidor'">
+            <hr>
+            <h3>Datos de Repartidor</h3>
+            <div class="form-group">
+                <label for="vehiculoRepartidor">Vehículo:</label>
+                <input type="text" id="vehiculoRepartidor" formControlName="vehiculoRepartidor">
+            </div>
+            <div class="form-group">
+                <label for="numeroLicenciaRepartidor">Número de Licencia:</label>
+                <input type="text" id="numeroLicenciaRepartidor" formControlName="numeroLicenciaRepartidor">
+            </div>
+        </ng-container>
+
+        <button type="submit" class="btn-primary" [disabled]="!userForm.valid">
+            <i class="fas fa-save"></i> Guardar Cambios
+        </button>
+
+        <div *ngIf="successMessage" class="success-message">
+            {{ successMessage }}
+        </div>
+        <div *ngIf="errorMessage && dataLoaded" class="error-message">
+            {{ errorMessage }}
+        </div>
+    </form>
+
+    <div class="back-link">
+        <a routerLink="/admin/users/manage-by-role"><i class="fas fa-arrow-left"></i> Volver a Gestión por Rol</a>
+    </div>
+</div>

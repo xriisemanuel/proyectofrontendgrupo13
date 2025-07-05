@@ -1,5 +1,5 @@
 <div class="register-container">
-  <h2>Registrarse</h2>
+  <h2>Registrarse como Cliente</h2>
   <form (ngSubmit)="onSubmit()">
     <div class="form-group">
       <label for="username">Usuario:</label>
@@ -15,7 +15,8 @@
     </div>
     <div class="form-group">
       <label for="telefono">Teléfono:</label>
-      <input type="tel" id="telefono" [(ngModel)]="telefono" name="telefono" required>
+      <input type="tel" id="telefono" [(ngModel)]="telefono" name="telefono">
+      <!-- Teléfono es opcional en el backend -->
     </div>
     <div class="form-group">
       <label for="nombre">Nombre:</label>
@@ -26,15 +27,26 @@
       <input type="text" id="apellido" [(ngModel)]="apellido" name="apellido" required>
     </div>
 
-    <!-- Campo de selección de Rol -->
-    <div class="form-group">
-      <label for="rolName">Rol:</label>
-      <select id="rolName" [(ngModel)]="rolName" name="rolName" required>
-        <option *ngFor="let rol of roles" [value]="rol.nombre">{{ rol.nombre | titlecase }}</option>
-      </select>
-      <div *ngIf="!rolName && (username || password || email || telefono || nombre || apellido)"
-        class="validation-error">
-        Por favor, seleccione un rol.
+    <!-- Campos específicos de Cliente -->
+    <div class="specific-fields-section">
+      <h3>Datos de Cliente</h3>
+      <div class="form-group">
+        <label for="direccionCliente">Dirección:</label>
+        <input type="text" id="direccionCliente" [(ngModel)]="direccionCliente" name="direccionCliente" required>
+      </div>
+      <div class="form-group">
+        <label for="fechaNacimientoCliente">Fecha de Nacimiento:</label>
+        <input type="date" id="fechaNacimientoCliente" [(ngModel)]="fechaNacimientoCliente"
+          name="fechaNacimientoCliente">
+      </div>
+      <div class="form-group">
+        <label for="preferenciasAlimentariasCliente">Preferencias Alimentarias (separadas por comas):</label>
+        <input type="text" id="preferenciasAlimentariasCliente" [(ngModel)]="preferenciasAlimentariasCliente"
+          name="preferenciasAlimentariasCliente" placeholder="Ej: Vegetariano, Sin Gluten">
+      </div>
+      <div class="form-group">
+        <label for="puntosCliente">Puntos de Fidelidad:</label>
+        <input type="number" id="puntosCliente" [(ngModel)]="puntosCliente" name="puntosCliente" min="0">
       </div>
     </div>
 

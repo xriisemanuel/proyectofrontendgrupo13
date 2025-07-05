@@ -1,32 +1,33 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ClienteService, ICliente } from '../../../services/cliente'; // Importa el servicio y la interfaz
-import { CommonModule } from '@angular/common'; // Para directivas como ngFor, ngIf
-import { Router, RouterLink } from '@angular/router'; // Para navegación programática
+import { Router, RouterLink } from '@angular/router';
+import { UsuarioService, IUsuario } from '../../../services/usuario'; // Usar UsuarioService
+import { CommonModule } from '@angular/common'; // Necesario para directivas como ngIf, ngFor
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import Swal from 'sweetalert2'; // Para alertas bonitas
 
 @Component({
   selector: 'app-manage-clientes',
-  imports: [CommonModule, RouterLink], // RouterLink para el botón de volver y editar
   templateUrl: './manage-clientes.html',
-  styleUrl: './manage-clientes.css'
+  styleUrls: ['./manage-clientes.css'],
+  standalone: true,
+  imports: [CommonModule, RouterLink] // Añade CommonModule y RouterLink
 })
-
-export class ManageClientes implements OnInit, OnDestroy {
-  clientes: ICliente[] = [];
-  isLoading: boolean = true;
+export class ManageClientesComponent implements OnInit, OnDestroy {
+  clientes: IUsuario[] = [];
   errorMessage: string = '';
+  successMessage: string = '';
+  isLoading: boolean = true;
 
   private destroy$ = new Subject<void>(); // Para desuscribirse de observables
 
   constructor(
-    private clienteService: ClienteService,
+    private usuarioService: UsuarioService, // Inyectar UsuarioService
     private router: Router
   ) { }
 
   ngOnInit(): void {
-    this.loadClientes(); // Carga los clientes al inicializar el componente
+    this.loadClientes();
   }
 
   ngOnDestroy(): void {
@@ -35,20 +36,21 @@ export class ManageClientes implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga la lista de clientes desde el servicio.
+   * Carga la lista de usuarios y luego filtra los que tienen el rol 'cliente'.
    */
   loadClientes(): void {
     this.isLoading = true;
     this.errorMessage = '';
-    this.clienteService.getClientes().pipe(takeUntil(this.destroy$)).subscribe({
+    this.successMessage = '';
+
+    this.usuarioService.getUsuarios().pipe(takeUntil(this.destroy$)).subscribe({ // Usar getUsuarios()
       next: (data) => {
-        // Filtra los clientes que tienen un usuario asociado y si el rol del usuario es 'cliente'
-        // Esto es una capa extra de seguridad si la API no filtra por rol
-        this.clientes = data.filter(cliente =>
-          cliente.usuarioId && cliente.usuarioId.rolId && cliente.usuarioId.rolId.nombre === 'cliente'
+        // Filtra los usuarios para mostrar solo aquellos con el rol 'cliente'
+        this.clientes = data.filter(usuario =>
+          usuario.rolId && usuario.rolId.nombre === 'cliente'
         );
-        console.log('Clientes cargados:', this.clientes);
         this.isLoading = false;
+        console.log('Clientes cargados:', this.clientes);
       },
       error: (err) => {
         console.error('Error al cargar clientes:', err);
@@ -59,49 +61,40 @@ export class ManageClientes implements OnInit, OnDestroy {
   }
 
   /**
-   * Navega a la página de edición de un cliente.
-   * @param clienteId El ID del perfil de cliente a editar.
+   * Navega al componente de edición genérico para un cliente específico.
+   * @param id El ID del usuario (cliente) a editar.
    */
-  editCliente(clienteId: string | undefined): void {
-    if (clienteId) {
-      this.router.navigate(['/admin/clientes/update', clienteId]);
-    } else {
-      console.warn('ID de cliente no proporcionado para edición.');
-      Swal.fire('Advertencia', 'No se pudo obtener el ID del cliente para la edición.', 'warning');
-    }
+  editCliente(id: string): void {
+    this.router.navigate(['/admin/users/update', id]); // Usa la ruta genérica de actualización de usuario
   }
 
   /**
-   * Elimina un cliente después de una confirmación.
-   * @param clienteId El ID del perfil de cliente a eliminar.
-   * @param username El nombre de usuario asociado para el mensaje de confirmación.
+   * Elimina un cliente (usuario) después de confirmación.
+   * @param id El ID del usuario (cliente) a eliminar.
+   * @param username El nombre de usuario para el mensaje de confirmación.
    */
-  deleteCliente(clienteId: string | undefined, username: string | undefined): void {
-    if (!clienteId) {
-      console.warn('ID de cliente no proporcionado para eliminación.');
-      Swal.fire('Advertencia', 'No se pudo obtener el ID del cliente para la eliminación.', 'warning');
-      return;
-    }
-
+  deleteCliente(id: string, username: string): void {
     Swal.fire({
-      title: `¿Estás seguro de eliminar al cliente ${username}?`,
-      text: 'Esta acción no se puede deshacer.',
+      title: '¿Estás seguro?',
+      text: `Estás a punto de eliminar al cliente: ${username}. ¡Esta acción no se puede deshacer!`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.clienteService.deleteCliente(clienteId).pipe(takeUntil(this.destroy$)).subscribe({
+        this.usuarioService.deleteUsuario(id).pipe(takeUntil(this.destroy$)).subscribe({ // Usar deleteUsuario()
           next: (response) => {
-            Swal.fire('¡Eliminado!', response.mensaje || 'El cliente ha sido eliminado.', 'success');
-            this.loadClientes(); // Recarga la lista para reflejar los cambios
+            this.successMessage = response.mensaje || 'Cliente eliminado exitosamente.';
+            Swal.fire('¡Eliminado!', this.successMessage, 'success');
+            this.loadClientes(); // Recarga la lista después de la eliminación
           },
           error: (err) => {
             console.error('Error al eliminar cliente:', err);
-            Swal.fire('Error', err.error?.mensaje || 'Error al eliminar el cliente.', 'error');
+            this.errorMessage = err.error?.mensaje || 'Error al eliminar el cliente.';
+            Swal.fire('Error', this.errorMessage, 'error');
           }
         });
       }

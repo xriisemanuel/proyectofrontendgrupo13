@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../../services/auth'; // Importa tu servicio de autenticación
-import { Router } from '@angular/router'; // Para la redirección
-import { Role } from '../../services/role'; // <--- ¡NUEVA IMPORTACIÓN! Para obtener los roles
+import { AuthService } from '../../services/auth'; // Ruta corregida
+import { Router, RouterLink } from '@angular/router'; // Para la redirección y RouterLink
 import { CommonModule } from '@angular/common'; // Necesario para directivas como ngFor
 import { FormsModule } from '@angular/forms'; // Necesario para ngModel
+import Swal from 'sweetalert2'; // Para alertas bonitas
 
 @Component({
   selector: 'app-register',
-  templateUrl: './register.html',
-  styleUrls: ['./register.css'],
-  imports: [CommonModule, FormsModule] // <--- Importa CommonModule y FormsModule
+  templateUrl: './register.html', // Nombre de archivo corregido
+  styleUrls: ['./register.css'], // Nombre de archivo corregido
+  standalone: true, // Asegura que sea un componente standalone
+  imports: [CommonModule, FormsModule, RouterLink] // Importa CommonModule, FormsModule y RouterLink
 })
 export class RegisterComponent implements OnInit {
   username = '';
@@ -18,42 +19,41 @@ export class RegisterComponent implements OnInit {
   telefono = '';
   nombre = '';
   apellido = '';
-  rolName = ''; // Inicialmente vacío, se llenará con el primer rol disponible (no cliente) o por defecto.
+  rolName = 'cliente'; // <--- Por defecto, los registros públicos son para clientes.
   errorMessage = '';
   isSuccessful = false;
-  roles: any[] = []; // <--- Propiedad para almacenar los roles disponibles
+
+  // Campos específicos para el rol 'cliente'
+  direccionCliente = '';
+  fechaNacimientoCliente = '';
+  preferenciasAlimentariasCliente = ''; // Se manejará como string separado por comas
+  puntosCliente = 0;
 
   constructor(
     private authService: AuthService,
-    private router: Router,
-    private roleService: Role // <--- ¡NUEVA INYECCIÓN!
+    private router: Router
   ) { }
 
   ngOnInit(): void {
-    // Carga los roles disponibles al inicializar el componente
-    this.loadRoles();
-  }
-
-  loadRoles(): void {
-    this.roleService.getRoles().subscribe({
-      next: (data) => {
-        // Filtra el rol 'cliente' si no quieres que sea seleccionable en este formulario de registro
-        this.roles = data.filter(role => role.nombre !== 'cliente');
-        if (this.roles.length > 0) {
-          this.rolName = this.roles[0].nombre; // Establece el primer rol como valor por defecto
-        }
-        console.log('Roles cargados:', this.roles);
-      },
-      error: (err) => {
-        console.error('Error al cargar los roles:', err);
-        this.errorMessage = 'Error al cargar los roles disponibles. Intente de nuevo más tarde.';
-      }
-    });
+    // No necesitamos cargar roles si el rol es fijo 'cliente'
   }
 
   onSubmit(): void {
     this.errorMessage = '';
     this.isSuccessful = false;
+
+    // Validaciones básicas en el frontend antes de enviar
+    if (!this.username || !this.password || !this.email || !this.nombre || !this.apellido || !this.direccionCliente) {
+      this.errorMessage = 'Por favor, complete todos los campos obligatorios.';
+      Swal.fire('Error', this.errorMessage, 'error');
+      return;
+    }
+
+    // Convertir preferenciasAlimentariasCliente de string a array de strings
+    let preferenciasArray: string[] = [];
+    if (this.preferenciasAlimentariasCliente) {
+      preferenciasArray = this.preferenciasAlimentariasCliente.split(',').map(item => item.trim()).filter(item => item.length > 0);
+    }
 
     // Llama al método register del AuthService con todos los datos del formulario
     this.authService.register(
@@ -61,13 +61,23 @@ export class RegisterComponent implements OnInit {
       this.password,
       this.email,
       this.telefono,
-      this.rolName, // Se envía el nombre del rol seleccionado
+      this.rolName, // 'cliente' por defecto
       this.nombre,
-      this.apellido
+      this.apellido,
+      // Campos específicos de cliente
+      this.direccionCliente,
+      this.fechaNacimientoCliente,
+      preferenciasArray, // Enviar como array
+      this.puntosCliente,
+      // Los campos de repartidor no se envían desde este formulario
+      undefined,
+      undefined
     ).subscribe({
       next: data => {
         console.log('Registro exitoso:', data);
         this.isSuccessful = true;
+        this.errorMessage = ''; // Limpiar cualquier error anterior
+        Swal.fire('¡Registro Exitoso!', 'Tu cuenta ha sido creada. Ahora puedes iniciar sesión.', 'success');
         // Opcional: Redirige al usuario a la página de login después de un registro exitoso
         setTimeout(() => {
           this.router.navigate(['/login']);
@@ -76,6 +86,7 @@ export class RegisterComponent implements OnInit {
       error: err => {
         console.error('Error de registro:', err);
         this.errorMessage = err.error?.mensaje || 'Error al registrar. Intente de nuevo.';
+        Swal.fire('Error', this.errorMessage, 'error');
       }
     });
   }
