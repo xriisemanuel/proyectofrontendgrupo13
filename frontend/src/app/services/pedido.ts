@@ -1,13 +1,11 @@
 // src/app/services/pedido/pedido.service.ts
 
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../core/constants'; // Asegúrate de que esta ruta sea correcta
 
 // --- INTERFACES ---
-// Estas interfaces reflejan la estructura de tus datos del backend, incluyendo las populaciones
-// que se hacen en los controladores.
 
 // Interfaz para el subdocumento detalleProductos
 export interface IDetalleProducto {
@@ -18,56 +16,38 @@ export interface IDetalleProducto {
   subtotal?: number; // El backend lo calcula, pero puede venir en la respuesta
 }
 
-// Interfaz para el usuario (usado en Cliente/Repartidor populado)
-export interface IUsuarioPopulated {
+// Interfaz para el usuario (cuando es populado específicamente con ciertos campos)
+// **AJUSTADO**
+export interface IUsuarioPopulatedPedido { // Renombramos para evitar conflicto y ser más específicos
   _id: string;
-  username: string;
   nombre: string;
   apellido: string;
   email: string;
-  telefono?: string;
-  rol: string;
-  // Añade otros campos de usuario si los necesitas
+  // NO se incluyen: username, telefono, rol, ya que el populate en listarPedidos no los trae para el cliente.usuarioId
 }
 
 // Interfaz para Cliente cuando es populado en un pedido
+// **AJUSTADO**
 export interface IClientePopulated {
   _id: string;
-  usuarioId: IUsuarioPopulated; // Si clienteId en Pedido.populate('clienteId') incluye usuarioId
-  nombre?: string; // Si solo populas 'nombre apellido email telefono' directamente del cliente
-  apellido?: string;
-  email?: string;
-  telefono?: string;
-  // Si tu populate en Pedido es: .populate('clienteId', 'nombre apellido email telefono')
-  // entonces los campos nombre, apellido, email, telefono vendrán directamente en IClientePopulated.
-  // Si populas con .populate('clienteId'), y el esquema de Cliente tiene un campo usuarioId
-  // que es un ObjectId referenciando al modelo Usuario, entonces el IClientePopulated
-  // debería tener un campo 'usuarioId' de tipo IUsuarioPopulated.
-  // AJUSTA ESTO SEGÚN CÓMO ESTÁS POPULANDO CLIENTE EN TUS CONTROLADORES.
-  // Basado en tu pedido.controller.js -> .populate('clienteId', 'nombre apellido email')
-  // Significa que las propiedades 'nombre', 'apellido', 'email' vendrán directamente en el objeto clienteId
-  // Si cliente.model.js tiene 'nombre', 'apellido', 'email' directamente, usa esto:
-  // _id: string;
-  // nombre: string;
-  // apellido: string;
-  // email: string;
-  // telefono?: string; // Si también se popula
+  usuarioId: IUsuarioPopulatedPedido; // Ahora apunta a la interfaz ajustada para la población de pedidos
+  // No se incluyen 'nombre', 'apellido', 'email', 'telefono' directamente aquí
+  // porque el populate trae solo 'usuarioId', y dentro de 'usuarioId' es donde están esos campos.
 }
 
 // Interfaz para Repartidor cuando es populado en un pedido
+// **AJUSTADO**
 export interface IRepartidorPopulated {
   _id: string;
-  nombre: string; // Basado en .populate('repartidorId', 'nombre')
-  apellido?: string; // Si también se popula
-  telefono?: string; // Si también se popula
-  // Añade otros campos del repartidor si los necesitas y los populas
+  nombre: string;
+  apellido?: string; // Ahora sí se popula
+  telefono?: string; // Ahora sí se popula
 }
-
 
 // Interfaz principal para un Pedido
 export interface IPedido {
   _id?: string; // Opcional al crear
-  clienteId: string | IClientePopulated; // Puede ser solo el ID o el objeto populado
+  clienteId: IClientePopulated; // Puede ser solo el ID o el objeto populado
   fechaPedido?: Date;
   estado: 'pendiente' | 'confirmado' | 'en_preparacion' | 'en_envio' | 'entregado' | 'cancelado';
   direccionEntrega: string;
@@ -100,15 +80,17 @@ export class PedidoService {
    * @param estados Opcional. Array de estados por los que filtrar (ej. ['pendiente', 'en_preparacion']).
    * @returns Un Observable con un array de pedidos.
    */
+  // **AJUSTADO: Eliminando la lógica de 'url = ${PEDIDO_API}/filtrados?estado=' aquí**
+  // Ya que ahora 'getPedidos' y 'getPedidosByRepartidorId' (que es el que se usa en el dashboard)
+  // pueden usar el mismo endpoint raíz '/pedido' con query parameters.
+  // Tu `listarPedidos` en el backend ya maneja `estado` y `repartidorId` como query params.
   getPedidos(estados?: string[]): Observable<IPedido[]> {
-    let url = PEDIDO_API;
+    let params = new HttpParams();
     if (estados && estados.length > 0) {
-      // Usamos el endpoint '/filtrados' y enviamos los estados como query params
-      // El controlador ya maneja 'estado' como query param para getPedidosFiltrados
-      url = `${PEDIDO_API}/filtrados?estado=${estados.join(',')}`;
+      params = params.set('estados', estados.join(','));
     }
-    // Si no se especifican estados, el backend devolverá lo que su lógica de rol permita.
-    return this.http.get<IPedido[]>(url);
+    // Llama al endpoint principal, que ahora puede manejar los filtros
+    return this.http.get<IPedido[]>(PEDIDO_API, { params });
   }
 
   /**
@@ -164,12 +146,13 @@ export class PedidoService {
 
   /**
    * @description Obtiene pedidos filtrados por estado (endpoint específico).
-   * @param estado El estado por el cual filtrar.
-   * @returns Un Observable con un array de pedidos.
+   * **RECOMENDACIÓN:** Este método `getPedidosByEstado` se vuelve redundante.
+   * Ahora `getPedidos(estados)` hace lo mismo llamando al endpoint principal.
+   * Puedes eliminarlo si ya no lo usas explícitamente en otros lugares.
    */
-  getPedidosByEstado(estado: IPedido['estado']): Observable<IPedido[]> {
-    return this.http.get<IPedido[]>(`${PEDIDO_API}/estado/${estado}`);
-  }
+  // getPedidosByEstado(estado: IPedido['estado']): Observable<IPedido[]> {
+  //   return this.http.get<IPedido[]>(`${PEDIDO_API}/estado/${estado}`);
+  // }
 
   /**
    * @description Asigna un repartidor a un pedido. (Solo para admin/supervisor_ventas)
@@ -190,5 +173,20 @@ export class PedidoService {
    */
   aplicarDescuentos(pedidoId: string, montoDescuento: number): Observable<any> {
     return this.http.patch(`${PEDIDO_API}/${pedidoId}/aplicar-descuentos`, { montoDescuento });
+  }
+
+  /**
+   * @description Obtiene pedidos asignados a un repartidor específico, opcionalmente filtrados por estado.
+   * @param repartidorId El ID del repartidor.
+   * @param estados Opcional. Array de estados por los que filtrar (ej. ['en_envio', 'entregado']).
+   * @returns Un Observable con un array de pedidos.
+   */
+  getPedidosByRepartidorId(repartidorId: string, estados?: string[]): Observable<IPedido[]> {
+    let params = new HttpParams().set('repartidorId', repartidorId);
+    if (estados && estados.length > 0) {
+      params = params.set('estados', estados.join(',')); // Envía estados como una cadena separada por comas
+    }
+    // Llama al endpoint principal `/pedido` que tu `listarPedidos` ya maneja
+    return this.http.get<IPedido[]>(PEDIDO_API, { params });
   }
 }

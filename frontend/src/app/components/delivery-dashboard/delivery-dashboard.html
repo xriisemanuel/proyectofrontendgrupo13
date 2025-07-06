@@ -1,1 +1,108 @@
-<p>delivery-dashboard works!</p>
+<!-- src/app/components/delivery-dashboard/delivery-dashboard.component.html -->
+<div class="delivery-dashboard-container">
+  <h1>Dashboard del Repartidor</h1>
+
+  <!-- Mensajes de estado (carga, error, éxito) -->
+  <div *ngIf="loadingRepartidor || loadingPedidos" class="loading-message">
+    Cargando datos...
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="successMessage" class="success-message">
+    {{ successMessage }}
+  </div>
+
+  <!-- Información del Perfil del Repartidor -->
+  <div *ngIf="repartidor && !loadingRepartidor" class="repartidor-info-card">
+    <h2>Mi Perfil de Repartidor</h2>
+    <p><strong>Nombre:</strong> {{ repartidor.usuarioId.nombre }} {{ repartidor.usuarioId.apellido }}</p>
+    <p><strong>Usuario:</strong> {{ repartidor.usuarioId.username }}</p>
+    <p><strong>Email:</strong> {{ repartidor.usuarioId.email }}</p>
+    <p><strong>Teléfono:</strong> {{ repartidor.usuarioId.telefono || 'N/A' }}</p>
+    <p><strong>Vehículo:</strong> {{ repartidor.vehiculo || 'No especificado' }}</p>
+    <p><strong>Licencia:</strong> {{ repartidor.numeroLicencia || 'No especificado' }}</p>
+    <p><strong>Estado Actual:</strong>
+      <span [ngClass]="{
+        'status-disponible': repartidor.estado === 'disponible',
+        'status-en-entrega': repartidor.estado === 'en_entrega',
+        'status-fuera-servicio': repartidor.estado === 'fuera_de_servicio'
+      }">
+        {{ repartidor.estado | titlecase }}
+      </span>
+    </p>
+    <p><strong>Calificación Promedio:</strong> {{ repartidor.calificacionPromedio ? (repartidor.calificacionPromedio | number:'1.1-1') : 'Sin calificaciones' }}</p>
+    <p><strong>Ubicación:</strong>
+      <span *ngIf="repartidor.ubicacionActual?.lat !== null && repartidor.ubicacionActual?.lon !== null">
+        Lat: {{ repartidor.ubicacionActual?.lat| number:'1.4-4' }}, Lon: {{ repartidor.ubicacionActual?.lon| number:'1.4-4' }}
+      </span>
+      <span *ngIf="repartidor.ubicacionActual?.lat === null || repartidor.ubicacionActual?.lon === null">
+        No disponible
+      </span>
+    </p>
+
+    <div class="actions">
+      <h3>Acciones de Perfil:</h3>
+      <button (click)="changeRepartidorStatus('disponible')" [disabled]="repartidor.estado === 'disponible'">
+        Poner Disponible
+      </button>
+      <button (click)="changeRepartidorStatus('fuera_de_servicio')" [disabled]="repartidor.estado === 'fuera_de_servicio'">
+        Poner Fuera de Servicio
+      </button>
+      <button (click)="updateLocation()">Actualizar Ubicación</button>
+    </div>
+
+    <h3>Historial de Entregas (últimas 5):</h3>
+    <ul *ngIf="repartidor.historialEntregas && repartidor.historialEntregas.length > 0">
+      <li *ngFor="let entrega of repartidor.historialEntregas.slice(0, 5)">
+        {{ getHistorialEntregaDisplay(entrega) }}
+      </li>
+    </ul>
+    <p *ngIf="!repartidor.historialEntregas || repartidor.historialEntregas.length === 0">No hay entregas registradas aún.</p>
+  </div>
+
+  <div *ngIf="!repartidor && !loadingRepartidor" class="no-data-message">
+    No se pudo cargar la información del repartidor.
+  </div>
+
+  <hr>
+
+  <!-- Sección de Pedidos Asignados -->
+  <div class="assigned-orders-section" *ngIf="repartidor && !loadingPedidos">
+    <h2>Pedidos Asignados</h2>
+    <div *ngIf="pedidosAsignados.length > 0; else noPedidos">
+      <div *ngFor="let pedido of pedidosAsignados" class="order-card">
+        <h3>Pedido #{{ pedido._id }}</h3>
+        <!-- Acceso a nombre y apellido del cliente a través de usuarioId dentro de clienteId -->
+        <!-- Ya no necesita 'as any' o 'as IClientePopulated' si ajustaste la interfaz IPedido en pedido.service.ts -->
+        <p><strong>Cliente:</strong> {{ pedido.clienteId.usuarioId.nombre }} {{ pedido.clienteId.usuarioId.apellido }}</p>
+        <p><strong>Dirección de Entrega:</strong> {{ pedido.direccionEntrega }}</p>
+        <p><strong>Estado:</strong> {{ pedido.estado | titlecase }}</p>
+        <p><strong>Total:</strong> ${{ pedido.total | number:'1.2-2' }}</p>
+        <p><strong>Fecha Pedido:</strong> {{ pedido.fechaPedido | date:'short' }}</p>
+        <p *ngIf="pedido.fechaEstimadaEntrega"><strong>Fecha Estimada Entrega:</strong> {{ pedido.fechaEstimadaEntrega | date:'short' }}</p>
+
+        <h4>Detalle de Productos:</h4>
+        <ul>
+          <li *ngFor="let item of pedido.detalleProductos">
+            {{ item.cantidad }} x {{ item.nombreProducto }} (${{ item.precioUnitario | number:'1.2-2' }} c/u) = ${{ item.subtotal | number:'1.2-2' }}
+          </li>
+        </ul>
+
+        <div class="order-actions">
+          <button *ngIf="pedido.estado === 'confirmado' || pedido.estado === 'en_preparacion'" (click)="takeOrder(pedido._id!)">
+            Tomar Pedido
+          </button>
+          <button *ngIf="pedido.estado === 'en_envio'" (click)="deliverOrder(pedido)">
+            Marcar como Entregado
+          </button>
+        </div>
+      </div>
+    </div>
+    <ng-template #noPedidos>
+      <p class="no-data-message">No tienes pedidos asignados actualmente.</p>
+    </ng-template>
+  </div>
+</div>

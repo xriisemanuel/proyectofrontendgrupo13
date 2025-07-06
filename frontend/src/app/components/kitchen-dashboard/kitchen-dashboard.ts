@@ -1,221 +1,123 @@
-// src/app/components/supervisor/kitchen/kitchen-dashboard/kitchen-dashboard.component.ts
+// src/app/components/kitchen-dashboard/kitchen-dashboard.component.ts
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common'; // Necesario para *ngIf, *ngFor, pipes
+import { FormsModule } from '@angular/forms'; // Necesario para ngModel
+import { RouterLink } from '@angular/router'; // Importación necesaria para RouterLink
 
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // Necesario para ngModel si lo usamos en filtros
-import { PedidoService, IPedido, IDetalleProducto, IClientePopulated } from '../../services/pedido'; // Asegúrate de que la ruta sea correcta
-import Swal from 'sweetalert2'; // Para las notificaciones amigables
+// Asegúrate de que las rutas a tus servicios sean CORRECTAS para tu proyecto
+// Si tus archivos de servicio se llaman 'auth.service.ts', 'repartidor.service.ts', 'pedido.service.ts'
+// entonces estas rutas son las correctas.
+import { AuthService } from '../../services/auth';
+import { RepartidorService } from '../../services/repartidor'; // Asumo que lo necesitas o lo usarás
+import { PedidoService, IPedido, IDetalleProducto, IClientePopulated, IRepartidorPopulated } from '../../services/pedido';
 
-// RouterLink es para la navegación declarativa en el HTML (si lo necesitamos, por ejemplo, para ir a detalles de un pedido)
-import { RouterLink } from '@angular/router';
+import { catchError, tap } from 'rxjs/operators';
+import { of, Subscription } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-kitchen-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink], // Importa FormsModule para ngModel si lo usas, RouterLink para enlaces
+  imports: [
+    CommonModule, // Provee *ngIf, *ngFor, pipes (date, number, titlecase)
+    FormsModule,   // Provee ngModel (para los filtros de input/select)
+    RouterLink     // Provee la directiva routerLink si la usas en tu HTML para navegación
+    // Agrega aquí cualquier otro componente o módulo standalone que uses en tu HTML
+  ],
   templateUrl: './kitchen-dashboard.html',
   styleUrls: ['./kitchen-dashboard.css']
 })
-export class KitchenDashboard implements OnInit {
+export class KitchenDashboard implements OnInit, OnDestroy {
+  // === DECLARACIONES DE VARIABLES DE ESTADO Y MENSAJES ===
+  // Declaraciones exactas para los mensajes de error y éxito
+  errorMessage: string | null = null;
+  successMessage: string | null = null;
+
   pedidos: IPedido[] = [];
-  filteredPedidos: IPedido[] = [];
-  isLoading: boolean = false;
-  errorMessage: string = '';
-  successMessage: string = '';
+  loading = true; // Para indicar si los datos están cargando
+  selectedEstado: string = 'pendiente'; // Estado inicial del filtro
+  searchTerm: string = ''; // Término de búsqueda para el filtro
 
-  // Estados relevantes para el supervisor de cocina
-  // Estos son los estados que el supervisor de cocina puede ver y gestionar
-  kitchenRelevantStates: IPedido['estado'][] = [
-    'pendiente',
-    'confirmado',
-    'en_preparacion',
-    'en_envio' // Incluimos 'en_envio' para que la cocina sepa qué salió y no duplicar trabajo, aunque no lo gestionen activamente.
-  ];
+  private pedidosSubscription: Subscription | undefined; // Para manejar la suscripción y evitar fugas de memoria
 
-  // Opciones de estado para cambiar un pedido (según los permisos en el backend)
-  // El supervisor de cocina puede cambiar a estos estados:
-  kitchenActionableStates: IPedido['estado'][] = [
-    'confirmado',
-    'en_preparacion',
-    'en_envio',
-    'cancelado'
-  ];
-
-  // Filtros
-  selectedFilterState: IPedido['estado'] | '' = ''; // Para filtrar por un estado específico
-  searchTerm: string = ''; // Para buscar por ID de pedido o nombre de cliente/producto
-Object: any;
-
-  constructor(private pedidoService: PedidoService) { }
+  constructor(
+    private pedidoService: PedidoService,
+    private authService: AuthService, // Inyectamos AuthService si lo necesitas para algo en este componente
+    private repartidorService: RepartidorService // Inyectamos RepartidorService si lo necesitas
+  ) {}
 
   ngOnInit(): void {
-    this.loadPedidos();
+    this.loadPedidos(); // Carga los pedidos al inicializar el componente
   }
 
+  ngOnDestroy(): void {
+    // Desuscribirse para evitar fugas de memoria cuando el componente se destruye
+    this.pedidosSubscription?.unsubscribe();
+  }
+
+  /**
+   * Carga los pedidos basándose en el estado seleccionado y el término de búsqueda.
+   */
   loadPedidos(): void {
-    this.isLoading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
+    this.loading = true; // Activa el indicador de carga
+    this.errorMessage = null; // Limpia cualquier mensaje de error anterior
+    this.successMessage = null; // Limpia cualquier mensaje de éxito anterior
 
-    // Llama al servicio para obtener todos los pedidos, o los relevantes para cocina
-    // Podríamos usar getPedidosByEstado() si queremos filtrar solo un estado,
-    // o getPedidos() y luego filtrar en el frontend si queremos varios.
-    // Para el dashboard de cocina, es común ver 'pendientes', 'confirmados', 'en_preparacion'.
-    // Usaremos getPedidos con el array de estados para que el backend filtre si soporta CSV o múltiples queries.
-    // Si tu backend getPedidosFiltrados soporta 'estado=estado1,estado2', esto es ideal.
-    // Si solo soporta un estado por vez, necesitaríamos varias llamadas o un ajuste en el backend.
-    // Asumiré que getPedidosFiltrados con query param 'estado' puede manejar un solo estado o múltiples si se unen por coma.
-    // Una forma de hacer esto es que el backend reciba 'estados' como un array de query params: ?estado=s1&estado=s2
-    // Pero el controlador actual usa `estado` directamente como string.
-    // Por lo tanto, la mejor estrategia es:
-    // 1. Obtener todos los pedidos permitidos para este rol (`listarPedidos` sin filtros)
-    // 2. Filtrar en el frontend por `kitchenRelevantStates`.
-
-    this.pedidoService.getPedidos().subscribe({
-      next: (data) => {
-        // Filtramos solo los pedidos que son relevantes para la cocina
-        this.pedidos = data.filter(pedido => this.kitchenRelevantStates.includes(pedido.estado));
-        this.applyFilters(); // Aplica filtros iniciales (si hay alguno seleccionado por defecto o vacío)
-        console.log('Pedidos cargados para cocina:', this.pedidos);
-      },
-      error: (err) => {
-        console.error('Error al cargar pedidos:', err);
-        this.errorMessage = err.error?.mensaje || 'Error al cargar los pedidos.';
-        this.isLoading = false;
-      },
-      complete: () => {
-        this.isLoading = false;
-      }
-    });
+    // Llama al servicio de pedidos, pasando el estado seleccionado como filtro
+    // Asumimos que getPedidos en PedidoService ahora puede manejar un array de estados
+    this.pedidosSubscription = this.pedidoService.getPedidos([this.selectedEstado])
+      .pipe(
+        tap(data => {
+          this.pedidos = data; // Asigna los pedidos recibidos
+          this.loading = false; // Desactiva el indicador de carga
+        }),
+        catchError((error: HttpErrorResponse) => {
+          console.error('Error al cargar los pedidos:', error);
+          // Muestra un mensaje de error amigable, extrayéndolo de la respuesta del backend si está disponible
+          this.errorMessage = `Error al cargar pedidos: ${error.error?.mensaje || error.message || 'Error desconocido'}`;
+          this.loading = false; // Desactiva el indicador de carga incluso si hay error
+          return of([]); // Retorna un observable vacío para que el stream continúe sin errores fatales
+        })
+      )
+      .subscribe(); // Suscribirse al Observable para que se ejecute
   }
 
-  applyFilters(): void {
-    let tempPedidos = [...this.pedidos];
-
-    // Filtrar por estado seleccionado
-    if (this.selectedFilterState) {
-      tempPedidos = tempPedidos.filter(pedido => pedido.estado === this.selectedFilterState);
-    }
-
-    // Filtrar por término de búsqueda (ID de pedido, nombre de cliente o nombre de producto)
-    if (this.searchTerm.trim()) {
-      const lowerCaseSearchTerm = this.searchTerm.trim().toLowerCase();
-      tempPedidos = tempPedidos.filter(pedido =>
-        // Buscar en ID de pedido
-        pedido._id?.toLowerCase().includes(lowerCaseSearchTerm) ||
-        // Buscar en nombre de cliente (si está populado)
-        (typeof pedido.clienteId !== 'string' && pedido.clienteId?.nombre?.toLowerCase().includes(lowerCaseSearchTerm)) ||
-        // Buscar en productos del detalle
-        pedido.detalleProductos.some(item => item.nombreProducto.toLowerCase().includes(lowerCaseSearchTerm))
-      );
-    }
-
-    this.filteredPedidos = tempPedidos;
+  /**
+   * Cambia el estado de un pedido específico.
+   * @param pedidoId El ID del pedido a actualizar.
+   * @param newStatus El nuevo estado del pedido.
+   */
+  changeOrderStatus(pedidoId: string, newStatus: IPedido['estado']): void {
+    this.pedidoService.updateEstadoPedido(pedidoId, newStatus)
+      .pipe(
+        tap(() => {
+          // Muestra un mensaje de éxito
+          this.showSuccessMessage(`Estado del pedido ${pedidoId} actualizado a ${newStatus}`);
+          this.loadPedidos(); // Recarga los pedidos para reflejar el cambio en la tabla
+        }),
+        catchError((error: HttpErrorResponse) => {
+          console.error('Error al actualizar estado del pedido:', error);
+          // Muestra un mensaje de error
+          this.errorMessage = `Error al actualizar estado: ${error.error?.mensaje || error.message || 'Error desconocido'}`;
+          return of(null); // Retorna un observable nulo para que el stream continúe
+        })
+      )
+      .subscribe();
   }
 
-  // Permite obtener el nombre del cliente cuando clienteId está populado
-  getClienteNombre(clienteId: string | IClientePopulated | undefined): string {
-    if (typeof clienteId === 'object' && clienteId !== null && 'nombre' in clienteId) {
-      return `${clienteId.nombre} ${clienteId.apellido || ''}`.trim();
-    }
-    return 'Cliente Desconocido';
+  /**
+   * Muestra un mensaje de éxito temporal en la interfaz de usuario.
+   * @param message El mensaje de éxito a mostrar.
+   */
+  private showSuccessMessage(message: string): void {
+    this.successMessage = message; // Asigna el mensaje de éxito
+    setTimeout(() => {
+      this.successMessage = null; // Oculta el mensaje después de 3 segundos
+    }, 3000);
   }
 
-
-  async updatePedidoEstado(pedidoId: string | undefined, currentStatus: IPedido['estado']): Promise<void> {
-    if (!pedidoId) {
-      Swal.fire('Error', 'ID de pedido no disponible.', 'error');
-      return;
-    }
-
-    const { value: nuevoEstado } = await Swal.fire({
-      title: 'Cambiar estado del pedido',
-      input: 'select',
-      inputOptions: this.getAvailableNextStates(currentStatus), // Obtiene estados válidos para cambiar
-      inputPlaceholder: 'Selecciona un nuevo estado',
-      showCancelButton: true,
-      confirmButtonText: 'Confirmar',
-      cancelButtonText: 'Cancelar',
-      inputValidator: (value) => {
-        return new Promise((resolve) => {
-          if (value) {
-            resolve('');
-          } else {
-            resolve('Necesitas seleccionar un estado');
-          }
-        });
-      }
-    });
-
-    if (nuevoEstado) {
-      this.isLoading = true;
-      this.pedidoService.updateEstadoPedido(pedidoId, nuevoEstado as IPedido['estado']).subscribe({
-        next: (res) => {
-          this.successMessage = res.mensaje || 'Estado del pedido actualizado exitosamente.';
-          Swal.fire('Éxito', this.successMessage, 'success');
-          this.loadPedidos(); // Recarga la lista para reflejar el cambio
-        },
-        error: (err) => {
-          console.error('Error al actualizar estado del pedido:', err);
-          this.errorMessage = err.error?.mensaje || 'Error al actualizar el estado del pedido.';
-          Swal.fire('Error', this.errorMessage, 'error');
-          this.isLoading = false;
-        },
-        complete: () => {
-          this.isLoading = false;
-        }
-      });
-    }
-  }
-
-  // Lógica para determinar los estados a los que se puede cambiar desde el estado actual
-  getAvailableNextStates(currentStatus: IPedido['estado']): { [key: string]: string } {
-    const statesMap: { [key: string]: string } = {};
-
-    // Mapeo de estados del backend a un formato amigable para el usuario
-    const friendlyStates: { [key: string]: string } = {
-      'pendiente': 'Pendiente',
-      'confirmado': 'Confirmado',
-      'en_preparacion': 'En Preparación',
-      'en_envio': 'En Envío',
-      'listo_para_entrega': 'Listo para Entrega',
-      'entregado': 'Entregado',
-      'cancelado': 'Cancelado'
-    };
-
-    let possibleNextStates: IPedido['estado'][] = [];
-
-    // Esta lógica debe reflejar los permisos del controlador de backend para 'supervisor_cocina'
-    switch (currentStatus) {
-      case 'pendiente':
-        possibleNextStates = ['confirmado', 'cancelado'];
-        break;
-      case 'confirmado':
-        possibleNextStates = ['en_preparacion', 'cancelado'];
-        break;
-      case 'en_preparacion':
-        possibleNextStates = ['en_envio', 'cancelado'];
-        break;
-      // Una vez que está "en_envio", la cocina no debería cambiarlo
-      // a estados de preparación. Solo a cancelado.
-      case 'en_envio':
-        possibleNextStates = ['cancelado']; // Solo puede cancelar o dejar que repartidor lo maneje
-        break;
-      default:
-        // No permitir cambios desde 'entregado' o 'cancelado' por supervisor de cocina
-        possibleNextStates = [];
-        break;
-    }
-
-    // Filtra los estados que el supervisor de cocina tiene permiso para modificar
-    possibleNextStates = possibleNextStates.filter(state => this.kitchenActionableStates.includes(state));
-
-
-    // Construye el objeto para SweetAlert2
-    possibleNextStates.forEach(state => {
-      statesMap[state] = friendlyStates[state] || state;
-    });
-
-    return statesMap;
-  }
+  // Puedes añadir un método para aplicar el filtro de búsqueda si tu backend lo soporta
+  // applySearchFilter(): void {
+  //   this.loadPedidos(); // Recarga los pedidos con el término de búsqueda actual
+  // }
 }

@@ -1,82 +1,93 @@
+<!-- src/app/components/kitchen-dashboard/kitchen-dashboard.component.html -->
 <div class="kitchen-dashboard-container">
-  <h2>Dashboard de Cocina</h2>
+  <h1>Dashboard de Cocina</h1>
   <p>Gestión y seguimiento de pedidos para preparación.</p>
 
-  <div class="filter-actions">
-    <div class="filter-group">
-      <label for="filterState">Filtrar por Estado:</label>
-      <select id="filterState" [(ngModel)]="selectedFilterState" (change)="applyFilters()">
-        <option value="">Todos los relevantes</option>
-        <option value="pendiente">Pendiente</option>
-        <option value="confirmado">Confirmado</option>
-        <option value="en_preparacion">En Preparación</option>
-        <option value="en_envio">En Envío (solo vista)</option>
-        <option value="listo_para_entrega">Listo para Entrega</option>
-        <option value="cancelado">Cancelado</option>
-      </select>
+  <!-- === SECCIÓN DE MENSAJES === -->
+  <!-- Muestra el mensaje de carga -->
+  <div *ngIf="loading" class="loading-message">
+    Cargando pedidos...
+  </div>
+  <!-- Muestra el mensaje de error si existe -->
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+  <!-- Muestra el mensaje de éxito si existe -->
+  <div *ngIf="successMessage" class="success-message">
+    {{ successMessage }}
+  </div>
+  <!-- === FIN SECCIÓN DE MENSAJES === -->
+
+  <!-- Controles de filtro -->
+  <div class="filters">
+    <label for="estadoFilter">Filtrar por Estado:</label>
+    <select id="estadoFilter" [(ngModel)]="selectedEstado" (change)="loadPedidos()">
+      <option value="pendiente">Pendiente</option>
+      <option value="confirmado">Confirmado</option>
+      <option value="en_preparacion">En Preparación</option>
+      <option value="en_envio">En Envío</option>
+      <option value="entregado">Entregado</option>
+      <option value="cancelado">Cancelado</option>
+    </select>
+
+    <label for="searchFilter">Buscar:</label>
+    <!-- El (keyup.enter) llama a loadPedidos cuando se presiona Enter en el campo de búsqueda -->
+    <input type="text" id="searchFilter" [(ngModel)]="searchTerm" placeholder="ID, cliente, producto..." (keyup.enter)="loadPedidos()">
+    <button (click)="loadPedidos()">Aplicar Filtros</button>
+  </div>
+
+  <!-- Tabla de Pedidos -->
+  <div class="orders-table-container">
+    <!-- Título condicional para la tabla -->
+    <h2 *ngIf="pedidos.length > 0">Pedidos (Estado: {{ selectedEstado | titlecase }})</h2>
+    <!-- Mensaje si no hay pedidos después de cargar/filtrar -->
+    <div *ngIf="pedidos.length === 0 && !loading" class="no-data-message">
+      No hay pedidos con los filtros aplicados.
     </div>
 
-    <div class="filter-group search-group">
-      <label for="searchTerm">Buscar:</label>
-      <input type="text" id="searchTerm" [(ngModel)]="searchTerm" (input)="applyFilters()" placeholder="ID, cliente, producto...">
-      <i class="fas fa-search search-icon"></i>
-    </div>
-  </div>
-
-  <div *ngIf="successMessage" class="alert success-message">
-    <i class="fas fa-check-circle"></i> {{ successMessage }}
-  </div>
-  <div *ngIf="errorMessage" class="alert error-message">
-    <i class="fas fa-exclamation-triangle"></i> {{ errorMessage }}
-  </div>
-
-  <div *ngIf="isLoading" class="loading-spinner">
-    <i class="fas fa-spinner fa-spin"></i> Cargando pedidos...
-  </div>
-
-  <div *ngIf="!isLoading && filteredPedidos.length === 0 && !errorMessage" class="no-data-message">
-    <i class="fas fa-info-circle"></i> No hay pedidos con los filtros aplicados.
-  </div>
-
-  <div *ngIf="!isLoading && filteredPedidos.length > 0" class="pedidos-table-container">
-    <table class="pedidos-table">
+    <!-- La tabla se muestra solo si hay pedidos -->
+    <table *ngIf="pedidos.length > 0">
       <thead>
         <tr>
           <th>ID Pedido</th>
           <th>Fecha</th>
           <th>Cliente</th>
-          <th>Productos</th>
-          <th>Total</th>
           <th>Estado</th>
+          <th>Total</th>
+          <th>Detalle Productos</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let pedido of filteredPedidos">
+        <tr *ngFor="let pedido of pedidos">
           <td>{{ pedido._id }}</td>
           <td>{{ pedido.fechaPedido | date:'short' }}</td>
-          <td>{{ getClienteNombre(pedido.clienteId) }}</td>
+          <!-- Acceso corregido al nombre y apellido del cliente a través de usuarioId dentro de clienteId -->
+          <!-- Esto asume que clienteId SIEMPRE es un objeto IClientePopulated (no un string) -->
+          <td>{{ pedido.clienteId.usuarioId?.nombre }} {{ pedido.clienteId.usuarioId?.apellido }}</td>
+          <td>{{ pedido.estado | titlecase }}</td>
+          <td>${{ pedido.total | number:'1.2-2' }}</td>
           <td>
             <ul>
               <li *ngFor="let item of pedido.detalleProductos">
-                {{ item.cantidad }}x {{ item.nombreProducto }} (${{ item.precioUnitario | number:'1.2-2' }})
+                {{ item.cantidad }} x {{ item.nombreProducto }} (${{ item.precioUnitario | number:'1.2-2' }})
               </li>
             </ul>
           </td>
-          <td>${{ pedido.total | number:'1.2-2' }}</td>
           <td>
-            <span class="status-badge" [ngClass]="'status-' + pedido.estado">
-              {{ pedido.estado | titlecase }}
-            </span>
-          </td>
-          <td class="actions-cell">
-            <button
-              class="btn btn-action btn-change-status"
-              (click)="updatePedidoEstado(pedido._id, pedido.estado)"
-              [disabled]="!getAvailableNextStates(pedido.estado) || Object.keys(getAvailableNextStates(pedido.estado)).length === 0"
-              title="Cambiar Estado"
-            >
-              <i class="fas fa-sync-alt"></i> Cambiar Estado
+            <!-- Botones de acción para cambiar el estado -->
+            <button *ngIf="pedido.estado === 'pendiente'" (click)="changeOrderStatus(pedido._id!, 'confirmado')">
+              Confirmar
+            </button>
+            <button *ngIf="pedido.estado === 'confirmado'" (click)="changeOrderStatus(pedido._id!, 'en_preparacion')">
+              En Preparación
+            </button>
+            <button *ngIf="pedido.estado === 'en_preparacion'" (click)="changeOrderStatus(pedido._id!, 'en_envio')">
+              Listo para Envío
+            </button>
+            <!-- Botón de cancelar visible si el pedido no está ya cancelado o entregado -->
+            <button *ngIf="pedido.estado !== 'cancelado' && pedido.estado !== 'entregado'" (click)="changeOrderStatus(pedido._id!, 'cancelado')">
+              Cancelar
             </button>
           </td>
         </tr>

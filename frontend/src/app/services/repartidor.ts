@@ -88,4 +88,7 @@ export class RepartidorService {
   registrarEntregaRepartidor(id: string, entregaData: { pedidoId: string; calificacionCliente?: number; fechaEntrega?: Date }): Observable<any> {
     return this.http.patch<any>(`${REPARTIDOR_API}${id}/registrar-entrega`, entregaData);
   }
+  getRepartidorByUserId(userId: string): Observable<IRepartidor> {
+    return this.http.get<IRepartidor>(`${REPARTIDOR_API}by-user/${userId}`);
+  }
 }

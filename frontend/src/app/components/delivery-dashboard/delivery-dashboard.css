@@ -1,0 +1,171 @@
+/* src/app/components/delivery-dashboard/delivery-dashboard.component.css */
+.delivery-dashboard-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 15px;
+}
+
+h2, h3 {
+    color: #555;
+    margin-top: 25px;
+    margin-bottom: 15px;
+}
+
+.loading-message, .error-message, .success-message, .no-data-message {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.loading-message {
+    background-color: #e0f7fa;
+    color: #00796b;
+}
+
+.error-message {
+    background-color: #ffe0e0;
+    color: #d32f2f;
+    border: 1px solid #d32f2f;
+}
+
+.success-message {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #2e7d32;
+}
+
+.no-data-message {
+    color: #777;
+    font-style: italic;
+    padding: 10px 0;
+}
+
+.repartidor-info-card {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+}
+
+.repartidor-info-card p {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+.status-disponible {
+    color: #2e7d32; /* Verde */
+    font-weight: bold;
+}
+
+.status-en-entrega {
+    color: #f57f17; /* Naranja */
+    font-weight: bold;
+}
+
+.status-fuera-servicio {
+    color: #d32f2f; /* Rojo */
+    font-weight: bold;
+}
+
+.actions button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.actions button:hover:not([disabled]) {
+    background-color: #0056b3;
+}
+
+.actions button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
+    margin: 40px 0;
+}
+
+.assigned-orders-section {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+}
+
+.order-card {
+    border: 1px solid #eee;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    background-color: #fdfdfd;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.order-card h3 {
+    margin-top: 0;
+    color: #007bff;
+}
+
+.order-card p {
+    margin-bottom: 5px;
+}
+
+.order-card ul {
+    list-style: disc;
+    margin-left: 20px;
+    padding-left: 0;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.order-card ul li {
+    margin-bottom: 3px;
+    color: #666;
+}
+
+.order-actions button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 8px;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease;
+}
+
+.order-actions button:hover {
+    background-color: #218838;
+}
+
+.order-actions button:last-child {
+    margin-right: 0;
+}
