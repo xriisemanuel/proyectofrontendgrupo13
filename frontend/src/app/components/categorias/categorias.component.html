@@ -1,10 +1,11 @@
-<div class="container mt-4 text-center">
+
+<div class="container mt-4 text-center bg-black">
   <h2 class="mt-4">Categorías disponibles - SUBTE</h2>
 
   <!-- Encabezado -->
   <div class="text-center my-4">
-    <h3 class="fw-bold text-dark text-uppercase">Productos más populares</h3>
-    <p class="text-muted">Los favoritos de nuestros clientes</p>
+    <h3 class="fw-bold text-light text-uppercase">Productos más populares</h3>
+    <h4 class="text-muted">Los favoritos de nuestros clientes</h4>
   </div>
 
   <!-- Carrusel de productos destacados -->
@@ -16,7 +17,7 @@
           <img [src]="producto.imagenes[0]" class="d-block w-100" [alt]="producto.nombre"
             style="height: 500px; object-fit: cover;">
         </a>
-        <div class="carousel-caption d-block bg-white bg-opacity-75 text-dark rounded py-3 px-4 shadow-sm">
+        <div class="carousel-caption d-block bg-grey bg-opacity-20 text-light rounded py-3 px-4 shadow-sm">
           <div *ngIf="i === 0" class="position-absolute top-0 start-0 m-2">
             <span class="badge bg-success fs-6">🏆 Más popular</span>
           </div>
@@ -53,7 +54,7 @@
   <div class="d-flex justify-content-end mb-3">
     <button class="btn btn-success" (click)="irAFormulario()"><i class="bi bi-plus-lg"></i> Agregar categoría</button>
   </div>
-   <h3 class="fw-bold text-dark text-uppercase">CATEGORÍAS:</h3>
+   <h3 class="fw-bold text-light text-uppercase">CATEGORÍAS:</h3>
   <!-- Lista de categorías en cards -->
   <div *ngIf="categorias.length > 0; else sinCategorias">
     <div class="row">
