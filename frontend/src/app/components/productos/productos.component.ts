@@ -31,12 +31,35 @@ export class ProductosComponent implements OnInit {
     private route: ActivatedRoute,
   ) { }
 
-  ngOnInit(): void {
-    this.categoriaSeleccionadaId = this.route.snapshot.queryParamMap.get('categoriaId');
+ngOnInit(): void {
+  this.route.queryParams.subscribe(params => {
+    this.categoriaSeleccionadaId = params['categoriaId'] || null;
+    const productoDestacadoId = params['idProducto'];
 
+    if (productoDestacadoId) {
+      this.productoService.getProductos().subscribe(data => {
+        const producto = data.find(p => p._id === productoDestacadoId);
+
+        if (producto) {
+          this.productos = [producto];
+          this.productosFiltrados = [producto];
+
+          this.categoriaService.getCategorias().subscribe(categorias => {
+            const categoria = categorias.find(c =>
+              String(c._id) === String(producto.categoriaId?._id || producto.categoriaId)
+            );
+            this.categoriaSeleccionadaNombre = categoria?.nombre ?? '';
+          });
+        }
+      });
+
+      return;
+    }
+
+    // 👇 Si no hay producto específico, se carga todo como siempre
     this.productoService.getProductos().subscribe(data => {
       this.categoriaService.getCategorias().subscribe(categorias => {
-        this.productos = data.map(prod => {
+        let productosMapeados = data.map(prod => {
           const categoria = categorias.find(c =>
             String(c._id) === String(prod.categoriaId?._id || prod.categoriaId)
           );
@@ -47,6 +70,8 @@ export class ProductosComponent implements OnInit {
             categoriaRealId: categoria?._id || prod.categoriaId?._id || prod.categoriaId
           };
         });
+
+        this.productos = productosMapeados;
 
         if (this.categoriaSeleccionadaId) {
           const nombreCategoria = categorias.find(c =>
@@ -62,13 +87,15 @@ export class ProductosComponent implements OnInit {
         }
       });
     });
+  });
 
-    document.addEventListener('hidden.bs.modal', () => {
+  document.addEventListener('hidden.bs.modal', () => {
     const active = document.activeElement as HTMLElement;
     if (active) active.blur();
   });
+}
 
-  }
+
   verTodos(): void {
     this.busqueda = '';
     this.categoriaSeleccionadaId = null;
@@ -76,8 +103,16 @@ export class ProductosComponent implements OnInit {
     this.productosFiltrados = [];
 
     // Navega sin query params
-    this.router.navigate(['/productos']);
+    this.router.navigate(['/productos'], {
+  queryParams: this.categoriaSeleccionadaId ? { categoriaId: this.categoriaSeleccionadaId } : {}
+});
   }
+
+  get cantidadTotal(): number {
+  return (this.categoriaSeleccionadaId || this.busqueda)
+    ? this.productosFiltrados.length
+    : this.productos.length;
+}
 
   volverACategorias(): void {
     this.router.navigate(['/categorias']);

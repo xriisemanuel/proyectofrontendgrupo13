@@ -12,6 +12,14 @@
     <button class="btn btn-outline-secondary btn-sm" (click)="verTodos()"><i class="bi bi-arrows-angle-expand"></i> Ver todos</button>
   </div>
 
+<div class="bg-light p-3 rounded shadow-sm text-center mb-4">
+  <h4 class="mb-2 text-dark">NUESTROS PRODUCTOS:</h4>
+  <p class="text-muted mb-0">
+    Mostrando {{ cantidadTotal }} producto{{ cantidadTotal === 1 ? '' : 's' }} disponibles
+  </p>
+</div>
+
+
   <!-- Botón para agregar nuevo producto -->
   <div class="d-flex justify-content-end mb-3">
     <button class="btn btn-success" (click)="irAFormulario()"><i class="bi bi-plus-lg"></i> Agregar producto</button>
@@ -47,7 +55,7 @@
             <p class="card-text">{{ producto.descripcion }}</p>
             <p><strong>Precio:</strong> ${{ producto.precio }}</p>
             <p><strong>Stock:</strong> {{ producto.stock }}</p>
-            <p><strong>Popularidad:</strong> {{ producto.popularidad }}</p>
+            <!--<p><strong>Popularidad:</strong> {{ producto.popularidad }}</p>-->
             <p><strong>Categoría:</strong> {{ producto.categoriaId?.nombre }}</p>
             <p>
               <strong>Disponible:</strong>

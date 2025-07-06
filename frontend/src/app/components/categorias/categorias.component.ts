@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CategoriaService } from '../../services/categoria.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { ProductoService } from '../../services/producto.service';
+
 
 @Component({
   selector: 'app-categorias',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './categorias.component.html',
   styleUrls: ['./categorias.component.css']
 })
@@ -15,9 +17,12 @@ export class CategoriasComponent implements OnInit {
 
   categorias: any[] = [];
   categoriaInactivaNombre = '';
+  mensajeModal = '';
+  productos: any[] = [];
 
   constructor(
     private categoriaService: CategoriaService,
+    private productoService: ProductoService,
     private router: Router
   ) {}
 
@@ -25,8 +30,17 @@ ngOnInit(): void {
   this.categoriaService.getCategorias().subscribe(data => {
     this.categorias = data;
   });
-}
+ this.productoService.getProductos().subscribe(data => {
+  this.productos = data
+  .filter(p =>
+    p.disponible &&
+    p.imagenes?.length > 0 &&
+    p.popularidad >= 6
+  )
+  .sort((a, b) => b.popularidad - a.popularidad); // 👈 más populares primero
+});
 
+}
   // Navegar al formulario de categoría
   irAFormulario(): void {
     this.router.navigate(['/categorias/formulario']);
@@ -49,8 +63,6 @@ ngOnInit(): void {
 verTodosLosProductos(): void {
   this.router.navigate(['/productos']);
 }
-
-  mensajeModal = '';
 
   verProductosPorCategoria(categoriaId: string): void {
   this.router.navigate(['/productos'], { queryParams: { categoriaId } });

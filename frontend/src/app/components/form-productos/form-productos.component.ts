@@ -150,15 +150,59 @@ generarReceta(nombreOriginal: string): void {
 
 traducirNombre(nombre: string): string {
   const traducciones: Record<string, string> = {
-    'milanesa': 'breaded cutlet',
-    'tarta': 'pie',
-    'ensalada': 'salad',
-    'empanada': 'turnover',
-    'tortilla': 'omelette'
-  };
+  'cassoulet': 'cazuela',
+  'wontons': 'empanadillas chinas',
+  'agridulce': 'sweet and sour',
+  'sopa': 'soup',
+  'picante': 'spicy',
+  'chuleta': 'pork chop',
+  'manzana': 'apple',
+  'batata': 'sweet potato',
+  'zucchini': 'zucchini',
+  'barbacoa': 'bbq',
+  'bigos': 'guiso de cazadores',
+  'katsudon': 'katsudon japonés',
+  'febras': 'barbecued pork',
+  'asadas': 'grilled',
+  'asado': 'roast',
+  'goulash': 'goulash',
+  'rendang': 'rendang de carne',
+  'bistek': 'bistec filipino',
+  'mechado': 'carne mechada',
+  'caldereta': 'caldereta de carne',
+  'fatteh': 'fatteh egipcio',
+  'mulukhiyah': 'mulukhiyah',
+  'moussaka': 'musaka',
+  'peas': 'arvejas',
+  'dumpling': 'dumpling',
+  'steak': 'bife',
+  'kidney': 'riñón',
+  'mustard': 'mostaza',
+  'pie': 'pastel',
+  'roast': 'asado',
+  'halloumi': 'halloumi',
+  'burger': 'hamburguesa',
+  'bacon': 'panceta',
+  'grilled': 'a la parrilla',
+  'sloppy': 'sloppy joe',
+  'joes': 'sloppy joe',
+  'sunday': 'domingo',
+  'stuffed': 'relleno',
+  'turnover': 'empanada',
+  'cutlet': 'milanesa',
+  'of': 'de',
+  'and': 'y',
+  'with': 'con',
+  'in': 'en',
+};
 
-  return traducciones[nombre.toLowerCase()] || nombre;
+  return nombre
+    .toLowerCase()
+    .split(' ')
+    .map(palabra => traducciones[palabra] || palabra)
+    .join(' ');
 }
+
 
 
 usarRecetaComoDescripcion(): void {
