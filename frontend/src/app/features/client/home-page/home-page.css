@@ -1,0 +1,258 @@
+/* home-page.css */
+
+/* Base Styles & Font */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #0A0A0A;
+    /* Negro muy profundo */
+    color: #E0E0E0;
+    /* Texto principal en gris muy claro */
+}
+
+/* Header */
+header {
+    top: 0;
+    left: 0;
+    right: 0;
+    /* Tailwind classes handle fixed, w-full, z-50 */
+}
+
+/* Custom Buttons & Inputs */
+.nav-link-dark {
+    color: #B0B0B0;
+    /* Gris claro para enlaces de navegación */
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.nav-link-dark:hover {
+    color: white;
+    /* Blanco puro al hover */
+    text-decoration: none;
+}
+
+.btn-primary-dark {
+    background-color: #FFD700;
+    /* Dorado brillante para acento principal */
+    color: #1A1A1A;
+    /* Texto oscuro en botón dorado */
+    padding: 0.9rem 2.2rem;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    /* Más audaz */
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 6px 15px rgba(255, 215, 0, 0.3);
+    /* Sombra dorada más pronunciada */
+}
+
+.btn-primary-dark:hover {
+    background-color: #E6C200;
+    /* Dorado más oscuro al hover */
+    transform: translateY(-3px);
+    /* Efecto de levantamiento */
+    box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
+}
+
+.btn-secondary-dark {
+    background-color: #4A4A4A;
+    /* Gris oscuro para el botón secundario */
+    color: white;
+    padding: 0.8rem 1.8rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.btn-secondary-dark:hover {
+    background-color: #3A3A3A;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.input-dark {
+    background-color: #2A2A2A;
+    /* Fondo oscuro para inputs */
+    color: #E0E0E0;
+    /* Texto claro en inputs */
+    border: 1px solid #4A4A4A;
+    /* Borde sutil */
+    border-radius: 0.75rem;
+    padding: 0.85rem 1.25rem;
+    width: 100%;
+    font-size: 1rem;
+    line-height: 1.5;
+    transition: all 0.3s ease;
+}
+
+.input-dark:focus {
+    outline: none;
+    border-color: #FFD700;
+    /* Borde dorado al enfocar */
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+    /* Sombra de enfoque dorada */
+    background-color: #1A1A1A;
+    /* Fondo más oscuro al enfocar */
+}
+
+/* Hero Section */
+.hero-dark {
+    background-color: #1A1A1A;
+    /* Fondo oscuro base */
+    position: relative;
+    padding-top: 10rem;
+    /* Espacio para el header fijo */
+}
+
+.hero-dark .absolute {
+    filter: brightness(0.7);
+    /* Oscurece la imagen de fondo */
+}
+
+/* Category Navigation (Dark Pills) */
+#categorias-nav {
+    background-color: #1A1A1A;
+    /* Fondo muy oscuro para la barra de categorías */
+    padding: 1.5rem 0;
+    border-radius: 1.5rem;
+    /* Más redondeado */
+    margin-bottom: 3rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    /* Sombra más pronunciada */
+    border: 1px solid #2A2A2A;
+    /* Borde sutil */
+}
+
+.category-pill-dark {
+    background-color: #333333;
+    /* Gris oscuro */
+    color: #B0B0B0;
+    /* Gris claro */
+    padding: 0.7rem 1.4rem;
+    border-radius: 2rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+.category-pill-dark:hover {
+    background-color: #444444;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.category-pill-dark.active-category-pill-dark {
+    background-color: #FFD700;
+    /* Dorado para categoría activa */
+    color: #1A1A1A;
+    /* Texto oscuro en dorado */
+    border-color: #FFD700;
+    box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3);
+    transform: translateY(-1px);
+}
+
+.category-pill-dark.active-category-pill-dark:hover {
+    background-color: #E6C200;
+    border-color: #E6C200;
+}
+
+.category-pill-dark img {
+    border-radius: 50%;
+}
+
+/* Product Card Styling (Dark & Premium) */
+.product-card-dark {
+    background-color: #1A1A1A;
+    /* Fondo oscuro para la tarjeta */
+    border-radius: 1.25rem;
+    /* Bordes más redondeados */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+    /* Sombra más profunda */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.4s ease, box-shadow 0.4s ease, background-color 0.3s ease;
+    border: 1px solid #2A2A2A;
+    /* Borde sutil */
+}
+
+.product-card-dark:hover {
+    transform: translateY(-12px) scale(1.03);
+    /* Efecto de levantamiento más pronunciado */
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+    /* Sombra más intensa al hover */
+    background-color: #2A2A2A;
+    /* Ligeramente más claro al hover */
+}
+
+.product-image-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.product-image-wrapper img {
+    transition: transform 0.5s ease;
+    /* Transición suave para el zoom */
+}
+
+.product-card-dark:hover .product-image-wrapper img {
+    transform: scale(1.1);
+    /* Zoom más pronunciado en la imagen al hover */
+}
+
+.btn-add-to-cart-dark {
+    background-color: #4CAF50;
+    /* Verde de acento (material design green) */
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(76, 175, 80, 0.3);
+}
+
+.btn-add-to-cart-dark:hover {
+    background-color: #43A047;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+}
+
+/* Login/Register Card Styling */
+#login-register-section {
+    background-color: #1A1A1A;
+    /* Fondo oscuro para la sección */
+}
+
+#login-register-section .shadow-2xl {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    /* Sombra fuerte */
+}
+
+/* Bootstrap Spinner for Loading */
+.spinner-border {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-width: 0.4em;
+    color: #FFD700;
+    /* Color del spinner dorado */
+}

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subte - Tu Experiencia Premium</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Bootstrap Icons CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="bg-gray-950 font-inter text-gray-100 min-h-screen flex flex-col antialiased">
+
+    <!-- Header & Navigation -->
+    <header class="bg-black bg-opacity-80 backdrop-blur-sm shadow-lg py-4 fixed w-full z-50 top-0">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <div class="flex items-center">
+                <i class="bi bi-train-front-fill text-3xl text-white mr-2"></i>
+                <h1 class="text-3xl font-bold text-white">Subte</h1>
+            </div>
+            <nav class="space-x-6 text-lg">
+                <a href="#productos-section" class="nav-link-dark">Productos</a>
+                <a href="#login-register-section" class="nav-link-dark">Acceso</a>
+                <a routerLink="/carrito" class="nav-link-dark">
+                    <i class="bi bi-cart3 text-xl"></i>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section (Impactante y visual) -->
+    <section class="hero-dark text-center py-40 px-4 relative overflow-hidden">
+        <div class="absolute inset-0 bg-cover bg-center opacity-30"
+            style="background-image: url('https://placehold.co/1920x1080/1A1A1A/FFFFFF?text=Fondo+Subte');"></div>
+        <div class="relative z-10 container mx-auto max-w-5xl">
+            <h2 class="text-6xl font-extrabold text-white mb-6 leading-tight drop-shadow-lg">
+                Explora la Colección Subte
+            </h2>
+            <p class="text-2xl text-gray-300 mb-10 opacity-90">
+                Artículos exclusivos diseñados para tu viaje diario con estilo y funcionalidad.
+            </p>
+            <a href="#productos-section"
+                class="btn-primary-dark inline-block text-xl font-semibold shadow-xl hover:shadow-2xl">
+                Ver Productos <i class="bi bi-arrow-down-circle ml-2"></i>
+            </a>
+        </div>
+    </section>
+
+    <main class="flex-grow pt-20">
+        <div class="container mx-auto p-4 md:p-8">
+
+            <!-- Sección de Búsqueda y Filtro de Categorías -->
+            <section class="mb-16 bg-gray-800 rounded-2xl shadow-xl p-6 md:p-8 border border-gray-700">
+                <h3 class="text-3xl font-bold text-white mb-8 text-center">Encuentra tu Esencial</h3>
+
+                <div class="flex flex-col md:flex-row items-center gap-4 mb-8">
+                    <!-- Barra de Búsqueda -->
+                    <div class="relative flex-grow w-full">
+                        <input type="text" [(ngModel)]="busqueda" (input)="filtrarProductos()"
+                            placeholder="Buscar productos por nombre, descripción o categoría..."
+                            class="input-dark pl-12">
+                        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-xl"></i>
+                    </div>
+                </div>
+
+                <!-- Navegación de Categorías (Píldoras oscuras y elegantes) -->
+                <nav id="categorias-nav" class="flex flex-wrap justify-center gap-3">
+                    <button (click)="verTodosProductos()" [class.active-category-pill-dark]="!categoriaSeleccionadaId"
+                        class="category-pill-dark">
+                        <i class="bi bi-grid-fill mr-2"></i> Todas
+                    </button>
+                    <button *ngFor="let categoria of categorias"
+                        (click)="verProductosPorCategoria(categoria._id, categoria.nombre)"
+                        [class.active-category-pill-dark]="categoriaSeleccionadaId === categoria._id"
+                        class="category-pill-dark">
+                        <img [src]="categoria.imagen || 'https://placehold.co/24x24/333333/999999?text=Cat'"
+                            alt="{{ categoria.nombre }}" class="w-6 h-6 rounded-full mr-2 inline-block object-cover">
+                        {{ categoria.nombre }}
+                    </button>
+                </nav>
+            </section>
+
+            <!-- Sección de Productos -->
+            <section id="productos-section" class="py-12">
+                <h2 class="text-4xl font-bold text-white mb-12 text-center">
+                    {{ categoriaSeleccionadaNombre ? 'Productos en ' + categoriaSeleccionadaNombre : 'Nuestros
+                    Destacados' }}
+                </h2>
+
+                <div *ngIf="isLoadingProducts || isLoadingCategories" class="text-center py-20">
+                    <div class="spinner-border text-light" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-4 text-gray-400 text-lg">Cargando productos y categorías...</p>
+                </div>
+
+                <div *ngIf="!isLoadingProducts && !isLoadingCategories && productosFiltrados.length === 0"
+                    class="text-center py-20">
+                    <p class="text-gray-400 text-xl">No se encontraron productos que coincidan con tu búsqueda o filtro.
+                    </p>
+                </div>
+
+                <div *ngIf="!isLoadingProducts && !isLoadingCategories && productosFiltrados.length > 0"
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    <div *ngFor="let producto of productosFiltrados" class="product-card-dark">
+                        <div class="product-image-wrapper">
+                            <img [src]="producto.imagenes[0] || 'https://placehold.co/400x300/333333/999999?text=Producto'"
+                                alt="{{ producto.nombre }}" class="w-full h-48 object-cover rounded-t-xl">
+                        </div>
+                        <div class="p-5 flex flex-col flex-grow">
+                            <h3 class="text-2xl font-bold text-white mb-2">{{ producto.nombre }}</h3>
+                            <p class="text-gray-400 text-sm mb-2">Categoría: {{ producto.categoriaNombre }}</p>
+                            <p class="text-gray-300 mb-4 line-clamp-3">{{ producto.descripcion }}</p>
+                            <div class="mt-auto flex items-center justify-between">
+                                <span class="text-3xl font-extrabold text-green-400">${{ producto.precio |
+                                    number:'1.2-2' }}</span>
+                                <button (click)="agregarAlCarrito(producto, $event)" class="btn-add-to-cart-dark">
+                                    <i class="bi bi-cart-plus mr-2"></i> Agregar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección de Login/Registro (Tarjeta Elegante y Oscura) -->
+            <section id="login-register-section"
+                class="py-16 px-4 bg-gray-800 rounded-2xl shadow-xl my-12 border border-gray-700">
+                <div class="container mx-auto flex flex-col md:flex-row items-center justify-center gap-12">
+                    <div class="text-center md:text-left md:w-1/2 text-white">
+                        <h3 class="text-4xl font-extrabold mb-4 text-yellow-300 drop-shadow-md">
+                            Acceso a tu Cuenta Subte
+                        </h3>
+                        <p class="text-xl opacity-90 max-w-lg mx-auto md:mx-0">
+                            Inicia sesión para gestionar tus pases, historial de viajes y acceder a beneficios
+                            exclusivos.
+                            ¿Eres nuevo? Regístrate y empieza tu viaje hoy mismo.
+                        </p>
+                    </div>
+                    <div
+                        class="w-full md:w-1/3 bg-gray-900 rounded-3xl shadow-2xl p-8 text-gray-100 transform transition duration-500 hover:scale-105 border border-gray-700">
+                        <h4 class="text-3xl font-bold mb-8 text-center text-white">Ingresar</h4>
+                        <form (ngSubmit)="handleLogin()">
+                            <div class="mb-5">
+                                <label for="loginEmail" class="block text-gray-300 text-lg font-semibold mb-2">
+                                    <i class="bi bi-envelope-fill mr-2"></i> Correo Electrónico:
+                                </label>
+                                <input type="email" id="loginEmail" name="loginEmail" class="input-dark"
+                                    placeholder="tu@ejemplo.com" required [(ngModel)]="email">
+                            </div>
+                            <div class="mb-8">
+                                <label for="loginPassword" class="block text-gray-300 text-lg font-semibold mb-2">
+                                    <i class="bi bi-lock-fill mr-2"></i> Contraseña:
+                                </label>
+                                <input type="password" id="loginPassword" name="loginPassword" class="input-dark"
+                                    placeholder="********" required [(ngModel)]="password">
+                            </div>
+                            <button type="submit"
+                                class="btn-primary-dark w-full text-xl font-bold shadow-lg hover:shadow-xl">
+                                Iniciar Sesión <i class="bi bi-box-arrow-in-right ml-2"></i>
+                            </button>
+                        </form>
+                        <p *ngIf="loginMessage" class="mt-6 text-center text-base font-medium"
+                            [ngClass]="{'text-green-400': loginSuccess, 'text-red-400': !loginSuccess}">
+                            {{ loginMessage }}
+                        </p>
+                        <div class="text-center mt-8">
+                            <p class="text-gray-300 text-lg">¿No tienes cuenta?</p>
+                            <a routerLink="/client-register"
+                                class="btn-secondary-dark inline-block mt-3 text-xl font-bold shadow-md hover:shadow-lg">
+                                Regístrate Aquí <i class="bi bi-person-plus-fill ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black text-gray-400 py-8 px-4 mt-auto">
+        <div class="container mx-auto text-center text-sm">
+            <p>&copy; 2025 Subte. Todos los derechos reservados.</p>
+            <div class="mt-4 space-x-4">
+                <a href="#" class="text-gray-500 hover:text-white transition duration-300">Política de Privacidad</a>
+                <span class="text-gray-600">|</span>
+                <a href="#" class="text-gray-500 hover:text-white transition duration-300">Términos de Servicio</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDjOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
