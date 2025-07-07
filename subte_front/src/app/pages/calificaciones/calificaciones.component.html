@@ -1,0 +1,94 @@
+<div class="calificaciones-wrapper">
+  <div class="calificaciones-card">
+    <h2 class="titulo-seccion">Registrar Nueva Calificación ✅</h2>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label>Pedido ID</label>
+        <input formControlName="pedidoId" class="form-control input-subte">
+      </div>
+
+      <div class="mb-3">
+        <label>Cliente ID</label>
+        <input formControlName="clienteId" class="form-control input-subte">
+      </div>
+
+      <!-- Plantilla de estrellas personalizada -->
+      <ng-template #star let-fill="fill">
+        <i class="bi" [ngClass]="fill === 100 ? 'bi-star-fill text-warning' : 'bi-star text-secondary'"></i>
+      </ng-template>
+
+      <div class="mb-3">
+        <label>Puntuación Comida (1-5)</label>
+        <ngb-rating
+          formControlName="puntuacionComida"
+          [max]="5"
+          [starTemplate]="star">
+        </ngb-rating>
+      </div>
+
+      <div class="mb-3">
+        <label>Puntuación Servicio (1-5)</label>
+        <ngb-rating
+          formControlName="puntuacionServicio"
+          [max]="5"
+          [starTemplate]="star">
+        </ngb-rating>
+      </div>
+
+      <div class="mb-3">
+        <label>Puntuación Entrega (1-5)</label>
+        <ngb-rating
+          formControlName="puntuacionEntrega"
+          [max]="5"
+          [starTemplate]="star">
+        </ngb-rating>
+      </div>
+
+      <div class="mb-3">
+        <label>Comentario</label>
+        <textarea formControlName="comentario" class="form-control input-subte"></textarea>
+      </div>
+
+      <button class="btn btn-amarillo w-100" type="submit">
+        Registrar Calificación
+      </button>
+    </form>
+
+    <div *ngIf="error" class="alert alert-danger mt-3">{{ error }}</div>
+  </div>
+
+  <div class="listado-wrapper mt-4">
+    <h3 class="titulo-seccion">Listado de Calificaciones</h3>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>Pedido ID</th>
+            <th>Cliente ID</th>
+            <th>Comida</th>
+            <th>Servicio</th>
+            <th>Entrega</th>
+            <th>Comentario</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of calificaciones">
+            <td>{{ c.pedidoId }}</td>
+            <td>{{ c.clienteId }}</td>
+            <td>{{ c.puntuacionComida }}</td>
+            <td>{{ c.puntuacionServicio }}</td>
+            <td>{{ c.puntuacionEntrega }}</td>
+            <td>{{ c.comentario }}</td>
+            <td>
+              <button class="btn btn-sm btn-danger" (click)="eliminarCalificacion(c._id!)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

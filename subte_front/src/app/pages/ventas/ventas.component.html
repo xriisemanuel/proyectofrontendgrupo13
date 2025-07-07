@@ -1,0 +1,76 @@
+<div class="ventas-wrapper">
+  <div class="ventas-card">
+    <h2 class="titulo-seccion">Registrar Nueva Venta ✅</h2>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label>Pedido ID</label>
+        <input formControlName="pedidoId" class="form-control input-subte">
+      </div>
+
+      <div class="mb-3">
+        <label>Cliente ID</label>
+        <input formControlName="clienteId" class="form-control input-subte">
+      </div>
+
+      <div class="mb-3">
+        <label>Monto Total</label>
+        <input type="number" formControlName="montoTotal" class="form-control input-subte">
+      </div>
+
+      <div class="mb-3">
+        <label>Método de Pago</label>
+        <select formControlName="metodoPago" class="form-select input-subte">
+          <option value="" disabled selected>Seleccionar</option>
+          <option value="efectivo">Efectivo</option>
+          <option value="qr">QR</option>
+          <option value="tarjeta">Tarjeta</option>
+        </select>
+      </div>
+
+      <button class="btn btn-amarillo w-100" type="submit">
+        Registrar Venta
+      </button>
+    </form>
+
+    <div *ngIf="error" class="alert alert-danger mt-3">{{ error }}</div>
+  </div>
+
+  <div class="listado-wrapper mt-4">
+    <div class="filtro-bar mb-3">
+      <label>Filtrar por Método de Pago:</label>
+      <select [(ngModel)]="filtroMetodo" (change)="onFiltroChange()" class="form-select filtro-input">
+        <option value="">Todos</option>
+        <option value="EFECTIVO">Efectivo</option>
+        <option value="QR">QR</option>
+        <option value="TARJETA">Tarjeta</option>
+
+      </select>
+    </div>
+
+    <h3 class="titulo-seccion">Listado de Ventas</h3>
+
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>Pedido ID</th>
+            <th>Cliente ID</th>
+            <th>Monto Total</th>
+            <th>Método Pago</th>
+            <th>Número Factura</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let v of ventasFiltradas">
+            <td>{{ v.pedidoId }}</td>
+            <td>{{ v.clienteId }}</td>
+            <td>{{ v.montoTotal | currency }}</td>
+            <td>{{ v.metodoPago }}</td>
+            <td>{{ v.numeroFactura }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

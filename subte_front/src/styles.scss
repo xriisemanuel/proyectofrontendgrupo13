@@ -1,0 +1,32 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Importing Bootstrap SCSS file. */
+@import 'bootstrap/scss/bootstrap';
+.header-subte {
+  background-color: #111;
+  color: #d4af37;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .brand {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #d4af37;
+  }
+
+  nav a {
+    margin-left: 1rem;
+    color: #d4af37;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+
+    &:hover,
+    &.active {
+      color: #c29e2f;
+      border-bottom: 2px solid #c29e2f;
+    }
+  }
+}
