@@ -24,22 +24,37 @@ export class RegisterComponent {
       telefono: ['', Validators.required],
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
-      rolName: ['admin', Validators.required]
+      rolName: ['cliente', Validators.required],
+      direccionCliente: ['']
+    });
+
+    this.registerForm.get('rolName')?.valueChanges.subscribe(rol => {
+      const direccionControl = this.registerForm.get('direccionCliente');
+      if (rol === 'cliente') {
+        direccionControl?.setValidators([Validators.required]);
+      } else {
+        direccionControl?.clearValidators();
+      }
+      direccionControl?.updateValueAndValidity();
     });
   }
 
   onSubmit() {
     if (this.registerForm.valid) {
-      this.authService.registerAdmin(this.registerForm.value).subscribe({
+      this.authService.register(this.registerForm.value).subscribe({
         next: () => {
           this.mensaje = 'Usuario registrado correctamente. Ahora puedes iniciar sesión.';
           this.registrado = true;
-          this.registerForm.reset({ rolName: 'admin' });
+          this.registerForm.reset({ rolName: 'cliente' });
         },
-        error: (err) => {
+        error: (err: any) => {
           this.mensaje = err.error?.mensaje || 'Error al registrar usuario.';
         }
       });
     }
+  }
+
+  isDireccionRequired(): boolean {
+    return this.registerForm.get('rolName')?.value === 'cliente';
   }
 }

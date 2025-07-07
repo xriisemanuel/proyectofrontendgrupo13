@@ -2,12 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+export interface ProductoEnCombo {
+  productoId: string;
+  unidades: number;
+}
+
 export interface Combo {
   _id?: string;
   nombre: string;
   descripcion: string;
-  productosIds: string[];
-  precioCombo: number;
+  productos: ProductoEnCombo[];
   descuento?: number;
   imagen?: string;
   estado?: boolean;

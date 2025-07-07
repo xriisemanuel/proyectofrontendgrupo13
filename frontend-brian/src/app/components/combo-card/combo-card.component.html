@@ -1,0 +1,79 @@
+<div class="combo-card" [class.inactive]="!combo.estado">
+  <!-- Badge de estado -->
+  <div class="status-badge" [class.active]="combo.estado" [class.inactive]="!combo.estado">
+    {{ combo.estado ? 'Activo' : 'Inactivo' }}
+  </div>
+
+  <!-- Imagen del combo -->
+  <div class="card-image">
+    <img 
+      *ngIf="combo.imagen && validarImagen(combo.imagen)" 
+      [src]="combo.imagen" 
+      [alt]="combo.nombre"
+      (error)="onImageError($event)"
+      class="combo-image">
+    <div *ngIf="!combo.imagen || !validarImagen(combo.imagen)" class="combo-image-placeholder">
+      <span class="placeholder-icon">🍽️</span>
+    </div>
+  </div>
+
+  <!-- Contenido de la card -->
+  <div class="card-content">
+    <h3 class="combo-title">{{ combo.nombre }}</h3>
+    
+    <p class="combo-description" *ngIf="combo.descripcion">
+      {{ combo.descripcion }}
+    </p>
+
+    <div class="combo-products">
+      <span class="products-label">Productos:</span>
+      <span class="products-list">{{ getProductosNombres() }}</span>
+    </div>
+
+    <!-- Precios -->
+    <div class="price-section">
+      <div class="price-container">
+        <span class="price-label">Precio:</span>
+        <div class="price-info">
+          <span class="original-price" *ngIf="combo.descuento && combo.descuento > 0">
+            ${{ calcularPrecioBase() | number:'1.2-2' }}
+          </span>
+          <span class="final-price">
+            ${{ getPrecioConDescuento() | number:'1.2-2' }}
+          </span>
+          <span class="discount-badge" *ngIf="combo.descuento && combo.descuento > 0">
+            -{{ combo.descuento }}%
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Acciones (solo para administradores) -->
+  <div class="card-actions" *ngIf="showActions">
+    <button class="btn-action btn-edit" title="Editar combo" (click)="onEditClick($event)">
+      <span class="btn-icon">✏️</span>
+      Editar
+    </button>
+    <button class="btn-action btn-delete" title="Eliminar combo" (click)="onDeleteClick($event)">
+      <span class="btn-icon">🗑️</span>
+      Eliminar
+    </button>
+    <button 
+      *ngIf="!combo.estado" 
+      class="btn-action btn-activate" 
+      title="Activar combo"
+      (click)="onActivateClick($event)">
+      <span class="btn-icon">✅</span>
+      Activar
+    </button>
+    <button 
+      *ngIf="combo.estado" 
+      class="btn-action btn-deactivate" 
+      title="Desactivar combo"
+      (click)="onDeactivateClick($event)">
+      <span class="btn-icon">⏸️</span>
+      Desactivar
+    </button>
+  </div>
+</div> 

@@ -1,77 +1,119 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Inject, PLATFORM_ID } from '@angular/core';
 import { ComboService, Combo } from '../../services/combo.service';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { ProductoService, Producto } from '../../services/producto.service';
+import { AuthService } from '../../services/auth.service';
+import { ComboCardComponent } from '../combo-card/combo-card.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-combo-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule, ComboCardComponent],
   templateUrl: './combo-list.component.html',
   styleUrl: './combo-list.component.css'
 })
 export class ComboListComponent implements OnInit {
   combos: Combo[] = [];
   productos: Producto[] = [];
-  mostrarModal: boolean = false;
-  comboForm: FormGroup;
-  mensaje: string = '';
-  comboEditandoId: string | null = null;
   terminoBusqueda: string = '';
   combosFiltrados: Combo[] = [];
+  errorCarga: string = '';
+  cargando: boolean = false;
+  @ViewChild('comboSearchInput') comboSearchInput!: ElementRef<HTMLInputElement>;
 
-  constructor(private comboService: ComboService, private productoService: ProductoService, private fb: FormBuilder) {
-    this.comboForm = this.fb.group({
-      nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
-      descripcion: ['', [Validators.maxLength(500)]],
-      productosIds: [[], Validators.required],
-      precioCombo: [0, [Validators.required, Validators.min(0)]],
-      descuento: [0, [Validators.min(0), Validators.max(100)]],
-      imagen: [''],
-      estado: [true]
-    });
-  }
+  constructor(
+    private comboService: ComboService, 
+    private productoService: ProductoService, 
+    public authService: AuthService,
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
   ngOnInit() {
+    // Cargar combos (ahora es público)
+    this.cargarCombos();
+    // Solo cargar productos si es administrador (para mostrar en las cards)
+    if (this.authService.hasAdminPermissions()) {
+      this.cargarProductos();
+    }
+    // Enfocar búsqueda si viene de Home
+    setTimeout(() => {
+      if (isPlatformBrowser(this.platformId) && sessionStorage.getItem('focusComboSearch') === '1') {
+        this.irABuscarCombo();
+        sessionStorage.removeItem('focusComboSearch');
+      }
+    }, 400);
+  }
+
+  cargarCombos() {
+    this.cargando = true;
+    this.errorCarga = '';
+    
     this.comboService.getCombos().subscribe({
       next: (data) => {
         this.combos = data;
-        this.combosFiltrados = data;
-      },
-      error: () => this.combos = []
-    });
-    this.productoService.getProductos().subscribe({
-      next: (data) => this.productos = data,
-      error: () => this.productos = []
-    });
-  }
-
-  eliminarCombo(id: string) {
-    console.log('Eliminando combo con ID:', id);
-    this.comboService.deleteCombo(id).subscribe({
-      next: (response) => {
-        console.log('Respuesta de eliminación:', response);
-        // Actualizar ambas listas en tiempo real
-        this.combos = this.combos.filter(combo => combo._id !== id);
-        this.combosFiltrados = this.combosFiltrados.filter(combo => combo._id !== id);
-        console.log('Listas actualizadas después de eliminar');
+        this.filtrarCombosPorRol();
+        this.cargando = false;
       },
       error: (error) => {
-        console.error('Error al eliminar:', error);
-        alert('Error al eliminar el combo');
+        this.cargando = false;
+        if (error.status === 401) {
+          this.errorCarga = 'Debes iniciar sesión para ver los combos.';
+        } else if (error.status === 403) {
+          this.errorCarga = 'No tienes permisos para ver los combos.';
+        } else {
+          this.errorCarga = 'Error al cargar los combos.';
+        }
+        this.combos = [];
+        this.combosFiltrados = [];
       }
     });
   }
 
+  cargarProductos() {
+    this.productoService.getProductos().subscribe({
+      next: (data) => this.productos = data,
+      error: (error) => {
+        if (error.status !== 401 && error.status !== 403) {
+          console.error('Error al cargar productos:', error);
+        }
+        this.productos = [];
+      }
+    });
+  }
+
+  filtrarCombosPorRol() {
+    if (this.authService.isCliente()) {
+      // Los clientes solo ven combos activos
+      this.combosFiltrados = this.combos.filter(combo => combo.estado === true);
+    } else {
+      // Los administradores ven todos los combos
+      this.combosFiltrados = [...this.combos];
+    }
+  }
+
+  eliminarCombo(id: string) {
+    if (confirm('¿Estás seguro de que quieres eliminar este combo?')) {
+      this.comboService.deleteCombo(id).subscribe({
+        next: () => {
+          this.combos = this.combos.filter(combo => combo._id !== id);
+          this.filtrarCombosPorRol();
+        },
+        error: (error) => {
+          console.error('Error al eliminar:', error);
+          alert('Error al eliminar el combo');
+        }
+      });
+    }
+  }
+
   activarCombo(id: string) {
-    console.log('Activando combo con ID:', id);
     this.comboService.activarCombo(id).subscribe({
       next: (response: any) => {
-        console.log('Respuesta de activación:', response);
-        // Extraer el combo de la respuesta del backend
         const comboActualizado = response.combo;
-        // Actualizar el combo en ambas listas
         this.actualizarComboEnListas(id, comboActualizado);
       },
       error: (error) => {
@@ -82,13 +124,9 @@ export class ComboListComponent implements OnInit {
   }
 
   desactivarCombo(id: string) {
-    console.log('Desactivando combo con ID:', id);
     this.comboService.desactivarCombo(id).subscribe({
       next: (response: any) => {
-        console.log('Respuesta de desactivación:', response);
-        // Extraer el combo de la respuesta del backend
         const comboActualizado = response.combo;
-        // Actualizar el combo en ambas listas
         this.actualizarComboEnListas(id, comboActualizado);
       },
       error: (error) => {
@@ -99,79 +137,17 @@ export class ComboListComponent implements OnInit {
   }
 
   actualizarComboEnListas(id: string, comboActualizado: any) {
-    console.log('Actualizando combo en listas:', id, comboActualizado);
-    
-    // Actualizar en la lista principal
     const indexPrincipal = this.combos.findIndex(combo => combo._id === id);
     if (indexPrincipal !== -1) {
       this.combos[indexPrincipal] = comboActualizado;
-      console.log('Combo actualizado en lista principal');
     }
     
-    // Actualizar en la lista filtrada
-    const indexFiltrado = this.combosFiltrados.findIndex(combo => combo._id === id);
-    if (indexFiltrado !== -1) {
-      this.combosFiltrados[indexFiltrado] = comboActualizado;
-      console.log('Combo actualizado en lista filtrada');
-    }
-  }
-
-  obtenerCombo(id: string) {
-    this.comboService.getComboById(id).subscribe({
-      next: (response: any) => {
-        const combo = response.combo;
-        alert(JSON.stringify(combo, null, 2));
-      },
-      error: () => alert('Error al obtener el combo')
-    });
+    this.filtrarCombosPorRol();
   }
 
   editarCombo(id: string) {
-    this.comboService.getComboById(id).subscribe({
-      next: (response: any) => {
-        console.log('Respuesta completa del backend:', response);
-        const combo = response.combo; // Acceder al combo dentro de la respuesta
-        console.log('Datos del combo extraídos:', combo);
-        this.comboEditandoId = id;
-        this.comboForm.patchValue({
-          nombre: combo.nombre,
-          descripcion: combo.descripcion,
-          productosIds: combo.productosIds,
-          precioCombo: combo.precioCombo,
-          descuento: combo.descuento,
-          imagen: combo.imagen,
-          estado: combo.estado
-        });
-        console.log('Formulario después de patchValue:', this.comboForm.value);
-        this.mostrarModal = true;
-      },
-      error: () => alert('Error al obtener combo para editar')
-    });
-  }
-
-  cerrarModal() {
-    this.mostrarModal = false;
-    this.comboEditandoId = null;
-    this.comboForm.reset({ estado: true, descuento: 0, precioCombo: 0, productosIds: [] });
-    this.mensaje = '';
-  }
-
-  guardarEdicion() {
-    if (this.comboForm.valid && this.comboEditandoId) {
-      this.comboService.updateCombo(this.comboEditandoId, this.comboForm.value).subscribe({
-        next: (response: any) => {
-          this.mensaje = 'Combo actualizado correctamente';
-          // Extraer el combo de la respuesta del backend
-          const comboActualizado = response.combo;
-          // Actualizar el combo en ambas listas en tiempo real
-          this.actualizarComboEnListas(this.comboEditandoId!, comboActualizado);
-          setTimeout(() => this.cerrarModal(), 1000);
-        },
-        error: () => {
-          this.mensaje = 'Error al actualizar combo';
-        }
-      });
-    }
+    // Redirigir a la página de edición de combo
+    this.router.navigate(['/editar-combo', id]);
   }
 
   obtenerNombresProductos(productosIds: string[]): string {
@@ -189,65 +165,44 @@ export class ComboListComponent implements OnInit {
 
   filtrarCombos() {
     if (!this.terminoBusqueda.trim()) {
-      this.combosFiltrados = [...this.combos]; // Usar spread operator para crear una copia
+      this.filtrarCombosPorRol();
       return;
     }
     
-    const termino = this.terminoBusqueda.toLowerCase().trim();
+    const termino = this.terminoBusqueda.toLowerCase();
     this.combosFiltrados = this.combos.filter(combo => 
       combo.nombre.toLowerCase().includes(termino) ||
-      combo.descripcion.toLowerCase().includes(termino) ||
-      this.obtenerNombresProductos(combo.productosIds).toLowerCase().includes(termino)
+      combo.descripcion.toLowerCase().includes(termino)
     );
   }
 
   limpiarBusqueda() {
     this.terminoBusqueda = '';
-    this.combosFiltrados = [...this.combos]; // Usar spread operator para crear una copia
+    this.filtrarCombosPorRol();
   }
 
   onErrorImagen(event: any) {
-    console.log('Error al cargar imagen:', event.target.src);
-    
-    // Ocultar la imagen que falló
-    event.target.style.display = 'none';
-    
-    // Buscar si ya existe un mensaje de error
-    let errorSpan = event.target.parentNode.querySelector('.error-imagen');
-    
-    // Si no existe, crear uno nuevo
-    if (!errorSpan) {
-      errorSpan = document.createElement('span');
-      errorSpan.className = 'error-imagen';
-      errorSpan.textContent = 'Imagen no disponible';
-      event.target.parentNode.appendChild(errorSpan);
-    }
+    event.target.src = 'assets/images/placeholder.jpg';
   }
 
   onLoadImagen(event: any) {
-    console.log('Imagen cargada exitosamente:', event.target.src);
-    // Remover cualquier mensaje de error si existía
-    const errorSpan = event.target.parentNode.querySelector('.error-imagen');
-    if (errorSpan) {
-      errorSpan.remove();
-    }
+    event.target.style.display = 'block';
   }
 
   esUrlValida(url: string): boolean {
-    if (!url || url.trim() === '') {
+    if (!url) return false;
+    try {
+      new URL(url);
+      return true;
+    } catch {
       return false;
     }
-    
-    try {
-      // Intentar crear un objeto URL para validar
-      new URL(url);
-      
-      // Verificar que sea HTTP o HTTPS
-      const urlObj = new URL(url);
-      return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
-    } catch (error) {
-      console.log('URL inválida:', url);
-      return false;
+  }
+
+  irABuscarCombo() {
+    if (this.comboSearchInput && this.comboSearchInput.nativeElement) {
+      this.comboSearchInput.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => this.comboSearchInput.nativeElement.focus(), 400);
     }
   }
 }

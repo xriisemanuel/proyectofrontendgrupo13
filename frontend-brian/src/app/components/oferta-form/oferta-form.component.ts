@@ -1,66 +1,119 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { OfertaService, Oferta } from '../../services/oferta.service';
 import { ProductoService, Producto } from '../../services/producto.service';
 import { CategoriaService, Categoria } from '../../services/categoria.service';
+import { AuthService } from '../../services/auth.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-oferta-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './oferta-form.component.html'
+  templateUrl: './oferta-form.component.html',
+  styleUrl: './oferta-form.component.css'
 })
 export class OfertaFormComponent implements OnInit {
   ofertaForm: FormGroup;
-  mensaje: string = '';
-  error: string = '';
   productos: Producto[] = [];
   categorias: Categoria[] = [];
   productosSeleccionados: string[] = [];
   categoriasSeleccionadas: string[] = [];
+  esEdicion: boolean = false;
+  ofertaId: string | null = null;
+  cargando: boolean = false;
+  guardando: boolean = false;
+  mensaje: string = '';
+  errorCarga: string = '';
 
   constructor(
     private fb: FormBuilder,
     private ofertaService: OfertaService,
     private productoService: ProductoService,
-    private categoriaService: CategoriaService
+    private categoriaService: CategoriaService,
+    public authService: AuthService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {
+    // Obtener fechas por defecto
+    const hoy = new Date();
+    const fechaInicio = hoy.toISOString().split('T')[0];
+    const fechaFin = new Date(hoy.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // 30 días después
+
     this.ofertaForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
       descripcion: ['', [Validators.maxLength(500)]],
-      descuento: ['', [Validators.required, Validators.min(0), Validators.max(100)]],
-      fechaInicio: ['', [Validators.required]],
-      fechaFin: ['', [Validators.required]],
+      descuento: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
+      fechaInicio: [fechaInicio, Validators.required],
+      fechaFin: [fechaFin, [Validators.required, this.fechaFinValidator.bind(this)]],
       imagen: [''],
-      productosAplicables: [[]],
-      categoriasAplicables: [[]],
       estado: [true]
-    });
+    }, { validators: this.fechasValidator });
+  }
+
+  // Validador personalizado para fecha de fin
+  fechaFinValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+    
+    const fechaFin = new Date(control.value);
+    const fechaInicio = this.ofertaForm?.get('fechaInicio')?.value;
+    
+    if (fechaInicio && fechaFin <= new Date(fechaInicio)) {
+      return { fechaFinInvalida: true };
+    }
+    
+    return null;
+  }
+
+  // Validador para ambas fechas
+  fechasValidator(group: AbstractControl): ValidationErrors | null {
+    const fechaInicio = group.get('fechaInicio')?.value;
+    const fechaFin = group.get('fechaFin')?.value;
+    
+    if (fechaInicio && fechaFin && new Date(fechaFin) <= new Date(fechaInicio)) {
+      return { fechasInvalidas: true };
+    }
+    
+    return null;
   }
 
   ngOnInit() {
+    // Verificar permisos
+    if (!this.authService.hasAdminPermissions()) {
+      this.router.navigate(['/']);
+      return;
+    }
+
+    // Obtener parámetros de la ruta
+    this.ofertaId = this.route.snapshot.paramMap.get('id');
+    this.esEdicion = !!this.ofertaId;
+
+    console.log('OfertaFormComponent inicializado');
+    console.log('Es edición:', this.esEdicion);
+    console.log('ID de oferta:', this.ofertaId);
+    console.log('Usuario autenticado:', this.authService.isLoggedIn());
+    console.log('Rol actual:', this.authService.getCurrentRole());
+    console.log('Token disponible:', !!localStorage.getItem('token'));
+
+    // Cargar productos y categorías
     this.cargarProductos();
     this.cargarCategorias();
-    
-    // Validación personalizada para fechaFin
-    this.ofertaForm.get('fechaInicio')?.valueChanges.subscribe(() => {
-      this.validarFechas();
-    });
-    
-    this.ofertaForm.get('fechaFin')?.valueChanges.subscribe(() => {
-      this.validarFechas();
-    });
+
+    // Si es edición, cargar la oferta
+    if (this.esEdicion && this.ofertaId) {
+      this.cargarOferta();
+    }
   }
 
   cargarProductos() {
     this.productoService.getProductos().subscribe({
       next: (data) => {
         this.productos = data;
-        console.log('Productos cargados:', data);
       },
       error: (error) => {
         console.error('Error al cargar productos:', error);
+        this.errorCarga = 'Error al cargar los productos';
       }
     });
   }
@@ -69,10 +122,98 @@ export class OfertaFormComponent implements OnInit {
     this.categoriaService.getCategorias().subscribe({
       next: (data) => {
         this.categorias = data;
-        console.log('Categorías cargadas:', data);
       },
       error: (error) => {
         console.error('Error al cargar categorías:', error);
+        this.errorCarga = 'Error al cargar las categorías';
+      }
+    });
+  }
+
+  cargarOferta() {
+    if (!this.ofertaId) return;
+
+    this.cargando = true;
+    this.errorCarga = '';
+
+    console.log('Intentando cargar oferta con ID:', this.ofertaId);
+
+    this.ofertaService.getOfertaById(this.ofertaId).subscribe({
+      next: (response: any) => {
+        console.log('Respuesta del backend:', response);
+        console.log('Tipo de respuesta:', typeof response);
+        console.log('¿Es array?', Array.isArray(response));
+        
+        // Verificar si la respuesta es válida
+        if (!response) {
+          console.error('Respuesta vacía del backend');
+          this.errorCarga = 'Error: Respuesta vacía del servidor';
+          this.cargando = false;
+          return;
+        }
+        
+        // El backend devuelve la oferta directamente, no dentro de un objeto 'oferta'
+        const oferta = response;
+        
+        console.log('Oferta extraída:', oferta);
+        console.log('Productos aplicables:', oferta.productosAplicables);
+        console.log('Categorías aplicables:', oferta.categoriasAplicables);
+        
+        // Verificar que la oferta tenga los campos necesarios
+        if (!oferta.nombre) {
+          console.error('Oferta sin nombre:', oferta);
+          this.errorCarga = 'Error: Datos de oferta incompletos';
+          this.cargando = false;
+          return;
+        }
+        
+        // Actualizar productos y categorías seleccionados
+        this.productosSeleccionados = oferta.productosAplicables?.map((p: any) => p._id || p) || [];
+        this.categoriasSeleccionadas = oferta.categoriasAplicables?.map((c: any) => c._id || c) || [];
+        
+        console.log('Productos seleccionados:', this.productosSeleccionados);
+        console.log('Categorías seleccionadas:', this.categoriasSeleccionadas);
+        
+        // Convertir fechas a formato de input date
+        const fechaInicio = oferta.fechaInicio ? new Date(oferta.fechaInicio).toISOString().split('T')[0] : '';
+        const fechaFin = oferta.fechaFin ? new Date(oferta.fechaFin).toISOString().split('T')[0] : '';
+        
+        console.log('Fechas convertidas:', { fechaInicio, fechaFin });
+        
+        // Actualizar formulario
+        this.ofertaForm.patchValue({
+          nombre: oferta.nombre,
+          descripcion: oferta.descripcion || '',
+          descuento: oferta.descuento || 0,
+          fechaInicio: fechaInicio,
+          fechaFin: fechaFin,
+          imagen: oferta.imagen || '',
+          estado: oferta.estado !== undefined ? oferta.estado : true
+        });
+        
+        console.log('Formulario actualizado:', this.ofertaForm.value);
+        
+        this.cargando = false;
+      },
+      error: (error: any) => {
+        console.error('Error al cargar oferta:', error);
+        console.error('Status:', error.status);
+        console.error('StatusText:', error.statusText);
+        console.error('Error completo:', error);
+        
+        this.cargando = false;
+        
+        if (error.status === 401) {
+          this.errorCarga = 'Error de autenticación. Por favor, inicia sesión nuevamente.';
+        } else if (error.status === 403) {
+          this.errorCarga = 'No tienes permisos para acceder a esta oferta.';
+        } else if (error.status === 404) {
+          this.errorCarga = 'Oferta no encontrada.';
+        } else if (error.status === 500) {
+          this.errorCarga = 'Error interno del servidor.';
+        } else {
+          this.errorCarga = `Error al cargar la oferta: ${error.message || 'Error desconocido'}`;
+        }
       }
     });
   }
@@ -84,8 +225,6 @@ export class OfertaFormComponent implements OnInit {
     } else {
       this.productosSeleccionados.push(productoId);
     }
-    this.ofertaForm.patchValue({ productosAplicables: this.productosSeleccionados });
-    console.log('Productos seleccionados:', this.productosSeleccionados);
   }
 
   toggleCategoria(categoriaId: string) {
@@ -95,82 +234,74 @@ export class OfertaFormComponent implements OnInit {
     } else {
       this.categoriasSeleccionadas.push(categoriaId);
     }
-    this.ofertaForm.patchValue({ categoriasAplicables: this.categoriasSeleccionadas });
-    console.log('Categorías seleccionadas:', this.categoriasSeleccionadas);
   }
 
-  isProductoSeleccionado(productoId: string): boolean {
-    return this.productosSeleccionados.includes(productoId);
-  }
-
-  isCategoriaSeleccionada(categoriaId: string | undefined): boolean {
-    if (!categoriaId) return false;
-    return this.categoriasSeleccionadas.includes(categoriaId);
-  }
-
-  validarFechas() {
-    const fechaInicio = this.ofertaForm.get('fechaInicio')?.value;
-    const fechaFin = this.ofertaForm.get('fechaFin')?.value;
-    
-    if (fechaInicio && fechaFin) {
-      const inicio = new Date(fechaInicio);
-      const fin = new Date(fechaFin);
-      
-      if (fin < inicio) {
-        this.ofertaForm.get('fechaFin')?.setErrors({ fechaInvalida: true });
-      } else {
-        this.ofertaForm.get('fechaFin')?.setErrors(null);
-      }
-    }
-  }
-
-  onSubmit() {
+  guardarOferta() {
     if (this.ofertaForm.valid) {
-      const ofertaData = this.ofertaForm.value;
-      
-      // Convertir fechas de string a Date
-      ofertaData.fechaInicio = new Date(ofertaData.fechaInicio);
-      ofertaData.fechaFin = new Date(ofertaData.fechaFin);
-      
-      console.log('Datos de oferta a enviar:', ofertaData);
-      console.log('Estado del formulario:', {
-        valor: ofertaData.estado,
-        tipo: typeof ofertaData.estado,
-        booleano: Boolean(ofertaData.estado)
-      });
-      
-      this.ofertaService.crearOferta(ofertaData).subscribe({
-        next: (response) => {
-          console.log('Oferta creada exitosamente:', response);
-          this.mensaje = 'Oferta creada exitosamente';
-          this.error = '';
-          this.ofertaForm.reset({ estado: true });
-          this.productosSeleccionados = [];
-          this.categoriasSeleccionadas = [];
-        },
-        error: (error) => {
-          console.error('Error al crear oferta:', error);
-          this.error = error.error?.mensaje || 'Error al crear la oferta';
-          this.mensaje = '';
-        }
-      });
+      this.guardando = true;
+      this.mensaje = '';
+
+      const ofertaData = {
+        ...this.ofertaForm.value,
+        fechaInicio: new Date(this.ofertaForm.value.fechaInicio).toISOString(),
+        fechaFin: new Date(this.ofertaForm.value.fechaFin).toISOString(),
+        productosAplicables: this.productosSeleccionados,
+        categoriasAplicables: this.categoriasSeleccionadas
+      };
+
+      if (this.esEdicion && this.ofertaId) {
+        // Actualizar oferta existente
+        this.ofertaService.editarOferta(this.ofertaId, ofertaData).subscribe({
+          next: (response: any) => {
+            this.mensaje = response.mensaje || 'Oferta actualizada correctamente';
+            this.guardando = false;
+            setTimeout(() => {
+              this.router.navigate(['/ofertas']);
+            }, 1500);
+          },
+          error: (error) => {
+            this.mensaje = error.error?.mensaje || 'Error al actualizar la oferta';
+            this.guardando = false;
+          }
+        });
+      } else {
+        // Crear nueva oferta
+        this.ofertaService.crearOferta(ofertaData).subscribe({
+          next: (response: any) => {
+            this.mensaje = response.mensaje || 'Oferta creada correctamente';
+            this.guardando = false;
+            setTimeout(() => {
+              this.router.navigate(['/ofertas']);
+            }, 1500);
+          },
+          error: (error: any) => {
+            this.mensaje = error.error?.mensaje || 'Error al crear la oferta';
+            this.guardando = false;
+          }
+        });
+      }
     } else {
       console.log('Formulario inválido:', this.ofertaForm.errors);
-      this.error = 'Por favor, completa todos los campos requeridos correctamente';
-      this.mensaje = '';
+      console.log('Errores por campo:', {
+        nombre: this.ofertaForm.get('nombre')?.errors,
+        descuento: this.ofertaForm.get('descuento')?.errors,
+        fechaInicio: this.ofertaForm.get('fechaInicio')?.errors,
+        fechaFin: this.ofertaForm.get('fechaFin')?.errors
+      });
     }
   }
 
-  getError(field: string): string {
-    const control = this.ofertaForm.get(field);
-    if (control?.errors && control.touched) {
-      if (control.errors['required']) return `${field} es requerido`;
-      if (control.errors['minlength']) return `${field} debe tener al menos ${control.errors['minlength'].requiredLength} caracteres`;
-      if (control.errors['maxlength']) return `${field} no puede exceder ${control.errors['maxlength'].requiredLength} caracteres`;
-      if (control.errors['min']) return `${field} debe ser mayor o igual a ${control.errors['min'].min}`;
-      if (control.errors['max']) return `${field} debe ser menor o igual a ${control.errors['max'].max}`;
-      if (control.errors['fechaInvalida']) return 'La fecha de fin debe ser posterior o igual a la fecha de inicio';
+  volverAtras() {
+    this.router.navigate(['/ofertas']);
+  }
+
+  esUrlValida(url: string): boolean {
+    if (!url) return true;
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
     }
-    return '';
   }
 } 

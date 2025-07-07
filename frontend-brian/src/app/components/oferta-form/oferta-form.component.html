@@ -1,138 +1,235 @@
-<h3>Crear Nueva Oferta</h3>
+<!-- Debug: Formulario de ofertas cargado -->
+<div style="background: yellow; padding: 10px; margin: 10px; border: 2px solid red;">
+  DEBUG: Formulario de ofertas visible - VERSIÓN SIMPLIFICADA
+  <br>
+  Estado del formulario: {{ ofertaForm.valid ? 'Válido' : 'Inválido' }}
+  <br>
+  Errores del formulario: {{ ofertaForm.errors | json }}
+  <br>
+  <strong>Errores por campo:</strong>
+  <br>
+  Nombre: {{ ofertaForm.get('nombre')?.errors | json }}
+  <br>
+  Descuento: {{ ofertaForm.get('descuento')?.errors | json }}
+  <br>
+  Fecha Inicio: {{ ofertaForm.get('fechaInicio')?.errors | json }}
+  <br>
+  Fecha Fin: {{ ofertaForm.get('fechaFin')?.errors | json }}
+  <br>
+  <strong>Valores actuales:</strong>
+  <br>
+  Nombre: "{{ ofertaForm.get('nombre')?.value }}"
+  <br>
+  Descuento: {{ ofertaForm.get('descuento')?.value }}
+  <br>
+  Fecha Inicio: "{{ ofertaForm.get('fechaInicio')?.value }}"
+  <br>
+  Fecha Fin: "{{ ofertaForm.get('fechaFin')?.value }}"
+  <br>
+  <strong>Validaciones de fechas:</strong>
+  <br>
+  Fecha Fin Inválida: {{ ofertaForm.get('fechaFin')?.errors?.['fechaFinInvalida'] | json }}
+  <br>
+  Fechas Inválidas (grupo): {{ ofertaForm.errors?.['fechasInvalidas'] | json }}
+</div>
 
-<form [formGroup]="ofertaForm" (ngSubmit)="onSubmit()">
-  <div>
-    <label for="nombre">Nombre *</label>
-    <input 
-      type="text" 
-      id="nombre" 
-      formControlName="nombre"
-      placeholder="Nombre de la oferta"
-    />
-    <div *ngIf="getError('nombre')" class="error">{{ getError('nombre') }}</div>
+<div class="oferta-form-container">
+  <div class="form-header">
+    <h2>{{ esEdicion ? 'Editar Oferta' : 'Crear Nueva Oferta' }}</h2>
+    <button type="button" (click)="volverAtras()" class="btn btn-outline">
+      ← Volver
+    </button>
   </div>
 
-  <div>
-    <label for="descripcion">Descripción</label>
-    <textarea 
-      id="descripcion" 
-      formControlName="descripcion"
-      placeholder="Descripción de la oferta"
-      rows="3"
-    ></textarea>
-    <div *ngIf="getError('descripcion')" class="error">{{ getError('descripcion') }}</div>
+  <div *ngIf="cargando" class="loading-state">
+    Cargando...
   </div>
 
-  <div>
-    <label for="descuento">Descuento (%) *</label>
-    <input 
-      type="number" 
-      id="descuento" 
-      formControlName="descuento"
-      placeholder="0-100"
-      min="0"
-      max="100"
-    />
-    <div *ngIf="getError('descuento')" class="error">{{ getError('descuento') }}</div>
+  <div *ngIf="errorCarga" class="error-state">
+    {{ errorCarga }}
   </div>
 
-  <div>
-    <label for="fechaInicio">Fecha de Inicio *</label>
-    <input 
-      type="datetime-local" 
-      id="fechaInicio" 
-      formControlName="fechaInicio"
-    />
-    <div *ngIf="getError('fechaInicio')" class="error">{{ getError('fechaInicio') }}</div>
-  </div>
-
-  <div>
-    <label for="fechaFin">Fecha de Fin *</label>
-    <input 
-      type="datetime-local" 
-      id="fechaFin" 
-      formControlName="fechaFin"
-    />
-    <div *ngIf="getError('fechaFin')" class="error">{{ getError('fechaFin') }}</div>
-  </div>
-
-  <div>
-    <label for="imagen">URL de Imagen</label>
-    <input 
-      type="url" 
-      id="imagen" 
-      formControlName="imagen"
-      placeholder="https://ejemplo.com/imagen.jpg"
-    />
-  </div>
-
-  <div>
-    <label for="estado">Estado</label>
-    <input 
-      type="checkbox" 
-      id="estado" 
-      formControlName="estado"
-    />
-    <span>Activa</span>
-  </div>
-
-  <div>
-    <label>Productos Aplicables</label>
-    <div *ngIf="productos.length > 0" class="seleccion-multiple">
-      <div *ngFor="let producto of productos" class="item-seleccionable">
+  <form *ngIf="!cargando && !errorCarga" [formGroup]="ofertaForm" (ngSubmit)="guardarOferta()" class="oferta-form">
+    <div class="form-section">
+      <h3>Información Básica</h3>
+      
+      <div class="form-group">
+        <label for="nombre">Nombre de la Oferta *</label>
         <input 
-          type="checkbox" 
-          [id]="'producto-' + producto._id"
-          [checked]="isProductoSeleccionado(producto._id)"
-          (change)="toggleProducto(producto._id)"
+          id="nombre"
+          type="text" 
+          formControlName="nombre" 
+          class="form-control"
+          placeholder="Ej: Descuento de Verano"
+          [class.invalid]="ofertaForm.get('nombre')?.invalid && ofertaForm.get('nombre')?.touched"
         />
-        <label [for]="'producto-' + producto._id">
-          {{ producto.nombre }} - ${{ producto.precio }}
-        </label>
+        <div *ngIf="ofertaForm.get('nombre')?.invalid && ofertaForm.get('nombre')?.touched" class="error-message">
+          <span *ngIf="ofertaForm.get('nombre')?.errors?.['required']">El nombre es requerido</span>
+          <span *ngIf="ofertaForm.get('nombre')?.errors?.['minlength']">El nombre debe tener al menos 3 caracteres</span>
+          <span *ngIf="ofertaForm.get('nombre')?.errors?.['maxlength']">El nombre no puede exceder 100 caracteres</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="descripcion">Descripción</label>
+        <textarea 
+          id="descripcion"
+          formControlName="descripcion" 
+          class="form-control"
+          placeholder="Describe la oferta..."
+          rows="3"
+          [class.invalid]="ofertaForm.get('descripcion')?.invalid && ofertaForm.get('descripcion')?.touched"
+        ></textarea>
+        <div *ngIf="ofertaForm.get('descripcion')?.invalid && ofertaForm.get('descripcion')?.touched" class="error-message">
+          <span *ngIf="ofertaForm.get('descripcion')?.errors?.['maxlength']">La descripción no puede exceder 500 caracteres</span>
+        </div>
       </div>
     </div>
-    <div *ngIf="productos.length === 0">
-      <p>Cargando productos...</p>
-    </div>
-    <div *ngIf="productosSeleccionados.length > 0">
-      <small>Seleccionados: {{ productosSeleccionados.length }} producto(s)</small>
-    </div>
-  </div>
 
-  <div>
-    <label>Categorías Aplicables</label>
-    <div *ngIf="categorias.length > 0" class="seleccion-multiple">
-      <div *ngFor="let categoria of categorias" class="item-seleccionable">
-        <input 
-          type="checkbox" 
-          [id]="'categoria-' + categoria._id"
-          [checked]="isCategoriaSeleccionada(categoria._id)"
-          (change)="toggleCategoria(categoria._id || '')"
-        />
-        <label [for]="'categoria-' + categoria._id">
-          {{ categoria.nombre }}
-        </label>
+    <div class="form-section">
+      <h3>Descuento y Fechas</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="descuento">Descuento (%) *</label>
+          <input 
+            id="descuento"
+            type="number" 
+            formControlName="descuento" 
+            class="form-control"
+            placeholder="0"
+            min="0"
+            max="100"
+            [class.invalid]="ofertaForm.get('descuento')?.invalid && ofertaForm.get('descuento')?.touched"
+          />
+          <div *ngIf="ofertaForm.get('descuento')?.invalid && ofertaForm.get('descuento')?.touched" class="error-message">
+            <span *ngIf="ofertaForm.get('descuento')?.errors?.['required']">El descuento es requerido</span>
+            <span *ngIf="ofertaForm.get('descuento')?.errors?.['min']">El descuento debe ser mayor o igual a 0</span>
+            <span *ngIf="ofertaForm.get('descuento')?.errors?.['max']">El descuento no puede exceder 100%</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="estado">Estado</label>
+          <select id="estado" formControlName="estado" class="form-control">
+            <option [value]="true">Activa</option>
+            <option [value]="false">Inactiva</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fechaInicio">Fecha de Inicio *</label>
+          <input 
+            id="fechaInicio"
+            type="date" 
+            formControlName="fechaInicio" 
+            class="form-control"
+            [class.invalid]="ofertaForm.get('fechaInicio')?.invalid && ofertaForm.get('fechaInicio')?.touched"
+          />
+          <div *ngIf="ofertaForm.get('fechaInicio')?.invalid && ofertaForm.get('fechaInicio')?.touched" class="error-message">
+            <span *ngIf="ofertaForm.get('fechaInicio')?.errors?.['required']">La fecha de inicio es requerida</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="fechaFin">Fecha de Fin *</label>
+          <input 
+            id="fechaFin"
+            type="date" 
+            formControlName="fechaFin" 
+            class="form-control"
+            [class.invalid]="ofertaForm.get('fechaFin')?.invalid && ofertaForm.get('fechaFin')?.touched"
+          />
+          <div *ngIf="ofertaForm.get('fechaFin')?.invalid && ofertaForm.get('fechaFin')?.touched" class="error-message">
+            <span *ngIf="ofertaForm.get('fechaFin')?.errors?.['required']">La fecha de fin es requerida</span>
+            <span *ngIf="ofertaForm.get('fechaFin')?.errors?.['fechaFinInvalida']">La fecha de fin debe ser posterior a la fecha de inicio</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error de validación de fechas a nivel de formulario -->
+      <div *ngIf="ofertaForm.errors?.['fechasInvalidas']" class="error-message">
+        La fecha de fin debe ser posterior a la fecha de inicio
       </div>
     </div>
-    <div *ngIf="categorias.length === 0">
-      <p>Cargando categorías...</p>
+
+    <div class="form-section">
+      <h3>Productos Aplicables</h3>
+      
+      <div class="form-group">
+        <label>Seleccionar Productos</label>
+        <div class="productos-selector">
+          <div *ngFor="let producto of productos" class="producto-item">
+            <input 
+              type="checkbox" 
+              [id]="'producto-' + producto._id"
+              [value]="producto._id"
+              (change)="toggleProducto(producto._id)"
+              [checked]="productosSeleccionados.includes(producto._id)"
+            />
+            <label [for]="'producto-' + producto._id" class="producto-label">
+              <span class="producto-nombre">{{ producto.nombre }}</span>
+              <span class="producto-precio">${{ producto.precio }}</span>
+            </label>
+          </div>
+        </div>
+      </div>
     </div>
-    <div *ngIf="categoriasSeleccionadas.length > 0">
-      <small>Seleccionadas: {{ categoriasSeleccionadas.length }} categoría(s)</small>
+
+    <div class="form-section">
+      <h3>Categorías Aplicables</h3>
+      
+      <div class="form-group">
+        <label>Seleccionar Categorías</label>
+        <div class="categorias-selector">
+          <div *ngFor="let categoria of categorias" class="categoria-item">
+            <input 
+              type="checkbox" 
+              [id]="'categoria-' + categoria._id"
+              [value]="categoria._id"
+              (change)="toggleCategoria(categoria._id!)"
+              [checked]="categoriasSeleccionadas.includes(categoria._id!)"
+            />
+            <label [for]="'categoria-' + categoria._id" class="categoria-label">
+              <span class="categoria-nombre">{{ categoria.nombre }}</span>
+            </label>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <button type="submit" [disabled]="ofertaForm.invalid">Crear Oferta</button>
-</form>
+    <div class="form-section">
+      <h3>Imagen</h3>
+      
+      <div class="form-group">
+        <label for="imagen">URL de la Imagen</label>
+        <input 
+          id="imagen"
+          type="url" 
+          formControlName="imagen" 
+          class="form-control"
+          placeholder="https://ejemplo.com/imagen.jpg"
+        />
+        <div *ngIf="ofertaForm.get('imagen')?.value && !esUrlValida(ofertaForm.get('imagen')?.value)" class="error-message">
+          URL de imagen inválida
+        </div>
+      </div>
+    </div>
 
-<div *ngIf="mensaje" class="mensaje-exito">{{ mensaje }}</div>
-<div *ngIf="error" class="mensaje-error">{{ error }}</div>
+    <div *ngIf="mensaje" class="alert" [class]="mensaje.includes('Error') ? 'alert-danger' : 'alert-success'">
+      {{ mensaje }}
+    </div>
 
-<div>
-  <h4>Debug - Estado del Formulario:</h4>
-  <pre>{{ ofertaForm.value | json }}</pre>
-  <pre>Válido: {{ ofertaForm.valid }}</pre>
-  <pre>Errores: {{ ofertaForm.errors | json }}</pre>
-  <pre>Productos seleccionados: {{ productosSeleccionados | json }}</pre>
-  <pre>Categorías seleccionadas: {{ categoriasSeleccionadas | json }}</pre>
-</div> 
+    <div class="form-actions">
+      <button type="button" (click)="volverAtras()" class="btn btn-outline">
+        Cancelar
+      </button>
+      <button type="submit" [disabled]="!ofertaForm.valid || guardando" class="btn btn-primary">
+        <span *ngIf="guardando">Guardando...</span>
+        <span *ngIf="!guardando">{{ esEdicion ? 'Actualizar Oferta' : 'Crear Oferta' }}</span>
+      </button>
+    </div>
+  </form>
+</div>

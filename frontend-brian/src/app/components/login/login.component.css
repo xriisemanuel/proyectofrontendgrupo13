@@ -1,0 +1,179 @@
+/* Componente Login - Estilos Específicos */
+
+.login-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.login-container h2 {
+  color: var(--gray-800);
+  margin-bottom: var(--spacing-xl);
+  font-size: 1.75rem;
+  font-weight: 700;
+  text-align: center;
+  font-family: var(--font-serif);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.form-group label {
+  font-weight: 600;
+  color: var(--gray-700);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-group input {
+  padding: var(--spacing-md);
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background-color: white;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+}
+
+.form-group input::placeholder {
+  color: var(--gray-400);
+}
+
+.form-group .error {
+  color: var(--danger-color);
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-top: var(--spacing-xs);
+}
+
+button[type="submit"] {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: var(--spacing-lg);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+button[type="submit"]:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+button[type="submit"]:disabled {
+  background: var(--gray-300);
+  color: var(--gray-500);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Información de roles */
+.roles-info {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.roles-info h4 {
+  color: var(--gray-800);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+  font-family: var(--font-alt);
+}
+
+.roles-info ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.roles-info li {
+  padding: var(--spacing-xs) 0;
+  color: var(--gray-600);
+  font-size: 0.875rem;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.roles-info li:last-child {
+  border-bottom: none;
+}
+
+.roles-info li strong {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.info-text {
+  color: var(--gray-500);
+  font-size: 0.75rem;
+  font-style: italic;
+  margin: 0;
+  text-align: center;
+}
+
+.error-message {
+  background-color: #FFF5F5;
+  border: 1px solid #FFE6E6;
+  color: var(--danger-color);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  margin-top: var(--spacing-lg);
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .login-container {
+    padding: 0 var(--spacing-md);
+  }
+  
+  .login-container h2 {
+    font-size: 1.5rem;
+  }
+  
+  button[type="submit"] {
+    padding: var(--spacing-md);
+    font-size: 0.875rem;
+  }
+}

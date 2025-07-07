@@ -1,24 +1,41 @@
 <ng-container *ngIf="authService.isLoggedIn(); else login">
-  <h1>Gestión de Combos y Ofertas</h1>
-    <section>
-    <h2>Agregar Combo</h2>
-    <app-combo-form></app-combo-form>
-    <app-combo-list></app-combo-list>
-  </section>
-  <hr />
-  <section>
-    <h2>Ofertas</h2>
-    <app-oferta-form></app-oferta-form>
-    <app-oferta-list></app-oferta-list>
-  </section>
-  <hr />
- 
-  <button (click)="logout()">Cerrar sesión</button>
+  <div class="header">
+    <h1>Gestión de Combos y Ofertas</h1>
+    <div class="user-info">
+      <span class="role-badge" [class.admin]="authService.hasAdminPermissions()" [class.cliente]="authService.isCliente()">
+        {{ authService.getCurrentRole() | titlecase }}
+      </span>
+      <button (click)="logout()" class="logout-btn">Cerrar sesión</button>
+    </div>
+  </div>
+  
+  <div class="main-container">
+    <!-- Navegación -->
+    <nav class="navigation">
+      <a routerLink="/" class="nav-link" routerLinkActive="router-link-active">Inicio</a>
+      <a routerLink="/combos" class="nav-link" routerLinkActive="router-link-active">Combos</a>
+      <a routerLink="/ofertas" class="nav-link" routerLinkActive="router-link-active">Ofertas</a>
+    </nav>
+
+    <!-- Contenido principal -->
+    <router-outlet />
+  </div>
 </ng-container>
+
 <ng-template #login>
-  <app-login></app-login>
-  <hr />
-  <app-register></app-register>
+  <div class="auth-container">
+    <h1>Bienvenido</h1>
+    <div class="auth-forms">
+      <div class="login-section">
+        <h2>Iniciar Sesión</h2>
+        <app-login></app-login>
+      </div>
+      <div class="register-section">
+        <h2>Registrarse</h2>
+        <app-register></app-register>
+      </div>
+    </div>
+  </div>
 </ng-template>
 
 <router-outlet />

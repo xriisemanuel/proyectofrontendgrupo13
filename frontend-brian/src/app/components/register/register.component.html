@@ -2,35 +2,63 @@
   <div>
     <label>Nombre:</label>
     <input formControlName="nombre" required />
+    <div *ngIf="registerForm.get('nombre')?.invalid && registerForm.get('nombre')?.touched" class="error">
+      Nombre es requerido
+    </div>
   </div>
   <div>
     <label>Apellido:</label>
     <input formControlName="apellido" required />
+    <div *ngIf="registerForm.get('apellido')?.invalid && registerForm.get('apellido')?.touched" class="error">
+      Apellido es requerido
+    </div>
   </div>
   <div>
     <label>Usuario:</label>
     <input formControlName="username" required />
+    <div *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched" class="error">
+      Usuario es requerido
+    </div>
   </div>
   <div>
     <label>Email:</label>
     <input formControlName="email" type="email" required />
+    <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="error">
+      Email válido es requerido
+    </div>
   </div>
   <div>
     <label>Teléfono:</label>
     <input formControlName="telefono" required />
+    <div *ngIf="registerForm.get('telefono')?.invalid && registerForm.get('telefono')?.touched" class="error">
+      Teléfono es requerido
+    </div>
   </div>
   <div>
     <label>Contraseña:</label>
     <input formControlName="password" type="password" required />
+    <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="error">
+      Contraseña es requerida
+    </div>
   </div>
   <div>
     <label>Rol:</label>
     <select formControlName="rolName" required>
-      <option *ngFor="let rol of roles" [value]="rol">{{ rol }}</option>
+      <option *ngFor="let rol of roles" [value]="rol">{{ rol | titlecase }}</option>
     </select>
+    <div *ngIf="registerForm.get('rolName')?.invalid && registerForm.get('rolName')?.touched" class="error">
+      Rol es requerido
+    </div>
+  </div>
+  <div *ngIf="isDireccionRequired()">
+    <label>Dirección:</label>
+    <input formControlName="direccionCliente" required />
+    <div *ngIf="registerForm.get('direccionCliente')?.invalid && registerForm.get('direccionCliente')?.touched" class="error">
+      Dirección es requerida para clientes
+    </div>
   </div>
   <div>
     <button type="submit" [disabled]="!registerForm.valid">Registrar</button>
   </div>
-  <div *ngIf="mensaje">{{ mensaje }}</div>
+  <div *ngIf="mensaje" [class]="registrado ? 'success' : 'error'">{{ mensaje }}</div>
 </form>

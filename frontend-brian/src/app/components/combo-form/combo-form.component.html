@@ -1,37 +1,188 @@
-<form [formGroup]="comboForm" (ngSubmit)="onSubmit()">
-  <div>
-    <label>Nombre:</label>
-    <input formControlName="nombre" required minlength="3" maxlength="100" />
+<div class="combo-form-container">
+  <div class="form-header">
+    <h2>{{ esEdicion ? 'Editar Combo' : 'Crear Nuevo Combo' }}</h2>
+    <button type="button" (click)="volverAtras()" class="btn btn-outline">
+      ← Volver
+    </button>
   </div>
-  <div>
-    <label>Descripción:</label>
-    <input formControlName="descripcion" maxlength="500" />
+
+  <div *ngIf="cargando" class="loading-state">
+    Cargando...
   </div>
-  <div>
-    <label>Productos:</label>
-    <select formControlName="productosIds" multiple required>
-      <option *ngFor="let producto of productos" [value]="producto._id">{{ producto.nombre }}</option>
-    </select>
+
+  <div *ngIf="errorCarga" class="error-state">
+    {{ errorCarga }}
   </div>
-  <div>
-    <label>Precio Combo:</label>
-    <input type="number" formControlName="precioCombo" required min="0" />
-  </div>
-  <div>
-    <label>Descuento (%):</label>
-    <input type="number" formControlName="descuento" min="0" max="100" />
-  </div>
-  <div>
-    <label>Imagen (URL):</label>
-    <input formControlName="imagen" />
-  </div>
-  <div>
-    <label>Estado:</label>
-    <select formControlName="estado">
-      <option [value]="true">Activo</option>
-      <option [value]="false">Inactivo</option>
-    </select>
-  </div>
-  <button type="submit" [disabled]="!comboForm.valid">Agregar Combo</button>
-  <div *ngIf="mensaje">{{ mensaje }}</div>
-</form>
+
+  <form *ngIf="!cargando && !errorCarga" [formGroup]="comboForm" (ngSubmit)="guardarCombo()" class="combo-form">
+    <div class="form-section">
+      <h3>Información Básica</h3>
+      
+      <div class="form-group">
+        <label for="nombre">Nombre del Combo *</label>
+        <input 
+          id="nombre"
+          type="text" 
+          formControlName="nombre" 
+          class="form-control"
+          placeholder="Ej: Combo Familiar"
+          [class.invalid]="comboForm.get('nombre')?.invalid && comboForm.get('nombre')?.touched"
+        />
+        <div *ngIf="comboForm.get('nombre')?.invalid && comboForm.get('nombre')?.touched" class="error-message">
+          <span *ngIf="comboForm.get('nombre')?.errors?.['required']">El nombre es requerido</span>
+          <span *ngIf="comboForm.get('nombre')?.errors?.['minlength']">El nombre debe tener al menos 3 caracteres</span>
+          <span *ngIf="comboForm.get('nombre')?.errors?.['maxlength']">El nombre no puede exceder 100 caracteres</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="descripcion">Descripción</label>
+        <textarea 
+          id="descripcion"
+          formControlName="descripcion" 
+          class="form-control"
+          placeholder="Describe el combo..."
+          rows="3"
+          [class.invalid]="comboForm.get('descripcion')?.invalid && comboForm.get('descripcion')?.touched"
+        ></textarea>
+        <div *ngIf="comboForm.get('descripcion')?.invalid && comboForm.get('descripcion')?.touched" class="error-message">
+          <span *ngIf="comboForm.get('descripcion')?.errors?.['maxlength']">La descripción no puede exceder 500 caracteres</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Productos del Combo</h3>
+      
+      <div class="form-group">
+        <label for="productos">Seleccionar Productos *</label>
+        <div class="productos-selector">
+          <div *ngFor="let producto of productos" class="producto-item">
+            <input 
+              type="checkbox" 
+              [id]="'producto-' + producto._id"
+              [value]="producto._id"
+              (change)="toggleProducto(producto._id)"
+              [checked]="isProductoSeleccionado(producto._id)"
+            />
+            <label [for]="'producto-' + producto._id" class="producto-label">
+              <span class="producto-nombre">{{ producto.nombre }}</span>
+              <span class="producto-precio">${{ producto.precio }}</span>
+            </label>
+            
+            <!-- Controles de unidades (solo mostrar si está seleccionado) -->
+            <div *ngIf="isProductoSeleccionado(producto._id)" class="unidades-control">
+              <label for="unidades-{{ producto._id }}">Unidades:</label>
+              <div class="unidades-input">
+                <button 
+                  type="button" 
+                  class="btn-unidad" 
+                  (click)="cambiarUnidades(producto._id, getUnidadesProducto(producto._id) - 1)"
+                  [disabled]="getUnidadesProducto(producto._id) <= 1"
+                >
+                  -
+                </button>
+                <input 
+                  type="number" 
+                  [id]="'unidades-' + producto._id"
+                  [value]="getUnidadesProducto(producto._id)"
+                  min="1"
+                  (change)="onUnidadesChange($event, producto._id)"
+                  class="unidades-number"
+                />
+                <button 
+                  type="button" 
+                  class="btn-unidad" 
+                  (click)="cambiarUnidades(producto._id, getUnidadesProducto(producto._id) + 1)"
+                >
+                  +
+                </button>
+              </div>
+              <span class="subtotal-producto">
+                Subtotal: ${{ getSubtotalProducto(producto).toFixed(2) }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="productosSeleccionados.length === 0" class="error-message">
+          <span>Debes seleccionar al menos un producto</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Precios y Descuentos</h3>
+      
+      <!-- Resumen de precios -->
+      <div class="precios-resumen" *ngIf="productosSeleccionados.length > 0">
+        <div class="resumen-item">
+          <span class="resumen-label">Precio Total sin Descuento:</span>
+          <span class="resumen-valor">${{ precioTotalSinDescuento.toFixed(2) }}</span>
+        </div>
+        
+        <div class="form-group">
+          <label for="descuento">Descuento (%)</label>
+          <input 
+            id="descuento"
+            type="number" 
+            formControlName="descuento" 
+            class="form-control"
+            placeholder="0"
+            min="0"
+            max="100"
+            [class.invalid]="comboForm.get('descuento')?.invalid && comboForm.get('descuento')?.touched"
+          />
+          <div *ngIf="comboForm.get('descuento')?.invalid && comboForm.get('descuento')?.touched" class="error-message">
+            <span *ngIf="comboForm.get('descuento')?.errors?.['min']">El descuento debe ser mayor o igual a 0</span>
+            <span *ngIf="comboForm.get('descuento')?.errors?.['max']">El descuento no puede exceder 100%</span>
+          </div>
+        </div>
+
+        <div class="resumen-item ahorro" *ngIf="ahorroTotal > 0">
+          <span class="resumen-label">Ahorro Total:</span>
+          <span class="resumen-valor ahorro-valor">${{ ahorroTotal.toFixed(2) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Imagen y Estado</h3>
+      
+      <div class="form-group">
+        <label for="imagen">URL de la Imagen</label>
+        <input 
+          id="imagen"
+          type="url" 
+          formControlName="imagen" 
+          class="form-control"
+          placeholder="https://ejemplo.com/imagen.jpg"
+        />
+        <div *ngIf="comboForm.get('imagen')?.value && !esUrlValida(comboForm.get('imagen')?.value)" class="error-message">
+          URL de imagen inválida
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="estado">Estado</label>
+        <select id="estado" formControlName="estado" class="form-control">
+          <option [value]="true">Activo</option>
+          <option [value]="false">Inactivo</option>
+        </select>
+      </div>
+    </div>
+
+    <div *ngIf="mensaje" class="alert" [class]="mensaje.includes('Error') ? 'alert-danger' : 'alert-success'">
+      {{ mensaje }}
+    </div>
+
+    <div class="form-actions">
+      <button type="button" (click)="volverAtras()" class="btn btn-outline">
+        Cancelar
+      </button>
+      <button type="submit" [disabled]="!comboForm.valid || guardando || productosSeleccionados.length === 0" class="btn btn-primary">
+        <span *ngIf="guardando">Guardando...</span>
+        <span *ngIf="!guardando">{{ esEdicion ? 'Actualizar Combo' : 'Crear Combo' }}</span>
+      </button>
+    </div>
+  </form>
+</div>

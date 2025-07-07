@@ -1,0 +1,141 @@
+<div class="home-container">
+  <div class="home-header">
+    <h2>Bienvenido a Nuestro Catálogo</h2>
+    <p>Descubre nuestros combos especiales y ofertas increíbles</p>
+  </div>
+
+  <div class="content-sections">
+    <!-- Sección de Combos -->
+    <div class="content-section">
+      <div class="section-header">
+        <h3>Combos Disponibles</h3>
+        <div class="section-actions">
+          <button *ngIf="authService.hasAdminPermissions()" 
+                  (click)="irABuscarCombos()" 
+                  class="btn-buscar">
+            🔎 Buscar combos
+          </button>
+          <button *ngIf="authService.hasAdminPermissions()" 
+                  routerLink="/crear-combo" 
+                  class="btn-create">
+            + Crear Combo
+          </button>
+        </div>
+      </div>
+      
+      <div *ngIf="cargandoCombos" class="loading-state">
+        Cargando combos...
+      </div>
+      
+      <div *ngIf="errorCombos && !cargandoCombos" class="error-state">
+        {{ errorCombos }}
+      </div>
+      
+      <div *ngIf="!cargandoCombos && !errorCombos && combosFiltrados.length > 0" class="carousel-container">
+        <button class="carousel-btn prev-btn" (click)="prevCombo()" [disabled]="currentComboIndex === 0">
+          ‹
+        </button>
+        
+        <div class="carousel-track">
+          <div class="carousel-slide" [style.transform]="'translateX(' + (-currentComboIndex * (100/getCardsVisibles())) + '%)'">
+            <app-combo-card 
+              *ngFor="let combo of combosFiltrados"
+              [combo]="combo"
+              [productos]="productos"
+              [showActions]="authService.hasAdminPermissions()"
+              (editClick)="editarCombo($event)"
+              (deleteClick)="eliminarCombo($event)"
+              (activateClick)="activarCombo($event)"
+              (deactivateClick)="desactivarCombo($event)"
+              class="carousel-item">
+            </app-combo-card>
+          </div>
+        </div>
+        
+        <button class="carousel-btn next-btn" (click)="nextCombo()" [disabled]="currentComboIndex >= maxComboIndex">
+          ›
+        </button>
+        
+        <div class="carousel-indicators">
+          <button 
+            *ngFor="let indicator of comboIndicators; let i = index" 
+            class="indicator" 
+            [class.active]="i === currentComboIndex"
+            (click)="goToCombo(i)">
+          </button>
+        </div>
+      </div>
+      
+      <div *ngIf="!cargandoCombos && !errorCombos && combosFiltrados.length === 0" class="empty-state">
+        No hay combos disponibles en este momento.
+      </div>
+    </div>
+
+    <!-- Sección de Ofertas -->
+    <div class="content-section">
+      <div class="section-header">
+        <h3>Ofertas Activas</h3>
+        <div class="section-actions">
+          <button *ngIf="authService.hasAdminPermissions()" 
+                  (click)="irABuscarOfertas()" 
+                  class="btn-buscar">
+            🔎 Buscar ofertas
+          </button>
+          <button *ngIf="authService.hasAdminPermissions()" 
+                  routerLink="/crear-oferta" 
+                  class="btn-create">
+            + Crear Oferta
+          </button>
+        </div>
+      </div>
+      
+      <div *ngIf="cargandoOfertas" class="loading-state">
+        Cargando ofertas...
+      </div>
+      
+      <div *ngIf="errorOfertas && !cargandoOfertas" class="error-state">
+        {{ errorOfertas }}
+      </div>
+      
+      <div *ngIf="!cargandoOfertas && !errorOfertas && ofertasFiltradas.length > 0" class="carousel-container">
+        <button class="carousel-btn prev-btn" (click)="prevOferta()" [disabled]="currentOfertaIndex === 0">
+          ‹
+        </button>
+        
+        <div class="carousel-track">
+          <div class="carousel-slide" [style.transform]="'translateX(' + (-currentOfertaIndex * (100/getCardsVisibles())) + '%)'">
+            <app-oferta-card 
+              *ngFor="let oferta of ofertasFiltradas"
+              [oferta]="oferta"
+              [productos]="productosDisponibles"
+              [categorias]="categoriasDisponibles"
+              [showActions]="authService.hasAdminPermissions()"
+              (editClick)="editarOferta($event)"
+              (deleteClick)="eliminarOferta($event)"
+              (activateClick)="activarOferta($event)"
+              (deactivateClick)="desactivarOferta($event)"
+              class="carousel-item">
+            </app-oferta-card>
+          </div>
+        </div>
+        
+        <button class="carousel-btn next-btn" (click)="nextOferta()" [disabled]="currentOfertaIndex >= maxOfertaIndex">
+          ›
+        </button>
+        
+        <div class="carousel-indicators">
+          <button 
+            *ngFor="let indicator of ofertaIndicators; let i = index" 
+            class="indicator" 
+            [class.active]="i === currentOfertaIndex"
+            (click)="goToOferta(i)">
+          </button>
+        </div>
+      </div>
+      
+      <div *ngIf="!cargandoOfertas && !errorOfertas && ofertasFiltradas.length === 0" class="empty-state">
+        No hay ofertas disponibles en este momento.
+      </div>
+    </div>
+  </div>
+</div> 

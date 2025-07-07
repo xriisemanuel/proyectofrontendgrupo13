@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, interval, timer } from 'rxjs';
+import { switchMap, startWith } from 'rxjs/operators';
 
 export interface Oferta {
   _id?: string;
@@ -27,10 +28,12 @@ export class OfertaService {
     return this.http.get<Oferta[]>(this.apiUrl);
   }
 
+  getOfertaById(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`);
+  }
+
   buscarOfertas(termino: string): Observable<Oferta[]> {
-    const url = `${this.apiUrl}?buscar=${encodeURIComponent(termino)}`;
-    console.log('Llamando a la API:', url);
-    return this.http.get<Oferta[]>(url);
+    return this.http.get<Oferta[]>(`${this.apiUrl}?buscar=${encodeURIComponent(termino)}`);
   }
 
   crearOferta(oferta: Oferta): Observable<any> {
@@ -51,5 +54,34 @@ export class OfertaService {
 
   desactivarOferta(id: string): Observable<any> {
     return this.http.patch<any>(`${this.apiUrl}/${id}/desactivar`, {});
+  }
+
+  // Nuevo método para verificar ofertas expiradas
+  verificarOfertasExpiradas(): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/verificar-expiradas`, {});
+  }
+
+  // Método para obtener ofertas con verificación automática de expiración
+  getOfertasConVerificacion(): Observable<Oferta[]> {
+    return this.http.get<Oferta[]>(`${this.apiUrl}/con-verificacion`);
+  }
+
+  // Método para verificar si una oferta específica ha expirado
+  verificarOfertaExpirada(oferta: Oferta): boolean {
+    if (!oferta.fechaFin || !oferta.estado) {
+      return false;
+    }
+    
+    const fechaFin = new Date(oferta.fechaFin);
+    const fechaActual = new Date();
+    
+    return fechaActual > fechaFin;
+  }
+
+  // Método para obtener ofertas que necesitan ser desactivadas
+  getOfertasParaDesactivar(ofertas: Oferta[]): Oferta[] {
+    return ofertas.filter(oferta => 
+      oferta.estado && this.verificarOfertaExpirada(oferta)
+    );
   }
 } 

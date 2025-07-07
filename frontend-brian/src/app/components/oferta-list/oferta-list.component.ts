@@ -1,85 +1,171 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { OfertaService, Oferta } from '../../services/oferta.service';
 import { ProductoService, Producto } from '../../services/producto.service';
 import { CategoriaService, Categoria } from '../../services/categoria.service';
-import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
+import { Subject, debounceTime, distinctUntilChanged, switchMap, interval, Subscription, timer } from 'rxjs';
+import { OfertaCardComponent } from '../oferta-card/oferta-card.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-oferta-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule, OfertaCardComponent],
   templateUrl: './oferta-list.component.html',
   styleUrl: './oferta-list.component.css'
 })
-export class OfertaListComponent implements OnInit {
+export class OfertaListComponent implements OnInit, OnDestroy {
   ofertas: Oferta[] = [];
   ofertasFiltradas: Oferta[] = [];
   terminoBusqueda: string = '';
   private searchSubject = new Subject<string>();
-  ofertaEditando: Oferta | null = null;
-  mostrarModal = false;
+  private verificacionSubscription?: Subscription;
   
-  // Productos y categorías disponibles
   productosDisponibles: Producto[] = [];
   categoriasDisponibles: Categoria[] = [];
   
-  // Arrays temporales para la selección múltiple
-  productosSeleccionados: string[] = [];
-  categoriasSeleccionadas: string[] = [];
+  errorCarga: string = '';
+  cargando: boolean = false;
+  ultimaVerificacion: Date = new Date();
+
+  @ViewChild('ofertaSearchInput') ofertaSearchInput!: ElementRef<HTMLInputElement>;
 
   constructor(
     private ofertaService: OfertaService,
     private productoService: ProductoService,
-    private categoriaService: CategoriaService
+    private categoriaService: CategoriaService,
+    public authService: AuthService,
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.searchSubject.pipe(
       debounceTime(300),
       distinctUntilChanged(),
       switchMap(termino => {
         if (termino.trim()) {
-          console.log('Ejecutando búsqueda con término:', termino);
           return this.ofertaService.buscarOfertas(termino);
         } else {
-          console.log('Cargando todas las ofertas');
           return this.ofertaService.getOfertas();
         }
       })
     ).subscribe({
       next: (ofertas) => {
-        console.log('Resultados de búsqueda:', ofertas.length, 'ofertas encontradas');
-        console.log('Ofertas:', ofertas);
         this.ofertas = ofertas;
-        this.ofertasFiltradas = ofertas;
+        this.filtrarOfertasPorRol();
+        this.verificarOfertasExpiradas();
       },
       error: (error) => {
         console.error('Error al buscar ofertas:', error);
-        console.error('Detalles del error:', {
-          status: error.status,
-          message: error.message,
-          error: error.error
-        });
       }
     });
   }
 
   ngOnInit(): void {
+    // Cargar ofertas (ahora es público)
     this.cargarOfertas();
-    this.cargarProductos();
-    this.cargarCategorias();
+    // Solo cargar productos y categorías si es administrador (para mostrar en las cards)
+    if (this.authService.hasAdminPermissions()) {
+      this.cargarProductos();
+      this.cargarCategorias();
+    }
+    
+    // Iniciar verificación automática cada minuto
+    this.iniciarVerificacionAutomatica();
+    // Enfocar búsqueda si viene de Home
+    setTimeout(() => {
+      if (isPlatformBrowser(this.platformId) && sessionStorage.getItem('focusOfertaSearch') === '1') {
+        this.irABuscarOferta();
+        sessionStorage.removeItem('focusOfertaSearch');
+      }
+    }, 400);
+  }
+
+  ngOnDestroy(): void {
+    // Limpiar suscripción al destruir el componente
+    if (this.verificacionSubscription) {
+      this.verificacionSubscription.unsubscribe();
+    }
+  }
+
+  iniciarVerificacionAutomatica(): void {
+    // Verificar inmediatamente al cargar
+    this.verificarOfertasExpiradas();
+    
+    // Luego verificar cada minuto
+    this.verificacionSubscription = interval(60000).subscribe(() => {
+      this.verificarOfertasExpiradas();
+    });
+  }
+
+  verificarOfertasExpiradas(): void {
+    // Verificar ofertas expiradas en el frontend
+    const ofertasParaDesactivar = this.ofertaService.getOfertasParaDesactivar(this.ofertas);
+    
+    if (ofertasParaDesactivar.length > 0) {
+      console.log(`Se encontraron ${ofertasParaDesactivar.length} ofertas expiradas`);
+      
+      // Desactivar ofertas expiradas
+      ofertasParaDesactivar.forEach(oferta => {
+        if (oferta._id) {
+          this.ofertaService.desactivarOferta(oferta._id).subscribe({
+            next: () => {
+              console.log(`Oferta "${oferta.nombre}" desactivada automáticamente por expiración`);
+              // Actualizar el estado local
+              const index = this.ofertas.findIndex(o => o._id === oferta._id);
+              if (index !== -1) {
+                this.ofertas[index].estado = false;
+              }
+            },
+            error: (error) => {
+              console.error(`Error al desactivar oferta expirada "${oferta.nombre}":`, error);
+            }
+          });
+        }
+      });
+      
+      // Actualizar la lista filtrada
+      this.filtrarOfertasPorRol();
+      this.ultimaVerificacion = new Date();
+    }
   }
 
   cargarOfertas(): void {
+    this.cargando = true;
+    this.errorCarga = '';
+    
     this.ofertaService.getOfertas().subscribe({
       next: (ofertas) => {
         this.ofertas = ofertas;
-        this.ofertasFiltradas = ofertas;
+        this.filtrarOfertasPorRol();
+        this.verificarOfertasExpiradas(); // Verificar inmediatamente al cargar
+        this.cargando = false;
       },
       error: (error) => {
-        console.error('Error al cargar ofertas:', error);
+        this.cargando = false;
+        if (error.status === 401) {
+          this.errorCarga = 'Debes iniciar sesión para ver las ofertas.';
+        } else if (error.status === 403) {
+          this.errorCarga = 'No tienes permisos para ver las ofertas.';
+        } else {
+          this.errorCarga = 'Error al cargar las ofertas.';
+        }
+        this.ofertas = [];
+        this.ofertasFiltradas = [];
       }
     });
+  }
+
+  filtrarOfertasPorRol() {
+    if (this.authService.isCliente()) {
+      // Los clientes solo ven ofertas activas
+      this.ofertasFiltradas = this.ofertas.filter(oferta => oferta.estado === true);
+    } else {
+      // Los administradores ven todas las ofertas
+      this.ofertasFiltradas = [...this.ofertas];
+    }
   }
 
   cargarProductos(): void {
@@ -88,7 +174,10 @@ export class OfertaListComponent implements OnInit {
         this.productosDisponibles = productos;
       },
       error: (error) => {
-        console.error('Error al cargar productos:', error);
+        if (error.status !== 401 && error.status !== 403) {
+          console.error('Error al cargar productos:', error);
+        }
+        this.productosDisponibles = [];
       }
     });
   }
@@ -99,33 +188,16 @@ export class OfertaListComponent implements OnInit {
         this.categoriasDisponibles = categorias;
       },
       error: (error) => {
-        console.error('Error al cargar categorías:', error);
+        if (error.status !== 401 && error.status !== 403) {
+          console.error('Error al cargar categorías:', error);
+        }
+        this.categoriasDisponibles = [];
       }
     });
   }
 
   buscarOfertas(): void {
-    console.log('Buscando ofertas con término:', this.terminoBusqueda);
     this.searchSubject.next(this.terminoBusqueda);
-  }
-
-  probarBusqueda(): void {
-    console.log('=== PRUEBA DE BÚSQUEDA ===');
-    console.log('Término actual:', this.terminoBusqueda);
-    console.log('Ofertas antes de búsqueda:', this.ofertas.length);
-    
-    // Hacer una búsqueda manual
-    this.ofertaService.buscarOfertas(this.terminoBusqueda || 'test').subscribe({
-      next: (ofertas) => {
-        console.log('Resultado de búsqueda manual:', ofertas);
-        console.log('Ofertas encontradas:', ofertas.length);
-        this.ofertas = ofertas;
-        this.ofertasFiltradas = ofertas;
-      },
-      error: (error) => {
-        console.error('Error en búsqueda manual:', error);
-      }
-    });
   }
 
   eliminarOferta(id: string): void {
@@ -136,6 +208,7 @@ export class OfertaListComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error al eliminar oferta:', error);
+          alert('Error al eliminar la oferta');
         }
       });
     }
@@ -148,6 +221,7 @@ export class OfertaListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al activar oferta:', error);
+        alert('Error al activar la oferta');
       }
     });
   }
@@ -159,78 +233,18 @@ export class OfertaListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al desactivar oferta:', error);
+        alert('Error al desactivar la oferta');
       }
     });
   }
 
   editarOferta(oferta: Oferta): void {
-    this.ofertaEditando = { ...oferta };
-    
-    // Inicializar arrays de selección con los valores actuales
-    this.productosSeleccionados = oferta.productosAplicables?.map(p => p._id || p) || [];
-    this.categoriasSeleccionadas = oferta.categoriasAplicables?.map(c => c._id || c) || [];
-    
-    this.mostrarModal = true;
-  }
-
-  guardarCambios(): void {
-    if (this.ofertaEditando && this.ofertaEditando._id) {
-      // Crear objeto para enviar al backend con fechas convertidas a string
-      const ofertaParaEnviar: any = {
-        ...this.ofertaEditando,
-        fechaInicio: new Date(this.ofertaEditando.fechaInicio).toISOString(),
-        fechaFin: new Date(this.ofertaEditando.fechaFin).toISOString(),
-        productosAplicables: this.productosSeleccionados,
-        categoriasAplicables: this.categoriasSeleccionadas
-      };
-
-      this.ofertaService.editarOferta(this.ofertaEditando._id, ofertaParaEnviar).subscribe({
-        next: () => {
-          this.cargarOfertas();
-          this.cancelarEdicion();
-        },
-        error: (error) => {
-          console.error('Error al editar oferta:', error);
-        }
-      });
-    }
-  }
-
-  cancelarEdicion(): void {
-    this.ofertaEditando = null;
-    this.mostrarModal = false;
-    this.productosSeleccionados = [];
-    this.categoriasSeleccionadas = [];
-  }
-
-  // Métodos para manejar selección múltiple
-  toggleProducto(productoId: string): void {
-    const index = this.productosSeleccionados.indexOf(productoId);
-    if (index > -1) {
-      this.productosSeleccionados.splice(index, 1);
-    } else {
-      this.productosSeleccionados.push(productoId);
-    }
-  }
-
-  toggleCategoria(categoriaId: string): void {
-    const index = this.categoriasSeleccionadas.indexOf(categoriaId);
-    if (index > -1) {
-      this.categoriasSeleccionadas.splice(index, 1);
-    } else {
-      this.categoriasSeleccionadas.push(categoriaId);
-    }
-  }
-
-  isProductoSeleccionado(productoId: string): boolean {
-    return this.productosSeleccionados.includes(productoId);
-  }
-
-  isCategoriaSeleccionada(categoriaId: string): boolean {
-    return this.categoriasSeleccionadas.includes(categoriaId);
+    // Redirigir a la página de edición de oferta
+    this.router.navigate(['/editar-oferta', oferta._id]);
   }
 
   validarImagen(url: string): boolean {
+    if (!url) return false;
     try {
       new URL(url);
       return true;
@@ -240,101 +254,54 @@ export class OfertaListComponent implements OnInit {
   }
 
   onImageError(event: any): void {
-    event.target.style.display = 'none';
+    event.target.src = 'assets/images/placeholder.jpg';
   }
 
-  getEstadoClass(estado: any): string {
-    // Manejar diferentes tipos de datos para el estado
-    if (estado === true || estado === 'true' || estado === 1 || estado === '1') {
-      return 'activo';
+  irABuscarOferta() {
+    if (this.ofertaSearchInput && this.ofertaSearchInput.nativeElement) {
+      this.ofertaSearchInput.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => this.ofertaSearchInput.nativeElement.focus(), 400);
     }
-    return 'inactivo';
   }
 
-  getEstadoTexto(estado: any): string {
-    // Manejar diferentes tipos de datos para el estado
-    if (estado === true || estado === 'true' || estado === 1 || estado === '1') {
-      return 'Activo';
-    }
-    return 'Inactivo';
-  }
-
-  getTipoEstado(estado: any): string {
-    return typeof estado;
-  }
-
-  formatearFecha(fecha: string | Date): string {
-    const fechaObj = new Date(fecha);
-    return fechaObj.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }
-
-  obtenerNombresProductos(productos: any[]): string {
-    if (!productos || productos.length === 0) {
-      return 'Todos los productos';
+  // Método para obtener el tiempo restante de una oferta
+  getTiempoRestante(oferta: Oferta): string {
+    if (!oferta.fechaFin || !oferta.estado) {
+      return 'N/A';
     }
     
-    const nombres = productos.map(producto => producto.nombre || 'Sin nombre');
-    return nombres.join(', ');
-  }
-
-  obtenerNombresCategorias(categorias: any[]): string {
-    if (!categorias || categorias.length === 0) {
-      return 'Todas las categorías';
+    const fechaFin = new Date(oferta.fechaFin);
+    const fechaActual = new Date();
+    const diferencia = fechaFin.getTime() - fechaActual.getTime();
+    
+    if (diferencia <= 0) {
+      return 'Expirada';
     }
     
-    const nombres = categorias.map(categoria => categoria.nombre || 'Sin nombre');
-    return nombres.join(', ');
+    const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+    const horas = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (dias > 0) {
+      return `${dias}d ${horas}h`;
+    } else if (horas > 0) {
+      return `${horas}h ${minutos}m`;
+    } else {
+      return `${minutos}m`;
+    }
   }
 
-  esUrlValida(url: string): boolean {
-    if (!url || url.trim() === '') {
-      console.log('URL vacía o nula');
+  // Método para verificar si una oferta está próxima a expirar (menos de 24 horas)
+  isProximaAExpiracion(oferta: Oferta): boolean {
+    if (!oferta.fechaFin || !oferta.estado) {
       return false;
     }
-    try {
-      new URL(url);
-      console.log('URL válida:', url);
-      return true;
-    } catch (error) {
-      console.log('URL inválida:', url, error);
-      return false;
-    }
-  }
-
-  onErrorImagen(event: any) {
-    console.log('Error al cargar imagen:', event);
-    console.log('Target src:', event.target?.src);
-  }
-
-  onLoadImagen(event: any) {
-    console.log('Imagen cargada correctamente:', event.target?.src);
-  }
-
-  formatearFechaParaInput(fecha: string | Date): string {
-    const fechaObj = new Date(fecha);
-    const year = fechaObj.getFullYear();
-    const month = String(fechaObj.getMonth() + 1).padStart(2, '0');
-    const day = String(fechaObj.getDate()).padStart(2, '0');
-    const hours = String(fechaObj.getHours()).padStart(2, '0');
-    const minutes = String(fechaObj.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
-  }
-
-  actualizarFechaInicio(event: any) {
-    if (this.ofertaEditando) {
-      this.ofertaEditando.fechaInicio = new Date(event.target.value);
-    }
-  }
-
-  actualizarFechaFin(event: any) {
-    if (this.ofertaEditando) {
-      this.ofertaEditando.fechaFin = new Date(event.target.value);
-    }
+    
+    const fechaFin = new Date(oferta.fechaFin);
+    const fechaActual = new Date();
+    const diferencia = fechaFin.getTime() - fechaActual.getTime();
+    const horasRestantes = diferencia / (1000 * 60 * 60);
+    
+    return horasRestantes > 0 && horasRestantes <= 24;
   }
 } 
