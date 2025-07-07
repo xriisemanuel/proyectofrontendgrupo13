@@ -132,20 +132,32 @@ generarReceta(nombreOriginal: string): void {
   const nombreTraducido = this.traducirNombre(nombreOriginal);
 
   this.openFoodService.buscarReceta(nombreTraducido).subscribe(res => {
-    const receta = res.meals ? res.meals[0] : null;
-    this.recetaSugerida = receta;
-    this.ingredientesSugeridos = [];
+    let receta = res.meals ? res.meals[0] : null;
 
-    if (receta) {
-      for (let i = 1; i <= 20; i++) {
-        const ing = receta['strIngredient' + i];
-        const med = receta['strMeasure' + i];
-        if (ing && ing.trim()) {
-          this.ingredientesSugeridos.push(`${ing.trim()} ${med ? '- ' + med.trim() : ''}`);
-        }
-      }
+    if (!receta) {
+      // Si no hay coincidencia, buscamos una receta aleatoria
+      fetch('https://www.themealdb.com/api/json/v1/1/random.php')
+        .then(r => r.json())
+        .then(data => {
+          receta = data.meals?.[0] || null;
+          this.asignarReceta(receta);
+        });
+    } else {
+      this.asignarReceta(receta);
     }
   });
+}
+asignarReceta(receta: any): void {
+  this.recetaSugerida = receta;
+  this.ingredientesSugeridos = [];
+
+  for (let i = 1; i <= 20; i++) {
+    const ing = receta['strIngredient' + i];
+    const med = receta['strMeasure' + i];
+    if (ing && ing.trim()) {
+      this.ingredientesSugeridos.push(`${ing.trim()} ${med ? '- ' + med.trim() : ''}`);
+    }
+  }
 }
 
 traducirNombre(nombre: string): string {
@@ -154,6 +166,8 @@ traducirNombre(nombre: string): string {
   'wontons': 'empanadillas chinas',
   'agridulce': 'sweet and sour',
   'sopa': 'soup',
+  'Potato Salad':'sandwich de milanesa',
+  'sándwich': 'sandwich',
   'picante': 'spicy',
   'chuleta': 'pork chop',
   'manzana': 'apple',
@@ -166,30 +180,6 @@ traducirNombre(nombre: string): string {
   'asadas': 'grilled',
   'asado': 'roast',
   'goulash': 'goulash',
-  'rendang': 'rendang de carne',
-  'bistek': 'bistec filipino',
-  'mechado': 'carne mechada',
-  'caldereta': 'caldereta de carne',
-  'fatteh': 'fatteh egipcio',
-  'mulukhiyah': 'mulukhiyah',
-  'moussaka': 'musaka',
-  'peas': 'arvejas',
-  'dumpling': 'dumpling',
-  'steak': 'bife',
-  'kidney': 'riñón',
-  'mustard': 'mostaza',
-  'pie': 'pastel',
-  'roast': 'asado',
-  'halloumi': 'halloumi',
-  'burger': 'hamburguesa',
-  'bacon': 'panceta',
-  'grilled': 'a la parrilla',
-  'sloppy': 'sloppy joe',
-  'joes': 'sloppy joe',
-  'sunday': 'domingo',
-  'stuffed': 'relleno',
-  'turnover': 'empanada',
-  'cutlet': 'milanesa',
   'of': 'de',
   'and': 'y',
   'with': 'con',
