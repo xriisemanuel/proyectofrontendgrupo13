@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth-guard';
 import { roleGuard } from './guards/role-guard';
 import { authRedirectGuard } from './guards/auth-redirect'; // Importa el authRedirectGuard
+import { PedidoDashboard } from './components/pedido-dashboard/pedido-dashboard';
 
 export const routes: Routes = [
   // Ruta por defecto: redirige al Home (página pública)
@@ -126,6 +127,12 @@ export const routes: Routes = [
     loadComponent: () => import('./components/delivery-dashboard/delivery-dashboard').then(m => m.DeliveryDashboard),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['repartidor'] }
+  },
+  {
+    path: 'pedido/dashboard',
+    loadComponent: () => import('./components/pedido-dashboard/pedido-dashboard').then(m => m.PedidoDashboard),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin', 'supervisor_ventas'] }
   },
 
   // Ruta de wildcard: cualquier otra ruta no definida redirige al Home

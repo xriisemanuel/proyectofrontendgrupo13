@@ -1,0 +1,288 @@
+/* src/app/components/pedido-dashboard/pedido-dashboard.component.css */
+.pedido-dashboard-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 25px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    font-family: 'Inter', sans-serif;
+    color: #333;
+}
+
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 15px;
+    font-size: 2.2em;
+}
+
+p {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #666;
+}
+
+.loading-message, .error-message, .success-message, .no-data-message {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.loading-message {
+    background-color: #e3f2fd; /* Light Blue */
+    color: #1976d2; /* Darker Blue */
+    border: 1px solid #90caf9;
+}
+
+.error-message {
+    background-color: #ffebee; /* Light Red */
+    color: #d32f2f; /* Darker Red */
+    border: 1px solid #ef9a9a;
+}
+
+.success-message {
+    background-color: #e8f5e9; /* Light Green */
+    color: #388e3c; /* Darker Green */
+    border: 1px solid #a5d6a7;
+}
+
+.no-data-message {
+    color: #777;
+    font-style: italic;
+    padding: 20px 0;
+    text-align: center;
+    font-size: 1.1em;
+}
+
+/* Filters Section */
+.filters-section {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.filters-section h3 {
+    width: 100%;
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #34495e;
+    font-size: 1.5em;
+    border-bottom: 1px dashed #e0e0e0;
+    padding-bottom: 10px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1; /* Allows groups to grow and shrink */
+    min-width: 180px; /* Minimum width for each filter group */
+}
+
+.filter-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+    font-size: 0.9em;
+}
+
+.filter-group select,
+.filter-group input[type="date"],
+.filter-group input[type="text"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+    width: 100%;
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+.filter-group.search-group {
+    flex-grow: 2; /* Allow search to take more space */
+}
+
+.apply-filters-btn {
+    background-color: #28a745; /* Green */
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    align-self: flex-end; /* Align button to the bottom of the flex container */
+}
+
+.apply-filters-btn:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+}
+
+/* Orders Table */
+.orders-table-container {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow-x: auto; /* Allows horizontal scrolling on small screens */
+}
+
+.orders-table-container h2 {
+    color: #34495e;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+table th, table td {
+    padding: 12px 15px;
+    border: 1px solid #eee;
+    text-align: left;
+    vertical-align: middle;
+}
+
+table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    color: #555;
+    font-size: 0.95em;
+}
+
+table tr:nth-child(even) {
+    background-color: #fcfcfc;
+}
+
+table tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Status Badges */
+.status-pendiente { background-color: #ffeb3b; color: #333; padding: 5px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold; } /* Yellow */
+.status-confirmado { background-color: #8bc34a; color: white; padding: 5px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold; } /* Light Green */
+.status-en-preparacion { background-color: #ff9800; color: white; padding: 5px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold; } /* Orange */
+.status-en-envio { background-color: #2196f3; color: white; padding: 5px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold; } /* Blue */
+.status-entregado { background-color: #4caf50; color: white; padding: 5px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold; } /* Green */
+.status-cancelado { background-color: #f44336; color: white; padding: 5px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold; } /* Red */
+
+/* Action Buttons */
+.actions-cell {
+    white-space: nowrap; /* Keep buttons on one line */
+}
+
+.action-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.85em;
+    margin-right: 5px;
+    transition: background-color 0.3s ease;
+    min-width: 80px; /* Ensure buttons have a minimum width */
+}
+
+.action-btn:hover {
+    background-color: #0056b3;
+}
+
+.action-btn.view-btn { background-color: #6c757d; } /* Gray */
+.action-btn.view-btn:hover { background-color: #5a6268; }
+
+.action-btn.assign-btn { background-color: #17a2b8; } /* Cyan */
+.action-btn.assign-btn:hover { background-color: #138496; }
+
+.action-btn.deliver-btn { background-color: #28a745; } /* Green */
+.action-btn.deliver-btn:hover { background-color: #218838; }
+
+.action-btn.cancel-btn { background-color: #dc3545; } /* Red */
+.action-btn.cancel-btn:hover { background-color: #c82333; }
+
+.action-btn.delete-btn { background-color: #6f42c1; } /* Purple */
+.action-btn.delete-btn:hover { background-color: #563d7c; }
+
+.action-btn.reassign-btn { background-color: #ffc107; color: #333; } /* Yellow */
+.action-btn.reassign-btn:hover { background-color: #e0a800; }
+
+.assign-select {
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 0.85em;
+    margin-right: 5px;
+    min-width: 120px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .filters-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .filter-group {
+        min-width: 100%;
+    }
+    .apply-filters-btn {
+        width: 100%;
+    }
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+    tr {
+        border: 1px solid #eee;
+        margin-bottom: 10px;
+        border-radius: 8px;
+    }
+    table td {
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 50%;
+        text-align: right;
+    }
+    table td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: bold;
+        color: #555;
+    }
+    .actions-cell {
+        text-align: center;
+        padding-left: 10px; /* Adjust padding for mobile */
+    }
+    .action-btn, .assign-select {
+        display: block;
+        width: calc(100% - 10px); /* Full width minus margin */
+        margin-bottom: 5px;
+        margin-right: 0;
+    }
+}

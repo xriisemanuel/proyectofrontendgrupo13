@@ -1,12 +1,9 @@
 import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http'; // Importar HttpErrorResponse
-import { Observable, BehaviorSubject, of, throwError } from 'rxjs'; // Importar throwError y of
-import { map, tap, catchError } from 'rxjs/operators'; // Importar tap y catchError
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
+import { map, tap, catchError } from 'rxjs/operators';
 import { API_BASE_URL } from '../core/constants';
-// Asegúrate de que la ruta a IUsuario e IRol sea correcta
-// Si están en 'src/app/services/usuario.ts' o 'src/app/interfaces/usuario.interface.ts'
-// ajusta la ruta. Por ahora, mantengo la que tenías:
 import { IUsuario, IRol } from '../services/usuario'; 
 
 const AUTH_API = API_BASE_URL + '/auth/';
@@ -37,7 +34,6 @@ export class AuthService {
         console.log('AuthService constructor: Usuario PARSEADO desde localStorage:', initialUser);
       } catch (e) {
         console.error('AuthService constructor: ERROR al parsear usuario desde localStorage:', e);
-        // Si hay un error al parsear, es probable que localStorage esté corrupto, lo borramos.
         localStorage.removeItem('user');
         initialUser = null;
       }
@@ -89,9 +85,14 @@ export class AuthService {
   login(username: string, password: string): Observable<any> {
     return this.http.post<any>(AUTH_API + 'login', { username, password })
       .pipe(
-        tap(response => { // Usamos tap para ver el side effect sin modificar el stream
+        tap(response => {
           console.log('AuthService login (TAP): Respuesta del backend RECIBIDA:', response);
           if (this.isBrowser && response && response.token) {
+            // Antes de guardar, asegúrate de que el rol sea una cadena limpia
+            if (response.usuario && response.usuario.rol) {
+                response.usuario.rol = String(response.usuario.rol).trim().toLowerCase(); // Normalizar el rol aquí
+                console.log('AuthService login (TAP): Rol normalizado ANTES de guardar:', response.usuario.rol);
+            }
             localStorage.setItem('user', JSON.stringify(response));
             this.currentUserSubject.next(response);
             console.log('AuthService login (TAP): Usuario y token GUARDADOS en localStorage y BehaviorSubject.');
@@ -100,9 +101,9 @@ export class AuthService {
             console.warn('AuthService login (TAP): No hay token en la respuesta, o no es un navegador.');
           }
         }),
-        catchError((error: HttpErrorResponse) => { // Captura errores de la petición HTTP
+        catchError((error: HttpErrorResponse) => {
             console.error('AuthService login (CATCH ERROR): Error en la petición de login:', error);
-            this.logout(); // Asegura que el estado se limpia en caso de error de login
+            this.logout();
             return throwError(() => new Error(error.error?.mensaje || 'Credenciales inválidas o error de red.'));
         })
       );
@@ -125,7 +126,6 @@ export class AuthService {
   getToken(): string | null {
     if (this.isBrowser) {
       const userResponse = this.currentUserSubject.value;
-      // console.log('AuthService getToken: currentUserSubject.value:', userResponse); // Descomentar para depuración intensa
       return userResponse && userResponse.token ? userResponse.token : null;
     }
     return null;
@@ -138,26 +138,26 @@ export class AuthService {
   getRole(): string | null {
     if (this.isBrowser) {
       const userResponse = this.currentUserSubject.value;
-      // console.log('AuthService getRole: currentUserSubject.value para rol:', userResponse); // Descomentar para depuración intensa
-      const roleName = userResponse && userResponse.usuario && userResponse.usuario.rol ? userResponse.usuario.rol : null;
-      // console.log('AuthService getRole: Rol extraído:', roleName); // Descomentar para depuración intensa
+      let roleName = null;
+      if (userResponse && userResponse.usuario && userResponse.usuario.rol) {
+          // Normaliza el rol al extraerlo también, por si acaso no se normalizó al guardar
+          roleName = String(userResponse.usuario.rol).trim().toLowerCase();
+      }
+      console.log('AuthService getRole: Rol extraído y normalizado:', roleName); // Nuevo log para depuración
       return roleName;
     }
     return null;
   }
 
   /**
-   * **MÉTODO AÑADIDO/CORREGIDO:** Obtiene el ID (_id) del usuario actualmente logueado.
+   * Obtiene el ID (_id) del usuario actualmente logueado.
    * @returns El ID del usuario (string) o null si no hay usuario logueado o el ID no está disponible.
    */
   getLoggedInUserId(): string | null {
     if (this.isBrowser) {
       const userResponse = this.currentUserSubject.value;
-      // console.log('AuthService getLoggedInUserId: currentUserSubject.value para ID:', userResponse); // Descomentar para depuración intensa
-      // Asume que la respuesta del login tiene userResponse.usuario.id (o _id si tu backend lo devuelve así)
       const userId = userResponse && userResponse.usuario && (userResponse.usuario.id || userResponse.usuario._id) ? 
                      (userResponse.usuario.id || userResponse.usuario._id) : null;
-      // console.log('AuthService getLoggedInUserId: ID de usuario logueado:', userId); // Descomentar para depuración intensa
       return userId;
     }
     return null;
@@ -169,7 +169,6 @@ export class AuthService {
    */
   isAuthenticated(): boolean {
     const authenticated = !!this.getToken();
-    // console.log('AuthService isAuthenticated: ', authenticated); // Descomentar para depuración intensa
     return authenticated;
   }
 }

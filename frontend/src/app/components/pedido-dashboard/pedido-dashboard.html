@@ -1,0 +1,133 @@
+<!-- src/app/components/pedido-dashboard/pedido-dashboard.component.html -->
+<div class="pedido-dashboard-container">
+  <h1>Dashboard de Pedidos</h1>
+  <p>Gestión centralizada de todas las órdenes en el sistema.</p>
+
+  <!-- Mensajes de estado (carga, error, éxito) -->
+  <div *ngIf="loading" class="loading-message">
+    Cargando pedidos...
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="successMessage" class="success-message">
+    {{ successMessage }}
+  </div>
+
+  <!-- Controles de filtro y búsqueda -->
+  <div class="filters-section">
+    <h3>Filtros y Búsqueda</h3>
+    <div class="filter-group">
+      <label for="estadoFilter">Estado:</label>
+      <select id="estadoFilter" [(ngModel)]="selectedEstado" (change)="loadPedidos()">
+        <option value="">Todos</option>
+        <option value="pendiente">Pendiente</option>
+        <option value="confirmado">Confirmado</option>
+        <option value="en_preparacion">En Preparación</option>
+        <option value="en_envio">En Envío</option>
+        <option value="entregado">Entregado</option>
+        <option value="cancelado">Cancelado</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="repartidorFilter">Repartidor:</label>
+      <select id="repartidorFilter" [(ngModel)]="selectedRepartidorId" (change)="loadPedidos()">
+        <option value="">Todos</option>
+        <option *ngFor="let rep of repartidores" [value]="rep._id">
+          {{ rep.usuarioId?.nombre }} {{ rep.usuarioId?.apellido }} ({{ rep.estado | titlecase }})
+        </option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="fechaDesde">Fecha Desde:</label>
+      <input type="date" id="fechaDesde" [(ngModel)]="fechaDesde" (change)="loadPedidos()">
+    </div>
+
+    <div class="filter-group">
+      <label for="fechaHasta">Fecha Hasta:</label>
+      <input type="date" id="fechaHasta" [(ngModel)]="fechaHasta" (change)="loadPedidos()">
+    </div>
+
+    <div class="filter-group search-group">
+      <label for="searchTerm">Buscar:</label>
+      <input type="text" id="searchTerm" [(ngModel)]="searchTerm" (input)="onSearchInputChange($event)" placeholder="ID, cliente, producto...">
+    </div>
+
+    <button class="apply-filters-btn" (click)="loadPedidos()">Aplicar Filtros</button>
+  </div>
+
+  <!-- Tabla de Pedidos -->
+  <div class="orders-table-container">
+    <h2 *ngIf="pedidos.length > 0">Listado de Pedidos ({{ pedidos.length }} encontrados)</h2>
+    <div *ngIf="pedidos.length === 0 && !loading" class="no-data-message">
+      No hay pedidos con los filtros aplicados.
+    </div>
+
+    <table *ngIf="pedidos.length > 0">
+      <thead>
+        <tr>
+          <th>ID Pedido</th>
+          <th>Fecha Pedido</th>
+          <th>Cliente</th>
+          <th>Dirección Entrega</th>
+          <th>Estado</th>
+          <th>Total</th>
+          <th>Repartidor</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let pedido of pedidos">
+          <td>{{ pedido._id }}</td>
+          <td>{{ pedido.fechaPedido | date:'short' }}</td>
+          <td>{{ getClienteNombre(pedido.clienteId) }}</td>
+          <td>{{ pedido.direccionEntrega }}</td>
+          <td>
+            <span [ngClass]="{
+              'status-pendiente': pedido.estado === 'pendiente',
+              'status-confirmado': pedido.estado === 'confirmado',
+              'status-en-preparacion': pedido.estado === 'en_preparacion',
+              'status-en-envio': pedido.estado === 'en_envio',
+              'status-entregado': pedido.estado === 'entregado',
+              'status-cancelado': pedido.estado === 'cancelado'
+            }">
+              {{ pedido.estado | titlecase }}
+            </span>
+          </td>
+          <td>${{ pedido.total | number:'1.2-2' }}</td>
+          <td>{{ getRepartidorNombre(pedido.repartidorId) }}</td>
+          <td class="actions-cell">
+            <button class="action-btn view-btn" (click)="viewOrderDetails(pedido._id!)">Ver</button>
+
+            <!-- Acciones de cambio de estado (ejemplos, ajustar según roles y flujo) -->
+            <button *ngIf="pedido.estado === 'pendiente'" class="action-btn assign-btn" (click)="changeOrderStatus(pedido._id!, 'confirmado')">Confirmar</button>
+            <button *ngIf="pedido.estado === 'confirmado'" class="action-btn assign-btn" (click)="changeOrderStatus(pedido._id!, 'en_preparacion')">En Prep.</button>
+            <button *ngIf="pedido.estado === 'en_preparacion'" class="action-btn assign-btn" (click)="changeOrderStatus(pedido._id!, 'en_envio')">Listo Envío</button>
+            <button *ngIf="pedido.estado === 'en_envio'" class="action-btn deliver-btn" (click)="changeOrderStatus(pedido._id!, 'entregado')">Entregado</button>
+            <button *ngIf="pedido.estado !== 'cancelado' && pedido.estado !== 'entregado'" class="action-btn cancel-btn" (click)="changeOrderStatus(pedido._id!, 'cancelado')">Cancelar</button>
+
+            <!-- Acción de asignar repartidor -->
+            <select *ngIf="!pedido.repartidorId && (pedido.estado === 'confirmado' || pedido.estado === 'en_preparacion' || pedido.estado === 'en_envio')"
+                    (change)="assignRepartidor(pedido._id!, $event)" class="assign-select">
+              <option value="">Asignar Repartidor</option>
+              <option *ngFor="let rep of repartidores" [value]="rep._id">
+                {{ rep.usuarioId?.nombre }} {{ rep.usuarioId?.apellido }}
+              </option>
+            </select>
+            <!-- Botón Reasignar: Ahora llama a la nueva función onReassignClick -->
+            <button *ngIf="pedido.repartidorId && (pedido.estado === 'confirmado' || pedido.estado === 'en_preparacion' || pedido.estado === 'en_envio')"
+                    class="action-btn reassign-btn" (click)="onReassignClick(pedido._id!)">Reasignar</button>
+
+
+            <!-- Botón de eliminar (generalmente solo para Admin) -->
+            <button class="action-btn delete-btn" (click)="deleteOrder(pedido._id!)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

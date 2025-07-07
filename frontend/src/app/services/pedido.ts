@@ -84,12 +84,35 @@ export class PedidoService {
   // Ya que ahora 'getPedidos' y 'getPedidosByRepartidorId' (que es el que se usa en el dashboard)
   // pueden usar el mismo endpoint raíz '/pedido' con query parameters.
   // Tu `listarPedidos` en el backend ya maneja `estado` y `repartidorId` como query params.
-  getPedidos(estados?: string[]): Observable<IPedido[]> {
+   getPedidos(
+    estados?: string[],
+    repartidorId?: string,
+    clienteId?: string,
+    fechaDesde?: string, // Usamos string para que coincida con el input type="date"
+    fechaHasta?: string, // Usamos string para que coincida con el input type="date"
+    searchTerm?: string
+  ): Observable<IPedido[]> {
     let params = new HttpParams();
+
     if (estados && estados.length > 0) {
       params = params.set('estados', estados.join(','));
     }
-    // Llama al endpoint principal, que ahora puede manejar los filtros
+    if (repartidorId) {
+      params = params.set('repartidorId', repartidorId);
+    }
+    if (clienteId) {
+      params = params.set('clienteId', clienteId);
+    }
+    if (fechaDesde) {
+      params = params.set('fechaDesde', fechaDesde);
+    }
+    if (fechaHasta) {
+      params = params.set('fechaHasta', fechaHasta);
+    }
+    if (searchTerm) {
+      params = params.set('searchTerm', searchTerm); // Asume que tu backend maneja este filtro
+    }
+
     return this.http.get<IPedido[]>(PEDIDO_API, { params });
   }
 
