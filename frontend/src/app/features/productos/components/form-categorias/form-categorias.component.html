@@ -1,0 +1,90 @@
+<body class="bg-dark">
+<div class="container mt-4">
+  <h3 class="text-light">{{ modoEdicion ? 'Editar Categoría' : 'Crear Nueva Categoría' }}</h3>
+  <div class="mb-3 text-end text-light">
+  <button class="btn btn-outline-secondary btn-sm" (click)="volver()"><i class="bi bi-arrow-left-circle"></i> Volver</button>
+</div>
+
+<form #form="ngForm" (ngSubmit)="form.valid && guardar()" class="mt-3">
+
+  <!-- Nombre -->
+  <div class="mb-3">
+    <label class="form-label">Nombre</label>
+    <input [(ngModel)]="categoria.nombre"
+           name="nombre"
+           required
+           #nombre="ngModel"
+           class="form-control"
+           [class.is-valid]="nombre.valid && nombre.touched"
+           [class.is-invalid]="nombre.invalid && nombre.touched">
+    <div *ngIf="nombre.invalid && nombre.touched" class="invalid-feedback">
+      El nombre es obligatorio.
+    </div>
+    <div *ngIf="nombre.valid && nombre.touched" class="valid-feedback">
+      ¡Nombre válido!
+    </div>
+  </div>
+
+  <!-- Descripción -->
+  <div class="mb-3">
+    <label class="form-label">Descripción</label>
+    <textarea [(ngModel)]="categoria.descripcion"
+              name="descripcion"
+              required
+              #descripcion="ngModel"
+              class="form-control"
+              [class.is-valid]="descripcion.valid && descripcion.touched"
+              [class.is-invalid]="descripcion.invalid && descripcion.touched"></textarea>
+    <div *ngIf="descripcion.invalid && descripcion.touched" class="invalid-feedback">
+      La descripción es obligatoria.
+    </div>
+    <div *ngIf="descripcion.valid && descripcion.touched" class="valid-feedback">
+      ¡Descripción válida!
+    </div>
+  </div>
+
+  <!-- Imagen -->
+  <div class="mb-3">
+    <label class="form-label">Imagen (URL)</label>
+    <input [(ngModel)]="categoria.imagen"
+           name="imagen"
+           required
+           #imagen="ngModel"
+           class="form-control"
+           [class.is-valid]="imagen.valid && imagen.touched"
+           [class.is-invalid]="imagen.invalid && imagen.touched">
+    <div *ngIf="imagen.invalid && imagen.touched" class="invalid-feedback">
+      La imagen es obligatoria.
+    </div>
+    <div *ngIf="imagen.valid && imagen.touched" class="valid-feedback">
+      ¡URL válida!
+    </div>
+  </div>
+
+  <!-- Estado -->
+  <div class="mb-3">
+    <label class="form-label">Estado</label>
+    <select [(ngModel)]="categoria.estado"
+            name="estado"
+            required
+            #estado="ngModel"
+            class="form-select"
+            [class.is-valid]="estado.valid && estado.touched"
+            [class.is-invalid]="estado.invalid && estado.touched">
+      <option [value]="true">Activa</option>
+      <option [value]="false">Inactiva</option>
+    </select>
+    <div *ngIf="estado.invalid && estado.touched" class="invalid-feedback">
+      Seleccioná un estado.
+    </div>
+    <div *ngIf="estado.valid && estado.touched" class="valid-feedback">
+      Estado seleccionado correctamente.
+    </div>
+  </div>
+
+  <button class="btn btn-primary" [disabled]="form.invalid">
+    {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
+  </button>
+</form>
+</div>
+</body>

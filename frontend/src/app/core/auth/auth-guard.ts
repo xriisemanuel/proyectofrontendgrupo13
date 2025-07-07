@@ -1,26 +1,18 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { AuthService } from './auth'; // Ruta corregida
+// src/app/core/auth/auth-guard.ts
+import { CanActivateFn, Router } from '@angular/router';
+import { inject } from '@angular/core';
+import { AuthService } from './auth'; // Asegúrate de la ruta correcta a tu AuthService
 
-@Injectable({
-  providedIn: 'root'
-})
-export class authGuard implements CanActivate { // Mantengo el nombre de clase como 'authGuard'
+export const authGuard: CanActivateFn = (route, state) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
 
-  constructor(private authService: AuthService, private router: Router) {}
-
-  canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
-
-    // Verifica si el usuario está autenticado usando tu AuthService
-    if (this.authService.isAuthenticated()) {
-      return true; // Permite el acceso a la ruta
-    } else {
-      // Si no está autenticado, redirige al login y puedes pasar la URL intentada
-      this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
-      return false; // Deniega el acceso
-    }
+  if (authService.isAuthenticated()) {
+    console.log('authGuard: Usuario autenticado. Permitiendo acceso.');
+    return true; // Permite el acceso si está autenticado
+  } else {
+    console.log('authGuard: Usuario NO autenticado. Redirigiendo a login.');
+    router.navigate(['/login']); // Redirige al login si no está autenticado
+    return false; // No permite el acceso a la ruta protegida
   }
-}
+};

@@ -7,15 +7,6 @@
     </div>
 
     <form *ngIf="!isLoading" [formGroup]="userForm" (ngSubmit)="onSubmit()">
-        <!-- Mensajes de éxito y error -->
-        <div *ngIf="successMessage" class="success-message">
-            {{ successMessage }}
-        </div>
-        <div *ngIf="errorMessage" class="error-message">
-            {{ errorMessage }}
-        </div>
-
-        <!-- Selección de Rol -->
         <div class="form-group">
             <label for="rolName">Rol del Usuario:</label>
             <select id="rolName" formControlName="rolName" required>
@@ -27,7 +18,6 @@
             </div>
         </div>
 
-        <!-- Campos Comunes del Usuario -->
         <div class="common-fields-section">
             <h3>Datos Generales del Usuario</h3>
             <div class="form-group">
@@ -78,17 +68,16 @@
                 <label for="telefono">Teléfono:</label>
                 <input type="tel" id="telefono" formControlName="telefono" placeholder="Ej: +5491123456789">
                 <div *ngIf="f['telefono'].invalid && f['telefono'].touched" class="validation-error">
-                    El teléfono es requerido y debe tener un formato válido (ej. +54911...).
+                    <span *ngIf="f['telefono'].errors?.['pattern']">El teléfono debe tener un formato válido (ej.
+                        +54911...).</span>
                 </div>
             </div>
         </div>
 
-        <!-- Campos Específicos del Rol (Condicionales) -->
         <ng-container *ngIf="selectedRoleName">
             <div class="role-specific-fields-section">
                 <h3>Datos Específicos para {{ selectedRoleName | titlecase }}</h3>
 
-                <!-- Campos para Cliente -->
                 <div *ngIf="selectedRoleName === 'cliente'">
                     <div class="form-group">
                         <label for="direccionCliente">Dirección:</label>
@@ -115,7 +104,6 @@
                     </div>
                 </div>
 
-                <!-- Campos para Repartidor -->
                 <div *ngIf="selectedRoleName === 'repartidor'">
                     <div class="form-group">
                         <label for="vehiculoRepartidor">Vehículo:</label>
@@ -137,23 +125,15 @@
                     </div>
                 </div>
 
-                <!-- Mensaje para roles sin campos específicos adicionales -->
                 <div *ngIf="selectedRoleName !== 'cliente' && selectedRoleName !== 'repartidor'" class="info-message">
                     Este rol no requiere campos adicionales específicos.
                 </div>
             </div>
         </ng-container>
 
-        <button type="submit" class="btn-primary" [disabled]="!userForm.valid">
+        <button type="submit" class="btn-primary" [disabled]="userForm.invalid">
             <i class="fas fa-user-plus"></i> Crear Usuario
         </button>
-
-        <div *ngIf="successMessage" class="success-message">
-            {{ successMessage }}
-        </div>
-        <div *ngIf="errorMessage" class="error-message">
-            {{ errorMessage }}
-        </div>
     </form>
 
     <div class="back-link">

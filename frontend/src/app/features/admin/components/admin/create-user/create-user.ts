@@ -1,47 +1,48 @@
+// proyecto/frontend/src/app/modules/admin/components/create-user/create-user.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common'; // Necesario para directivas como ngIf, ngFor
+import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import Swal from 'sweetalert2';
+
+import { ToastrService } from 'ngx-toastr'; // <-- NUEVO: Importa ToastrService
 
 // Importa AuthService para el registro y UsuarioService para obtener roles
-import { AuthService } from '../../../../../core/auth/auth'; // Ruta corregida
+import { AuthService } from '../../../../../core/auth/auth';
+import { IRegisterUserPayload } from '../../../../../core/auth/auth.interface'; // Importa la interfaz del payload
 import { UsuarioService, IRol } from '../../../../../data/services/usuario'; // Ruta e interfaz corregidas
 
 @Component({
-  selector: 'app-create-user-with-role', // Mantengo el nombre original si ya lo usas en otros lugares
+  selector: 'app-create-user-with-role',
   templateUrl: './create-user.html',
   styleUrls: ['./create-user.css'],
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, CommonModule]
+  imports: [ReactiveFormsModule, RouterLink, CommonModule] // No necesitas importar ToastrModule aquí si ya está en AppModule o main.ts
 })
 export class CreateUserWithRoleComponent implements OnInit, OnDestroy {
   userForm: FormGroup;
-  roles: IRol[] = []; // Lista de roles disponibles
-  selectedRoleName: string = ''; // El nombre del rol seleccionado actualmente
-  errorMessage: string = '';
-  successMessage: string = '';
-  isLoading: boolean = true; // Para controlar el estado de carga inicial
+  roles: IRol[] = [];
+  selectedRoleName: string = '';
+  isLoading: boolean = true;
 
-  private destroy$ = new Subject<void>(); // Para desuscribirse de observables
+  private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private usuarioService: UsuarioService, // Usar UsuarioService para obtener roles
-    private router: Router
+    private usuarioService: UsuarioService,
+    private router: Router,
+    private toastr: ToastrService // <-- NUEVO: Inyecta ToastrService
   ) {
-    // Inicializa el formulario con los campos comunes a todos los usuarios
     this.userForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       email: ['', [Validators.required, Validators.email]],
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
-      telefono: [''], // Opcional
-      rolName: ['', Validators.required], // Campo para seleccionar el rol
+      telefono: ['', [Validators.pattern(/^\+?[1-9]\d{1,14}$/)]], // Opcional, pero con patrón si se llena
+      rolName: ['', Validators.required],
 
       // Campos específicos para el rol 'cliente' (inicialmente deshabilitados)
       direccionCliente: [{ value: '', disabled: true }],
@@ -54,14 +55,14 @@ export class CreateUserWithRoleComponent implements OnInit, OnDestroy {
       numeroLicenciaRepartidor: [{ value: '', disabled: true }]
     });
 
-    // Suscribirse a los cambios del campo 'rolName' para adaptar el formulario
+    // Suscribirse a los cambios del rol para activar/desactivar campos específicos
     this.userForm.get('rolName')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(roleName => {
       this.onRoleChange(roleName);
     });
   }
 
   ngOnInit(): void {
-    this.loadRoles(); // Carga los roles al inicializar el componente
+    this.loadRoles();
   }
 
   ngOnDestroy(): void {
@@ -69,12 +70,9 @@ export class CreateUserWithRoleComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  /**
-   * Carga los roles disponibles desde el backend.
-   */
   loadRoles(): void {
     this.isLoading = true;
-    this.usuarioService.getRoles().pipe(takeUntil(this.destroy$)).subscribe({ // Usar usuarioService.getRoles()
+    this.usuarioService.getRoles().pipe(takeUntil(this.destroy$)).subscribe({
       next: (data: IRol[]) => {
         this.roles = data.filter(rol => rol.estado); // Solo roles activos
         this.isLoading = false;
@@ -82,138 +80,131 @@ export class CreateUserWithRoleComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error al cargar roles:', err);
-        this.errorMessage = err.error?.mensaje || 'Error al cargar la lista de roles.';
+        const errorMessage = err.error?.mensaje || 'Error al cargar la lista de roles.';
+        this.toastr.error(errorMessage, 'Error'); // <-- Usar Toastr para errores
         this.isLoading = false;
       }
     });
   }
 
-  /**
-   * Adapta el formulario según el rol seleccionado.
-   * Habilita/deshabilita campos y añade/elimina validadores.
-   * @param roleName El nombre del rol seleccionado.
-   */
   onRoleChange(roleName: string): void {
     this.selectedRoleName = roleName;
 
-    // Deshabilitar y limpiar todos los campos específicos de rol por defecto
-    this.userForm.get('direccionCliente')?.disable();
-    this.userForm.get('direccionCliente')?.clearValidators();
-    this.userForm.get('direccionCliente')?.setValue('');
+    // Lista de todos los campos específicos de cliente y repartidor
+    const allSpecificFields = [
+      'direccionCliente', 'fechaNacimientoCliente', 'preferenciasAlimentariasCliente', 'puntosCliente',
+      'vehiculoRepartidor', 'numeroLicenciaRepartidor'
+    ];
 
-    this.userForm.get('fechaNacimientoCliente')?.disable();
-    this.userForm.get('fechaNacimientoCliente')?.clearValidators();
-    this.userForm.get('fechaNacimientoCliente')?.setValue('');
+    // 1. Deshabilitar y limpiar validadores y valores de TODOS los campos específicos.
+    allSpecificFields.forEach(field => {
+      const control = this.userForm.get(field);
+      control?.disable();
+      control?.clearValidators();
+      if (field === 'puntosCliente') {
+        control?.setValue(0); // Reiniciar puntos a 0
+      } else {
+        control?.setValue(''); // Limpiar otros campos a vacío
+      }
+    });
 
-    this.userForm.get('preferenciasAlimentariasCliente')?.disable();
-    this.userForm.get('preferenciasAlimentariasCliente')?.clearValidators();
-    this.userForm.get('preferenciasAlimentariasCliente')?.setValue('');
-
-    this.userForm.get('puntosCliente')?.disable();
-    this.userForm.get('puntosCliente')?.clearValidators();
-    this.userForm.get('puntosCliente')?.setValue(0);
-
-
-    this.userForm.get('vehiculoRepartidor')?.disable();
-    this.userForm.get('vehiculoRepartidor')?.clearValidators();
-    this.userForm.get('vehiculoRepartidor')?.setValue('');
-
-    this.userForm.get('numeroLicenciaRepartidor')?.disable();
-    this.userForm.get('numeroLicenciaRepartidor')?.clearValidators();
-    this.userForm.get('numeroLicenciaRepartidor')?.setValue('');
-
-    // Habilitar y añadir validadores para los campos del rol seleccionado
+    // 2. Habilitar y añadir validadores para los campos del rol seleccionado.
     if (roleName === 'cliente') {
       this.userForm.get('direccionCliente')?.enable();
-      this.userForm.get('direccionCliente')?.setValidators(Validators.required);
+      this.userForm.get('direccionCliente')?.setValidators(Validators.required); // Dirección obligatoria para cliente
       this.userForm.get('fechaNacimientoCliente')?.enable();
       this.userForm.get('preferenciasAlimentariasCliente')?.enable();
       this.userForm.get('puntosCliente')?.enable();
     } else if (roleName === 'repartidor') {
       this.userForm.get('vehiculoRepartidor')?.enable();
-      this.userForm.get('vehiculoRepartidor')?.setValidators(Validators.required);
+      this.userForm.get('vehiculoRepartidor')?.setValidators(Validators.required); // Vehículo obligatorio para repartidor
       this.userForm.get('numeroLicenciaRepartidor')?.enable();
-      this.userForm.get('numeroLicenciaRepartidor')?.setValidators(Validators.required);
+      this.userForm.get('numeroLicenciaRepartidor')?.setValidators(Validators.required); // Licencia obligatoria para repartidor
     }
 
-    // Actualizar la validez de los controles para que los cambios de validadores surtan efecto
-    this.userForm.get('direccionCliente')?.updateValueAndValidity();
-    this.userForm.get('fechaNacimientoCliente')?.updateValueAndValidity();
-    this.userForm.get('preferenciasAlimentariasCliente')?.updateValueAndValidity();
-    this.userForm.get('puntosCliente')?.updateValueAndValidity();
-    this.userForm.get('vehiculoRepartidor')?.updateValueAndValidity();
-    this.userForm.get('numeroLicenciaRepartidor')?.updateValueAndValidity();
+    // 3. Actualizar la validez del formulario después de cambiar validadores
+    this.userForm.updateValueAndValidity();
   }
 
-  /**
-   * Maneja el envío del formulario.
-   */
   onSubmit(): void {
-    this.errorMessage = '';
-    this.successMessage = '';
+    // No necesitamos errorMessage/successMessage como propiedades del componente
+    // si usamos Toastr para mostrarlos.
 
-    // Asegurarse de que todos los campos relevantes estén habilitados para obtener sus valores
-    // Esto es crucial para que `this.userForm.value` incluya los campos específicos de rol
-    this.userForm.get('direccionCliente')?.enable();
-    this.userForm.get('fechaNacimientoCliente')?.enable();
-    this.userForm.get('preferenciasAlimentariasCliente')?.enable();
-    this.userForm.get('puntosCliente')?.enable();
-    this.userForm.get('vehiculoRepartidor')?.enable();
-    this.userForm.get('numeroLicenciaRepartidor')?.enable();
+    // Habilitar temporalmente los campos específicos del rol para que sus valores
+    // se incluyan en `userForm.value` antes de la validación final y el envío.
+    // Esto es crucial porque `userForm.value` solo incluye controles habilitados.
+    const specificClientFields = ['direccionCliente', 'fechaNacimientoCliente', 'preferenciasAlimentariasCliente', 'puntosCliente'];
+    const specificRepartidorFields = ['vehiculoRepartidor', 'numeroLicenciaRepartidor'];
+
+    specificClientFields.forEach(field => this.userForm.get(field)?.enable());
+    specificRepartidorFields.forEach(field => this.userForm.get(field)?.enable());
+
 
     if (this.userForm.valid) {
       const formData = this.userForm.value;
-      console.log('Datos del formulario a enviar:', formData);
+      console.log('Datos del formulario a enviar (incluyendo deshabilitados):', formData);
 
-      // Convertir preferenciasAlimentariasCliente de string a array de strings
-      let preferenciasArray: string[] = [];
+      let preferenciasArray: string[] | null = null;
       if (formData.preferenciasAlimentariasCliente) {
-        preferenciasArray = formData.preferenciasAlimentariasCliente.split(',').map((item: string) => item.trim()).filter((item: string) => item.length > 0);
+        preferenciasArray = formData.preferenciasAlimentariasCliente
+          .split(',')
+          .map((item: string) => item.trim())
+          .filter((item: string) => item.length > 0);
       }
 
-      this.authService.register(
-        formData.username,
-        formData.password,
-        formData.email,
-        formData.telefono,
-        formData.rolName,
-        formData.nombre,
-        formData.apellido,
-        // Campos específicos de cliente
-        formData.direccionCliente,
-        formData.fechaNacimientoCliente,
-        preferenciasArray, // Enviar como array
-        formData.puntosCliente,
-        // Campos específicos de repartidor
-        formData.vehiculoRepartidor,
-        formData.numeroLicenciaRepartidor
-      ).pipe(takeUntil(this.destroy$)).subscribe({
+      // Construir el payload según la interfaz IRegisterUserPayload
+      const registerPayload: IRegisterUserPayload = {
+        username: formData.username,
+        passwordHash: formData.password, // Mapea password del formulario a passwordHash para el payload
+        email: formData.email,
+        telefono: formData.telefono || null, // Asegura que sea null si está vacío o no se introduce
+        rolName: formData.rolName,
+        nombre: formData.nombre,
+        apellido: formData.apellido,
+        // Campos específicos de cliente (se incluyen si están presentes, el backend maneja la lógica de rol)
+        direccionCliente: formData.direccionCliente || null,
+        fechaNacimientoCliente: formData.fechaNacimientoCliente || null,
+        preferenciasAlimentariasCliente: preferenciasArray,
+        puntosCliente: formData.puntosCliente !== undefined && formData.puntosCliente !== null ? formData.puntosCliente : null,
+
+        // Campos específicos de repartidor (se incluyen si están presentes, el backend maneja la lógica de rol)
+        vehiculoRepartidor: formData.vehiculoRepartidor || null,
+        numeroLicenciaRepartidor: formData.numeroLicenciaRepartidor || null,
+      };
+
+      this.authService.register(registerPayload).pipe(takeUntil(this.destroy$)).subscribe({
         next: (response) => {
-          this.successMessage = response.mensaje || 'Usuario y perfil de rol creado exitosamente!';
-          Swal.fire('¡Creado!', this.successMessage, 'success');
+          const successMsg = response.mensaje || 'Usuario y perfil de rol creado exitosamente!';
+          this.toastr.success(successMsg, '¡Creado!'); // <-- Usar Toastr para éxito
           console.log('Respuesta del backend:', response);
           this.userForm.reset(); // Limpiar el formulario
           this.selectedRoleName = ''; // Limpia el rol seleccionado para ocultar campos específicos
-          // Opcional: Redirigir a la gestión de usuarios o a otro lugar
+          // Resetear el estado de los controles específicos (deshabilitarlos y limpiar validadores)
+          this.onRoleChange(''); // Llama a onRoleChange con un rol vacío para resetear todos los campos
+          // Redirigir después de un breve retraso para que el usuario vea el mensaje de éxito
           setTimeout(() => {
-            this.router.navigate(['/admin/users/manage-by-role']); // Redirigir a la vista de gestión por rol
+            this.router.navigate(['/admin/users/manage-by-role']);
           }, 2000);
         },
         error: (err) => {
           console.error('Error al crear usuario y perfil:', err);
-          this.errorMessage = err.error?.mensaje || 'Error al crear usuario y perfil. Intente de nuevo.';
-          Swal.fire('Error', this.errorMessage, 'error');
+          const errorMsg = err.error?.mensaje || 'Error al crear usuario y perfil. Intente de nuevo.';
+          this.toastr.error(errorMsg, 'Error'); // <-- Usar Toastr para errores
+          // Después de un error, volver a deshabilitar/limpiar campos específicos si es necesario
+          // Esto evita que queden habilitados si la validación del frontend falla y el usuario no cambia el rol
+          this.onRoleChange(this.selectedRoleName);
         }
       });
     } else {
-      this.errorMessage = 'Por favor, complete todos los campos requeridos y válidos.';
+      const validationErrorMsg = 'Por favor, complete todos los campos requeridos y válidos.';
       this.userForm.markAllAsTouched(); // Marca todos los campos como tocados para mostrar errores
-      // Después de marcar como tocados, deshabilita los campos específicos de nuevo si no son del rol seleccionado
-      // Esto es importante para que la UI se vea correcta después de un intento fallido de envío
-      this.onRoleChange(this.selectedRoleName);
+
+      // Importante: Volver a deshabilitar/limpiar campos específicos si la validación local falla
+      // para que el formulario se muestre correctamente al usuario.
+      this.onRoleChange(this.selectedRoleName); // Vuelve a aplicar la lógica de habilitación/deshabilitación
+      this.toastr.warning(validationErrorMsg, 'Validación'); // <-- Usar Toastr para advertencias
     }
   }
 
-  // Getter para facilitar el acceso a los controles del formulario en el HTML
   get f() { return this.userForm.controls; }
 }

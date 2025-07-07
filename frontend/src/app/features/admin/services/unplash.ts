@@ -15,4 +15,3 @@ export class Unplash {
     return this.http.get<any>(`${this.apiUrl}?query=${query}&per_page=1&client_id=${this.accessKey}`);
   }
 }
-

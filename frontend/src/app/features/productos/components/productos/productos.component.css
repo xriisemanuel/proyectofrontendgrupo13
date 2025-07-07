@@ -1,0 +1,152 @@
+/* Tipografía y fondo */
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #1c1c1c;
+  color: #f4f4f4;
+}
+
+/* Contenedor principal */
+.container {
+  background-color: #2a2a2a;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.04);
+}
+
+/* Títulos */
+h2 {
+  font-weight: 700;
+  color: #ffa500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+h5 {
+  color: #eee;
+  font-weight: 500;
+}
+
+/* Subtítulo destacado */
+.bg-light {
+  background-color: #2e2e2e !important;
+  border: 1px solid #444;
+}
+.text-muted {
+  color: #aaa !important;
+}
+
+/* Buscador */
+.input-group .form-control {
+  background-color: #dfc7c7;
+  color: #070505;
+  border: 1px solid #444;
+}
+.input-group-text {
+  background-color: #ffa500;
+  color: #1c1c1c;
+  border: none;
+}
+
+/* Botones */
+.btn-outline-primary {
+  border-color: #ffa500;
+  color: #ffa500;
+  background-color: transparent;
+}
+.btn-outline-primary:hover {
+  background-color: #ffa500;
+  color: #1c1c1c;
+}
+.btn-outline-secondary {
+  border-color: #ccc;
+  color: #ccc;
+}
+.btn-outline-secondary:hover {
+  background-color: #ccc;
+  color: #000;
+}
+.btn-success {
+  background-color: #ffcc00;
+  color: #000;
+  border: none;
+}
+.btn-success:hover {
+  background-color: #ffe066;
+}
+.btn-outline-success {
+  border-color: #ffcc00;
+  color: #ffcc00;
+}
+.btn-outline-success:hover {
+  background-color: #ffcc00;
+  color: #000;
+}
+.btn-danger {
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+}
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+/* Cards de producto */
+.card {
+  background-color: #1f1f1f;
+  color: #f0f0f0;
+  border-radius: 10px;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+.card:hover {
+  box-shadow: 0 0 15px rgba(255, 165, 0, 0.2);
+  transform: scale(1.02);
+}
+
+/* Imagen */
+.card-img-top {
+  border-radius: 10px 10px 0 0;
+}
+
+/* Detalles en la tarjeta */
+.card-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+.card-text {
+  font-size: 0.95rem;
+  color: #ccc;
+}
+.badge {
+  font-size: 0.75rem;
+  padding: 6px 10px;
+}
+.bg-success {
+  background-color: #ffcc00 !important;
+  color: #000 !important;
+}
+.bg-danger {
+  background-color: #dc3545 !important;
+}
+
+/* Producto inactivo */
+.opacity-50 {
+  filter: grayscale(70%);
+  opacity: 0.5;
+  pointer-events: auto;
+}
+
+/* Modal personalizado */
+.modal-content {
+  background-color: #2a2a2a;
+  color: #f4f4f4;
+  border-radius: 12px;
+}
+.modal-header.bg-success {
+  background-color: #ffa500 !important;
+  color: #000;
+}
+.modal-header.bg-danger {
+  background-color: #dc3545 !important;
+}
+.modal-header.bg-info {
+  background-color: #0dcaf0 !important;
+}

@@ -1,0 +1,135 @@
+<div class="container mt-4">
+  <h2 class="text-center">Productos disponibles - SUBTE <i class="bi bi-fork-knife"></i> </h2>
+
+  <div class="mb-3">
+    <button class="btn btn-outline-primary btn-sm" (click)="volverACategorias()">
+     <i class="bi bi-arrow-left-circle"></i> Volver a categorías
+    </button>
+  </div>
+
+  <div *ngIf="categoriaSeleccionadaNombre" class="mb-3">
+    <h5>Mostrando productos de: <span class="text-primary">{{ categoriaSeleccionadaNombre }}</span></h5>
+    <button class="btn btn-outline-secondary btn-sm" (click)="verTodos()"><i class="bi bi-arrows-angle-expand"></i> Ver todos</button>
+  </div>
+
+<div class="bg-light p-3 rounded shadow-sm text-center mb-4">
+  <h4 class="mb-2 text-light">NUESTROS PRODUCTOS:</h4>
+  <p class="text-muted mb-0">
+    Mostrando {{ cantidadTotal }} producto{{ cantidadTotal === 1 ? '' : 's' }} disponibles
+  </p>
+</div>
+
+
+  <!-- Botón para agregar nuevo producto -->
+  <div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-success" (click)="irAFormulario()"><i class="bi bi-plus-lg"></i> Agregar producto</button>
+  </div>
+
+  <!-- Buscador reactivo -->
+  <div class="input-group mb-4">
+    <input type="text" [(ngModel)]="busqueda" (ngModelChange)="filtrarProductos()" placeholder="Buscar producto..."
+      class="form-control">
+    <span class="input-group-text"><i class="bi bi-search"></i></span>
+    <p class="text-warning" *ngIf="categoriaSeleccionadaId && productosFiltrados.length === 0">
+      No se encontraron coincidencias en esta categoría.
+    </p>
+
+  </div>
+
+
+  <!-- Resultado filtrado o completo -->
+  <div
+    *ngIf="(categoriaSeleccionadaId || busqueda) ? productosFiltrados.length > 0 : productos.length > 0; else sinProductos">
+    <div class="row">
+      <div class="col-md-4 mb-4"
+        *ngFor="let producto of (categoriaSeleccionadaId || busqueda ? productosFiltrados : productos)">
+        <div class="card h-100 shadow" [class.opacity-50]="!producto.disponible"
+          (click)="producto.disponible ? editarProducto(producto) : mostrarModalProductoInactivo(producto.nombre)"
+          style="cursor: pointer;">
+          <!-- Imagen principal (opcionalmente más imágenes debajo) -->
+          <img [src]="producto.imagenes[0]" class="card-img-top" alt="{{ producto.nombre }}"
+            style="height: 200px; object-fit: cover;">
+
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">{{ producto.nombre }}</h5>
+            <p class="card-text">{{ producto.descripcion }}</p>
+            <p><strong>Precio:</strong> ${{ producto.precio }}</p>
+            <p><strong>Stock:</strong> {{ producto.stock }}</p>
+            <!--<p><strong>Popularidad:</strong> {{ producto.popularidad }}</p>-->
+            <p><strong>Categoría:</strong> {{ producto.categoriaId?.nombre }}</p>
+            <p>
+              <strong>Disponible:</strong>
+              <span class="badge" [ngClass]="producto.disponible ? 'bg-success' : 'bg-danger'">
+                {{ producto.disponible ? 'Sí' : 'No' }}
+              </span>
+            </p>
+
+            <div class="mt-auto d-flex justify-content-between">
+              <button class="btn btn-primary btn-sm" (click)="editarProducto(producto)"><i class="bi bi-pencil"></i> Modificar</button>
+              <button class="btn btn-danger btn-sm" (click)="eliminarProducto(producto._id)"><i class="bi bi-trash"></i> Eliminar</button>
+            </div>
+            <button class="btn btn-outline-success btn-sm mt-2"
+              (click)="agregarAlCarrito(producto); $event.stopPropagation()">
+              <i class="bi bi-cart-plus"></i> Agregar al carrito
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sin productos -->
+  <ng-template #sinProductos>
+    <p class="text-muted">
+      {{ categoriaSeleccionadaNombre
+      ? 'No hay productos relacionados a esta categoría aún.'
+      : 'No se encontraron productos disponibles.' }}
+    </p>
+  </ng-template>
+
+  <!-- Modal de éxito -->
+  <div class="modal fade" id="modalExito" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title">¡Éxito!</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <p>{{ mensajeModal }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para producto inactivo -->
+<div class="modal fade" id="modalProductoInactivo" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Producto inactivo</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p>El producto <strong>{{ productoInactivoNombre }}</strong> no está disponible actualmente.</p>
+        <p>No se puede modificar ni visualizar detalles.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Producto agregado al carrito -->
+<div class="modal fade" id="modalCarrito" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title">¡Producto agregado! 🎉</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p>El producto <strong>{{ productoAgregadoNombre }}</strong> fue agregado al carrito exitosamente.</p>
+      </div>
+    </div>
+  </div>
+</div>

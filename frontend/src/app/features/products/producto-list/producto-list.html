@@ -1,0 +1,84 @@
+<div class="product-list-container">
+    <h2>Listado de Productos</h2>
+
+    <div class="filter-section">
+        <label for="filterStatus">Mostrar:</label>
+        <select id="filterStatus" class="form-control" [(ngModel)]="filterStatus">
+            <option value="all">Todos</option>
+            <option value="available">Disponibles</option>
+            <option value="unavailable">No Disponibles / Sin Stock</option>
+        </select>
+    </div>
+
+    <div class="action-buttons">
+        <button type="button" class="btn btn-primary" (click)="createNewProduct()">
+            <i class="fas fa-plus-circle"></i> Nuevo Producto
+        </button>
+        <button type="button" class="btn btn-info" (click)="getProducts()">
+            <i class="fas fa-sync-alt"></i> Recargar Productos
+        </button>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-indicator text-center mt-3">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Cargando productos...</span>
+        </div>
+        <p>Cargando productos...</p>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger mt-3" role="alert">
+        {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!isLoading && filteredProducts.length === 0 && !errorMessage" class="alert alert-info mt-3"
+        role="alert">
+        No hay productos para mostrar con los criterios actuales.
+    </div>
+
+    <div class="product-table-responsive">
+        <table class="table table-striped table-hover mt-3" *ngIf="filteredProducts.length > 0">
+            <thead>
+                <tr>
+                    <th>Imagen</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                    <th>Categoría</th>
+                    <th>Stock</th>
+                    <th>Disponible</th>
+                    <th>Popularidad</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let product of filteredProducts">
+                    <td>
+                        <img [src]="getProductImageUrl(product)" alt="{{ product.nombre }}" class="product-thumbnail">
+                    </td>
+                    <td>{{ product.nombre }}</td>
+                    <td>{{ product.descripcion | slice:0:50 }}...</td>
+                    <td>{{ product.precio | currency:'USD':'symbol':'1.2-2' }}</td>
+                    <td>{{ getCategoryName(product) }}</td>
+                    <td>{{ product.stock }}</td>
+                    <td>
+                        <span [class.text-success]="product.disponible && product.stock > 0"
+                            [class.text-danger]="!product.disponible || product.stock === 0">
+                            {{ product.disponible && product.stock > 0 ? 'Sí' : 'No' }}
+                        </span>
+                    </td>
+                    <td>{{ product.popularidad }}</td>
+                    <td>
+                        <button type="button" class="btn btn-warning btn-sm" (click)="editProduct(product._id!)"
+                            title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" (click)="deleteProduct(product._id!)"
+                            title="Eliminar">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

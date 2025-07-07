@@ -1,0 +1,122 @@
+
+<div class="container mt-4 text-center bg-black">
+  <h2 class="mt-4">Categorías disponibles - SUBTE</h2>
+
+  <!-- Encabezado -->
+  <div class="text-center my-4">
+    <h3 class="fw-bold text-light text-uppercase">Productos más populares</h3>
+    <h4 class="text-muted">Los favoritos de nuestros clientes</h4>
+  </div>
+
+  <!-- Carrusel de productos destacados -->
+  <div id="carouselProductos" class="carousel slide mb-5 shadow-sm rounded overflow-hidden" data-bs-ride="carousel"
+    data-bs-interval="5000">
+    <div class="carousel-inner">
+      <div *ngFor="let producto of productos; let i = index" class="carousel-item" [class.active]="i === 0">
+        <a [routerLink]="['/productos']" [queryParams]="{ idProducto: producto._id }">
+          <img [src]="producto.imagenes[0]" class="d-block w-100" [alt]="producto.nombre"
+            style="height: 500px; object-fit: cover;">
+        </a>
+        <div class="carousel-caption d-block bg-grey bg-opacity-20 text-light rounded py-3 px-4 shadow-sm">
+          <div *ngIf="i === 0" class="position-absolute top-0 start-0 m-2">
+            <span class="badge bg-success fs-6">🏆 Más popular</span>
+          </div>
+
+          <h5 class="fw-semibold mb-1">{{ producto.nombre }}</h5>
+          <p class="small mb-1 text-muted">{{ producto.descripcion }}</p>
+          <p class="mb-0">
+            <span class="badge bg-warning text-dark">
+              Popularidad: {{ producto.popularidad }}/10
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselProductos" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" style="filter: invert(100%);"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselProductos" data-bs-slide="next">
+      <span class="carousel-control-next-icon" style="filter: invert(100%);"></span>
+    </button>
+  </div>
+
+
+  <div class="text-center my-4">
+    <button type="button" class="btn btn-outline-primary btn-lg px-4 py-2 rounded-pill shadow-sm fw-semibold"
+      (click)="verTodosLosProductos()">
+      <i class="bi bi-grid-fill me-2"></i> Ver todos los productos <i class="bi bi-arrow-up-circle"></i>
+    </button>
+  </div>
+
+
+  <!-- Botón para agregar nueva categoría -->
+  <div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-success" (click)="irAFormulario()"><i class="bi bi-plus-lg"></i> Agregar categoría</button>
+  </div>
+   <h3 class="fw-bold text-light text-uppercase">CATEGORÍAS:</h3>
+  <!-- Lista de categorías en cards -->
+  <div *ngIf="categorias.length > 0; else sinCategorias">
+    <div class="row">
+      <div class="col-md-4 mb-4 p-md-1" *ngFor="let categoria of categorias">
+        <div class="card h-100 shadow" [class.opacity-50]="!categoria.estado"
+          (click)="categoria.estado ? verProductosPorCategoria(categoria._id) : mostrarModalInactivo(categoria.nombre)"
+          style="cursor: pointer;">
+          <img [src]="categoria.imagen" class="card-img-top" alt="{{ categoria.nombre }}"
+            style="height: 200px; object-fit: cover;">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">{{ categoria.nombre }}</h5>
+            <p class="card-text">{{ categoria.descripcion }}</p>
+            <p>
+              <strong>Estado:</strong>
+              <span class="badge" [ngClass]="categoria.estado ? 'bg-success' : 'bg-secondary'">
+                {{ categoria.estado ? 'Activa' : 'Inactiva' }}
+              </span>
+            </p>
+            <div class="mt-auto d-flex justify-content-between">
+              <button class="btn btn-primary btn-sm" (click)="editarCategoria(categoria)"><i class="bi bi-pencil"></i>
+                Modificar</button>
+              <button class="btn btn-danger btn-sm" (click)="eliminarCategoria(categoria._id)"><i
+                  class="bi bi-trash"></i> Eliminar</button>
+            </div>
+
+            <!-- Modal de éxito -->
+            <div class="modal fade" id="modalExito" tabindex="-1">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">¡Éxito!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p>{{ mensajeModal }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Template en caso de no haber categorías -->
+<ng-template #sinCategorias>
+  <p>No se encontraron categorías disponibles.</p>
+</ng-template>
+
+<div class="modal fade" id="modalInactivo" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-secondary text-white">
+        <h5 class="modal-title">Categoría inactiva</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p>La categoría <strong>{{ categoriaInactivaNombre }}</strong> está actualmente inactiva.</p>
+        <p>No se pueden visualizar productos relacionados por el momento.</p>
+      </div>
+    </div>
+  </div>
+</div>

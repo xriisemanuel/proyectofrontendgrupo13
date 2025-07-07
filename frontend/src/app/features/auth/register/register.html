@@ -1,3 +1,4 @@
+<!-- src/app/features/auth/register/register.html -->
 <div class="register-container">
   <h2>Registrarse como Cliente</h2>
   <form (ngSubmit)="onSubmit()">
@@ -52,12 +53,13 @@
 
     <button type="submit" class="btn-primary">Registrar</button>
 
-    <div *ngIf="errorMessage" class="error-message">
+    <!-- Los mensajes de error/éxito se mostrarán con Toastr, pero puedes mantener esto para validación interna si quieres -->
+    <!-- <div *ngIf="errorMessage" class="error-message">
       {{ errorMessage }}
     </div>
     <div *ngIf="isSuccessful" class="success-message">
       Registro exitoso. Ahora puedes <a routerLink="/login">iniciar sesión</a>.
-    </div>
+    </div> -->
   </form>
   <p>¿Ya tienes cuenta? <a routerLink="/login">Inicia Sesión</a></p>
 </div>

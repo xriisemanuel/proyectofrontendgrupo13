@@ -1,10 +1,17 @@
+// proyecto/frontend/src/app/core/auth/auth.service.ts
 import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { API_BASE_URL } from '../../core/constants/constants';
-import { IUsuario, IRol } from '../../data/services/usuario'; // Ruta corregida a usuario.service.ts
+import { IUsuario, IRol } from '../../data/services/usuario'; // Asegúrate de que esta ruta y las interfaces sean correctas
+
+// NUEVO: Importar la interfaz de registro
+import { IRegisterUserPayload, IRegisterSuccessResponse } from './auth.interface';
+
+// NUEVO: Importar jwt-decode
+import { jwtDecode } from 'jwt-decode'; // Importar jwtDecode directamente
 
 const AUTH_API = API_BASE_URL + '/auth/';
 
@@ -26,7 +33,22 @@ export class AuthService {
     if (this.isBrowser) {
       const storedUser = localStorage.getItem('user');
       console.log('AuthService constructor: Usuario almacenado en localStorage:', storedUser);
-      initialUser = storedUser ? JSON.parse(storedUser) : null;
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          // Al inicializar, también validamos el token si existe
+          if (parsedUser && parsedUser.token && !this.isTokenExpired(parsedUser.token)) {
+            initialUser = parsedUser;
+          } else {
+            // Si el token está expirado o es inválido, limpiamos localStorage
+            localStorage.removeItem('user');
+            console.log('AuthService constructor: Token expirado o inválido en localStorage. Sesión limpiada.');
+          }
+        } catch (e) {
+          console.error('AuthService constructor: Error al parsear usuario de localStorage:', e);
+          localStorage.removeItem('user'); // Limpiar si hay error al parsear
+        }
+      }
     }
     this.currentUserSubject = new BehaviorSubject<any>(initialUser);
     this.currentUser = this.currentUserSubject.asObservable();
@@ -36,36 +58,14 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
-  register(
-    username: string,
-    password: string,
-    email: string,
-    telefono: string,
-    rolName: string,
-    nombre: string,
-    apellido: string,
-    direccionCliente?: string,
-    fechaNacimientoCliente?: string,
-    preferenciasAlimentariasCliente?: string[],
-    puntosCliente?: number,
-    vehiculoRepartidor?: string,
-    numeroLicenciaRepartidor?: string
-  ): Observable<any> {
-    return this.http.post(AUTH_API + 'register', {
-      username,
-      password,
-      email,
-      telefono,
-      rolName,
-      nombre,
-      apellido,
-      direccionCliente,
-      fechaNacimientoCliente,
-      preferenciasAlimentariasCliente,
-      puntosCliente,
-      vehiculoRepartidor,
-      numeroLicenciaRepartidor
-    });
+  /**
+   * Registra un nuevo usuario con los datos de payload.
+   * @param payload Objeto que contiene todos los datos de registro, incluyendo campos de perfil.
+   * @returns Observable con la respuesta del registro.
+   */
+  register(payload: IRegisterUserPayload): Observable<IRegisterSuccessResponse> {
+    console.log('AuthService: Enviando payload de registro al backend:', payload);
+    return this.http.post<IRegisterSuccessResponse>(AUTH_API + 'register', payload);
   }
 
   login(username: string, password: string): Observable<any> {
@@ -73,9 +73,15 @@ export class AuthService {
       .pipe(map(response => {
         console.log('AuthService login: Respuesta del backend:', response);
         if (this.isBrowser && response && response.token) {
-          localStorage.setItem('user', JSON.stringify(response));
-          this.currentUserSubject.next(response);
-          console.log('AuthService login: Usuario guardado en localStorage y BehaviorSubject.');
+          // Almacenar solo si el token no está expirado inmediatamente
+          if (!this.isTokenExpired(response.token)) {
+            localStorage.setItem('user', JSON.stringify(response));
+            this.currentUserSubject.next(response);
+            console.log('AuthService login: Usuario guardado en localStorage y BehaviorSubject.');
+          } else {
+            console.warn('AuthService login: Token recibido ya expirado. No se guarda la sesión.');
+            this.logout(); // Limpiar por si acaso
+          }
         }
         return response;
       }));
@@ -90,40 +96,76 @@ export class AuthService {
   }
 
   /**
-   * Gets the current user's JWT token.
-   * @returns The JWT token string or null if not authenticated.
+   * Decodifica el token JWT y verifica si ha expirado.
+   * @param token El token JWT a verificar.
+   * @returns True si el token ha expirado o es inválido, false en caso contrario.
+   */
+  private isTokenExpired(token: string): boolean {
+    if (!token) {
+      return true;
+    }
+    try {
+      const decoded: any = jwtDecode(token);
+      if (!decoded || !decoded.exp) {
+        return true; // No se pudo decodificar o no tiene fecha de expiración
+      }
+      const currentTime = Date.now() / 1000; // Tiempo actual en segundos
+      return decoded.exp < currentTime; // True si expiró
+    } catch (error) {
+      console.error('Error al decodificar el token JWT:', error);
+      return true; // Si hay un error al decodificar, consideramos que es inválido/expirado
+    }
+  }
+
+  /**
+   * Obtiene el token JWT actual y verifica su validez.
+   * @returns El JWT token string o null si no está autenticado o el token ha expirado.
    */
   getToken(): string | null {
-    if (this.isBrowser) {
-      const user = this.currentUserSubject.value;
-      console.log('AuthService getToken: currentUserSubject.value:', user);
-      return user && user.token ? user.token : null;
+    if (!this.isBrowser) {
+      return null;
     }
-    return null;
+    const user = this.currentUserSubject.value;
+    const token = user && user.token ? user.token : null;
+
+    if (token && this.isTokenExpired(token)) {
+      console.log('AuthService getToken: Token expirado. Realizando logout.');
+      this.logout(); // Limpiar sesión si el token expiró
+      return null;
+    }
+    return token;
   }
 
   /**
-   * Gets the current user's role.
-   * @returns The role name string or null if not authenticated or role not found.
+   * Obtiene el rol del usuario del token JWT decodificado.
+   * @returns El nombre del rol como string o null si no está autenticado o el rol no se encuentra.
    */
   getRole(): string | null {
-    if (this.isBrowser) {
-      const user = this.currentUserSubject.value;
-      console.log('AuthService getRole: currentUserSubject.value para rol:', user);
-      const role = user && user.usuario && user.usuario.rol ? user.usuario.rol : null;
-      console.log('AuthService getRole: Rol extraído:', role);
-      return role;
+    if (!this.isBrowser || !this.isAuthenticated()) { // Solo intenta obtener el rol si está autenticado
+      return null;
+    }
+    const user = this.currentUserSubject.value;
+    const token = user && user.token ? user.token : null;
+
+    if (token) {
+      try {
+        const decoded: any = jwtDecode(token);
+        // Asumiendo que el rol está en la propiedad 'rol' del payload del token
+        return decoded.rol || null;
+      } catch (error) {
+        console.error('Error al obtener el rol del token:', error);
+        this.logout(); // Si el token es inválido para decodificar, limpia la sesión
+        return null;
+      }
     }
     return null;
   }
 
   /**
-   * Checks if the user is currently authenticated.
-   * @returns True if authenticated, false otherwise.
+   * Checks if the user is currently authenticated and has a valid, non-expired token.
+   * @returns True if authenticated with a valid token, false otherwise.
    */
   isAuthenticated(): boolean {
-    const authenticated = !!this.getToken();
-    console.log('AuthService isAuthenticated: ', authenticated);
-    return authenticated;
+    return !!this.getToken(); // Depende de getToken() que ahora valida la expiración
   }
 }
