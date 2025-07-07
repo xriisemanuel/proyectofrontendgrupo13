@@ -118,7 +118,7 @@ export const routes: Routes = [
   },
   {
     path: 'ventas/dashboard',
-    loadComponent: () => import('./components/sales-dashboard/sales-dashboard').then(m => m.SalesDashboard),
+    loadComponent: () => import('./components/ventas/ventas.component').then(m => m.VentasComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['supervisor_ventas'] }
   },
@@ -133,6 +133,17 @@ export const routes: Routes = [
     loadComponent: () => import('./components/pedido-dashboard/pedido-dashboard').then(m => m.PedidoDashboard),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['admin', 'supervisor_ventas'] }
+  },
+
+  { path: 'calificaciones',
+    loadComponent: () => import('./components/calificaciones/calificaciones.component').then(m => m.CalificacionesComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin', 'cliente', 'supervisor_ventas'] } // Solo admin y cliente pueden acceder
+  },
+  { path: 'ventas',
+    loadComponent: () => import('./components/ventas/ventas.component').then(m => m.VentasComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin', 'supervisor_ventas'] } // Solo admin y supervisor de ventas pueden acceder
   },
 
   // Ruta de wildcard: cualquier otra ruta no definida redirige al Home

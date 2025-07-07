@@ -1,0 +1,96 @@
+<!-- src/app/components/calificaciones/calificaciones.component.html -->
+<div class="calificaciones-wrapper">
+  <div class="calificaciones-card">
+    <h2 class="titulo-seccion">Registrar Nueva Calificación ✅</h2>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label>Pedido ID</label>
+        <input formControlName="pedidoId" class="form-control input-subte">
+      </div>
+
+      <div class="mb-3">
+        <label>Cliente ID</label>
+        <input formControlName="clienteId" class="form-control input-subte">
+      </div>
+
+      <div class="mb-3">
+        <label>Puntuación Comida (1-5)</label>
+        <!-- Contenedor para las estrellas de JS puro -->
+        <div id="puntuacionComidaForm" class="star-rating-container-js"></div>
+        <!-- El input numérico se mantiene oculto para que Reactive Forms lo gestione -->
+        <input type="hidden" formControlName="puntuacionComida">
+      </div>
+
+      <div class="mb-3">
+        <label>Puntuación Servicio (1-5)</label>
+        <!-- Contenedor para las estrellas de JS puro -->
+        <div id="puntuacionServicioForm" class="star-rating-container-js"></div>
+        <input type="hidden" formControlName="puntuacionServicio">
+      </div>
+
+      <div class="mb-3">
+        <label>Puntuación Entrega (1-5)</label>
+        <!-- Contenedor para las estrellas de JS puro -->
+        <div id="puntuacionEntregaForm" class="star-rating-container-js"></div>
+        <input type="hidden" formControlName="puntuacionEntrega">
+      </div>
+
+      <div class="mb-3">
+        <label>Comentario</label>
+        <textarea formControlName="comentario" class="form-control input-subte"></textarea>
+      </div>
+
+      <button class="btn btn-amarillo w-100" type="submit">
+        Registrar Calificación
+      </button>
+    </form>
+
+    <div *ngIf="error" class="alert alert-danger mt-3">{{ error }}</div>
+  </div>
+
+  <div class="listado-wrapper mt-4">
+    <h3 class="titulo-seccion">Listado de Calificaciones</h3>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>Pedido ID</th>
+            <th>Cliente ID</th>
+            <th>Comida</th>
+            <th>Servicio</th>
+            <th>Entrega</th>
+            <th>Comentario</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of calificaciones">
+            <td>{{ c.pedidoId }}</td>
+            <td>{{ c.clienteId }}</td>
+            <td>
+              <!-- Contenedor para las estrellas de JS puro en modo lectura -->
+              <div id="puntuacionComidaTable_{{c._id}}" class="star-rating-container-js"></div>
+            </td>
+            <td>
+              <ng-container *ngIf="c.puntuacionServicio">
+                <div id="puntuacionServicioTable_{{c._id}}" class="star-rating-container-js"></div>
+              </ng-container>
+            </td>
+            <td>
+              <ng-container *ngIf="c.puntuacionEntrega">
+                <div id="puntuacionEntregaTable_{{c._id}}" class="star-rating-container-js"></div>
+              </ng-container>
+            </td>
+            <td>{{ c.comentario }}</td>
+            <td>
+              <button class="btn btn-sm btn-danger" (click)="eliminarCalificacion(c._id!)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

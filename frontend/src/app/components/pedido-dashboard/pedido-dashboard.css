@@ -257,13 +257,6 @@ table tr:hover {
         margin-bottom: 10px;
         border-radius: 8px;
     }
-    table td {
-        border: none;
-        border-bottom: 1px solid #eee;
-        position: relative;
-        padding-left: 50%;
-        text-align: right;
-    }
     table td:before {
         content: attr(data-label);
         position: absolute;
@@ -285,4 +278,52 @@ table tr:hover {
         margin-bottom: 5px;
         margin-right: 0;
     }
+}
+
+/* Estilos para la nueva sección de navegación */
+.quick-nav-section {
+  background-color: #e9ecef;
+  padding: 15px 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.quick-nav-section h3 {
+  color: #343a40;
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.2em;
+}
+
+.nav-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px; /* Espacio entre los botones */
+  flex-wrap: wrap; /* Permite que los botones se envuelvan en pantallas pequeñas */
+}
+
+.nav-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  text-decoration: none; /* Para routerLink */
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  min-width: 120px; /* Ancho mínimo para los botones */
+}
+
+.nav-btn:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px); /* Pequeño efecto al pasar el ratón */
+}
+
+.nav-btn.active {
+  background-color: #0056b3; /* Color para el botón activo */
+  border: 2px solid #004085;
+  font-weight: bold;
 }

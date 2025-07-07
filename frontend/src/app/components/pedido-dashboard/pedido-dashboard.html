@@ -3,6 +3,18 @@
   <h1>Dashboard de Pedidos</h1>
   <p>Gestión centralizada de todas las órdenes en el sistema.</p>
 
+  <!-- Sección de Navegación Rápida (NUEVO) -->
+  <div class="quick-nav-section">
+    <h3>Navegación Rápida</h3>
+    <div class="nav-buttons">
+      <button class="nav-btn">Pedidos</button>
+      <button class="nav-btn" routerLink="/ventas/dashboard" routerLinkActive="active">Ventas</button>
+      <button class="nav-btn" routerLink="/calificaciones" routerLinkActive="active">Calificaciones</button>
+      <!-- Puedes añadir más botones si hay otros dashboards relevantes para este rol -->
+    </div>
+  </div>
+  <!-- Fin Sección de Navegación Rápida -->
+
   <!-- Mensajes de estado (carga, error, éxito) -->
   <div *ngIf="loading" class="loading-message">
     Cargando pedidos...

@@ -1,0 +1,111 @@
+/* src/app/components/calificaciones/calificaciones.component.scss */
+.calificaciones-wrapper {
+  background-color: #f0e7d8;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 800px;
+  margin: 2rem auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+
+  .calificaciones-card {
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .titulo-seccion {
+    text-align: center;
+    color: #111;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+  }
+
+  .input-subte {
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    transition: border-color 0.3s;
+
+    &:focus {
+      border-color: #d4af37;
+      outline: none;
+      box-shadow: 0 0 5px #d4af37;
+    }
+  }
+
+  .btn-amarillo {
+    background-color: #d4af37;
+    border: none;
+    color: #111;
+    font-weight: 600;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: #c29e2f;
+    }
+  }
+
+  .listado-wrapper {
+    margin-top: 3rem;
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.table-responsive {
+  border-radius: 0.5rem;
+  overflow: auto;
+  max-width: 100%;
+
+  table {
+    table-layout: fixed;
+    width: 100%;
+
+    th, td {
+      word-wrap: break-word;
+      white-space: normal;
+    }
+  }
+}
+
+/* --- ESTILOS PARA LAS ESTRELLAS DE JAVASCRIPT PURO --- */
+/* Contenedor principal de las estrellas */
+.star-rating-container-js {
+  display: inline-block;
+  font-size: 1.8em; /* Tamaño de las estrellas */
+  color: #e4e5e9; /* Color por defecto de las estrellas vacías */
+  user-select: none; /* Evita la selección de texto */
+  margin-top: 5px; /* Espacio debajo del label */
+}
+
+/* Estilo para cada estrella */
+.star {
+  cursor: pointer;
+  padding: 0 2px; /* Espacio entre estrellas */
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: inline-block; /* Asegura que se muestren en línea */
+}
+
+/* Estrellas llenas */
+.star.filled {
+  color: #ffc107; /* Color amarillo/naranja para estrellas llenas */
+}
+
+/* Estrellas al pasar el ratón (hover) */
+.star:not(.readonly):hover {
+  transform: scale(1.1); /* Efecto de escala */
+  color: #ffd700; /* Un poco más brillante al hacer hover */
+}
+
+/* Estrellas llenas por hover (si se implementa en JS) */
+.star.hover-filled {
+  color: #ffd700; /* Color para estrellas llenas por hover */
+}
+
+/* Estrellas de solo lectura */
+.star.readonly {
+  cursor: default; /* Cursor por defecto para solo lectura */
+}
