@@ -1,0 +1,82 @@
+<div class="container mt-4">
+  <h2 class="text-center text-light">Productos disponibles - SUBTE 🍔</h2>
+
+  <div class="mb-3">
+    <button class="btn btn-outline-warning btn-sm" (click)="volverACategorias()">
+      <i class="bi bi-arrow-left-circle"></i> Volver a categorías
+    </button>
+  </div>
+
+  <div *ngIf="categoriaSeleccionadaNombre" class="mb-3">
+    <h5 class="text-light">Mostrando productos de: <span class="text-warning">{{ categoriaSeleccionadaNombre }}</span></h5>
+    <button class="btn btn-outline-secondary btn-sm" (click)="verTodos()">
+      <i class="bi bi-arrows-angle-expand"></i> Ver todos
+    </button>
+  </div>
+
+  <div class="bg-dark p-3 rounded shadow-sm text-center mb-4">
+    <h4 class="mb-2 text-light">Nuestros productos</h4>
+    <p class="text-muted mb-0">
+      Mostrando {{ cantidadTotal }} producto{{ cantidadTotal === 1 ? '' : 's' }} disponibles
+    </p>
+  </div>
+
+  <!-- Buscador -->
+  <div class="input-group mb-4">
+    <input type="text" [(ngModel)]="busqueda" (ngModelChange)="filtrarProductos()" placeholder="Buscar producto..."
+      class="form-control bg-dark text-light border-light">
+    <span class="input-group-text bg-warning"><i class="bi bi-search"></i></span>
+  </div>
+
+  <!-- Lista de productos -->
+  <div
+    *ngIf="(categoriaSeleccionadaId || busqueda) ? productosFiltrados.length > 0 : productos.length > 0; else sinProductos">
+    <div class="row">
+      <div class="col-md-4 mb-4"
+        *ngFor="let producto of (categoriaSeleccionadaId || busqueda ? productosFiltrados : productos)">
+        <div class="card h-100 shadow bg-dark text-light" style="cursor: default;">
+          <img [src]="producto.imagenes[0]" class="card-img-top" alt="{{ producto.nombre }}"
+            style="height: 200px; object-fit: cover;">
+
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">{{ producto.nombre }}</h5>
+            <p class="card-text">{{ producto.descripcion }}</p>
+            <p><strong>Precio:</strong> ${{ producto.precio }}</p>
+            <p><strong>Categoría:</strong> {{ producto.categoriaNombre }}</p>
+
+            <div class="mt-auto">
+              <button class="btn btn-outline-success btn-sm w-100"
+                (click)="agregarAlCarrito(producto)">
+                <i class="bi bi-cart-plus"></i> Agregar al carrito
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Template si no hay productos -->
+  <ng-template #sinProductos>
+    <p class="text-muted text-center">
+      {{ categoriaSeleccionadaNombre
+        ? 'No hay productos disponibles en esta categoría.'
+        : 'No se encontraron productos disponibles.' }}
+    </p>
+  </ng-template>
+
+  <!-- Modal: Producto agregado al carrito -->
+  <div class="modal fade" id="modalCarrito" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark text-light">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title">¡Producto agregado! 🎉</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <p>El producto <strong>{{ productoAgregadoNombre }}</strong> fue agregado al carrito exitosamente.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -196,27 +196,31 @@ traducirNombre(nombre: string): string {
 
 
 usarRecetaComoDescripcion(): void {
-  // Validación previa
   if (!this.recetaSugerida?.strMeal || !this.ingredientesSugeridos.length) return;
 
-  // Resetea la descripción por si el botón se presionó varias veces
   this.producto.descripcion = '';
 
   let descripcion = `Receta sugerida: ${this.recetaSugerida.strMeal}\n`;
   descripcion += `Categoría: ${this.recetaSugerida.strCategory}\n`;
   descripcion += `Origen: ${this.recetaSugerida.strArea}\n\n`;
-
   descripcion += 'Ingredientes:\n';
+  this.producto.descripcion = descripcion.slice(0, 500);
   this.ingredientesSugeridos.forEach(ing => {
     descripcion += `- ${ing}\n`;
   });
-
   if (this.recetaSugerida.strInstructions) {
     descripcion += `\nInstrucciones:\n${this.recetaSugerida.strInstructions}`;
   }
 
   this.producto.descripcion = descripcion;
+
+  // ⏱️ Esperamos a que se actualice el campo y marcamos como tocado
+  setTimeout(() => {
+    const campo = document.querySelector('[name="descripcion"]') as HTMLElement;
+    if (campo) campo.dispatchEvent(new Event('blur'));
+  }, 0);
 }
+
 
 limpiarDescripcion(): void {
   this.producto.descripcion = '';

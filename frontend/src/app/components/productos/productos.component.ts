@@ -21,6 +21,7 @@ export class ProductosComponent implements OnInit {
   mensajeModal = '';
   categoriaSeleccionadaId: string | null = null;
   categoriaSeleccionadaNombre = '';
+  bloquearClick = false;
   productoInactivoNombre = '';
   productoAgregadoNombre = '';
   
@@ -153,11 +154,28 @@ ngOnInit(): void {
     }
   }
 
-  mostrarModal(mensaje: string): void {
-    this.mensajeModal = mensaje;
-    const modal = new (window as any).bootstrap.Modal(document.getElementById('modalExito'));
-    modal.show();
-  }
+mostrarModal(mensaje: string): void {
+  this.mensajeModal = mensaje;
+
+  const modalEl = document.getElementById('modalExito');
+  if (!modalEl) return;
+
+  const modal = new (window as any).bootstrap.Modal(modalEl);
+  modal.show();
+
+  setTimeout(() => {
+    modal.hide();
+
+    // Limpieza total de foco y backdrop
+   if (document.activeElement instanceof HTMLElement) {
+  document.activeElement.blur();
+}
+
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach(b => b.remove());
+  }, 1500);
+}
+
 
   mostrarModalProductoInactivo(nombre: string): void {
     this.productoInactivoNombre = nombre;

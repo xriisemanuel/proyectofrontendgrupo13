@@ -59,18 +59,16 @@
       <!-- Descripción -->
       <div class="mb-3">
         <label class="form-label">Descripción</label>
-        <textarea [(ngModel)]="producto.descripcion" name="descripcion" maxlength="500" required #descripcion="ngModel"
-          class="form-control" [class.is-valid]="descripcion.valid && descripcion.touched"
-          [class.is-invalid]="descripcion.invalid && descripcion.touched"></textarea>
-        <div *ngIf="descripcion.invalid && descripcion.touched" class="invalid-feedback">
-          La descripción es obligatoria.
-        </div>
-        <div *ngIf="descripcion.valid && descripcion.touched" class="valid-feedback">
-          ¡Descripción válida!
-        </div>
+        <textarea [(ngModel)]="producto.descripcion" name="descripcion" required #descripcionModel="ngModel"
+          class="form-control" [class.is-valid]="descripcionModel.valid && descripcionModel.touched"
+          [class.is-invalid]="descripcionModel.invalid && descripcionModel.touched"></textarea>
         <p class="text-success" *ngIf="producto.descripcion?.length > 0">
           ✅ Descripción generada automáticamente. Podés editarla si querés.
         </p>
+        <p class="text-muted small">
+          {{ producto.descripcion.length }}/500 caracteres
+        </p>
+
       </div>
 
       <!-- Botón limpiar -->
