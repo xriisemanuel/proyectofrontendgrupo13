@@ -1,0 +1,70 @@
+<div class="manage-combos-container">
+  <div class="header-section">
+    <h2><i class="fas fa-sitemap"></i> Gestión de Combos</h2>
+    <p>Administra los combos existentes: visualiza, edita, activa, desactiva y elimina.</p>
+    <div class="actions-row">
+      <a routerLink="/admin/combos/create" class="add-new-button">
+        <i class="fas fa-plus-circle"></i> Crear Nuevo Combo
+      </a>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-message">
+    <i class="fas fa-spinner fa-spin"></i> Cargando combos...
+  </div>
+  <div *ngIf="errorMessage" class="error-message">
+    <i class="fas fa-exclamation-triangle"></i> {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!loading && combos.length === 0" class="no-data-message">
+    <i class="fas fa-info-circle"></i> No hay combos registrados. ¡Crea uno nuevo!
+  </div>
+
+  <div *ngIf="!loading && combos.length > 0" class="combos-table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Precio Combo</th>
+          <th>Descuento (%)</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let combo of combos">
+          <td>{{ combo.nombre }}</td>
+          <td>{{ combo.descripcion || 'N/A' }}</td>
+          <td>{{ combo.precioCombo | currency:'USD':'symbol':'1.2-2' }}</td>
+          <td>{{ combo.descuento || 0 }}%</td>
+          <td>
+            <span [ngClass]="{'status-active': combo.activo, 'status-inactive': !combo.activo}">
+              {{ combo.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td class="actions-cell">
+            <!-- ¡CORREGIDO! Botón para abrir el modal de detalles -->
+            <button class="action-button view-button" title="Ver Detalles" (click)="viewComboDetails(combo._id!)">
+              <i class="fas fa-eye"></i>
+            </button>
+            <!-- Los botones de editar y toggle status se mantienen, pero el de editar podría ir en el modal -->
+            <button class="action-button edit-button" title="Editar Combo" (click)="editCombo(combo._id!)">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button
+              class="action-button toggle-status-button"
+              [ngClass]="{'toggle-active': !combo.activo, 'toggle-inactive': combo.activo}"
+              [title]="combo.activo ? 'Desactivar Combo' : 'Activar Combo'"
+              (click)="toggleComboStatus(combo)">
+              <i class="fas" [ngClass]="{'fa-toggle-on': combo.activo, 'fa-toggle-off': !combo.activo}"></i>
+            </button>
+            <button class="action-button delete-button" title="Eliminar Combo" (click)="deleteCombo(combo._id!, combo.nombre)">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

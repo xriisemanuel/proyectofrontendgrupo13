@@ -1,117 +1,112 @@
 // src/app/features/admin/manage-categories/manage-categories.ts
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { ToastrService } from 'ngx-toastr';
-
-// Importa el servicio y la interfaz necesaria
+import { RouterLink, Router } from '@angular/router'; // Importa Router
 import { CategoriaService } from '../../../data/services/categoria';
-import { ICategoria } from '../../../shared/interfaces';
+import { ICategoria } from '../../../shared/interfaces'; // Asegúrate de que la ruta es correcta
+import { catchError, finalize } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
+import { ConfirmDialogService } from '../../../shared/confirm-dialog';
 
 @Component({
   selector: 'app-manage-categories',
-  templateUrl: './manage-categories.html',
-  styleUrls: ['./manage-categories.css'],
   standalone: true,
-  imports: [CommonModule, RouterLink] // Necesario para directivas estructurales y navegación
+  imports: [
+    CommonModule,
+    RouterLink
+  ],
+  templateUrl: './manage-categories.html',
+  styleUrls: ['./manage-categories.css']
 })
-export class ManageCategories implements OnInit, OnDestroy {
-  categorias: ICategoria[] = []; // Lista de categorías
-  isLoading: boolean = false;
-  private destroy$ = new Subject<void>();
+export class ManageCategories implements OnInit {
+  categorias: ICategoria[] = [];
+  loading = false;
+  errorMessage: string | null = null;
 
   constructor(
     private categoriaService: CategoriaService,
-    private router: Router,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private confirmDialogService: ConfirmDialogService,
+    private router: Router // Inyecta Router
   ) { }
 
   ngOnInit(): void {
     this.loadCategorias();
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  /**
-   * Carga todas las categorías del sistema.
-   */
   loadCategorias(): void {
-    this.isLoading = true;
-    this.categoriaService.getCategorias().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (data: ICategoria[]) => {
-        this.categorias = data;
-        this.isLoading = false;
-        console.log('Categorías cargadas:', this.categorias);
-      },
-      error: (err) => {
-        console.error('Error al cargar categorías:', err);
-        const errorMessage = err.error?.mensaje || 'Error al cargar la lista de categorías.';
-        this.toastr.error(errorMessage, 'Error de Carga');
-        this.isLoading = false;
-      }
+    this.loading = true;
+    this.errorMessage = null;
+    this.categoriaService.getCategorias().pipe(
+      catchError(error => {
+        this.errorMessage = 'Error al cargar las categorías: ' + (error.message || 'Error desconocido');
+        this.toastr.error(this.errorMessage, 'Error de Carga');
+        return of([]);
+      }),
+      finalize(() => this.loading = false)
+    ).subscribe(categorias => {
+      this.categorias = categorias;
     });
   }
 
-  /**
-   * Navega a la página de edición de categoría.
-   * @param categoryId El ID de la categoría a editar.
-   */
-  editCategory(categoryId: string): void {
-    this.toastr.info(`Redirigiendo para editar categoría con ID: ${categoryId}.`);
-    this.router.navigate(['/admin/categories/edit', categoryId]); // Asume una ruta de edición
+  editCategory(id: string): void {
+    this.router.navigate(['/admin/categories/edit', id]);
   }
 
-  /**
-   * Elimina una categoría después de confirmar.
-   * @param categoryId El ID de la categoría a eliminar.
-   * @param categoryName El nombre de la categoría para el mensaje de confirmación.
-   */
-  deleteCategory(categoryId: string, categoryName: string): void {
-    if (confirm(`¿Estás seguro de que quieres eliminar la categoría "${categoryName}"? Esta acción es irreversible.`)) {
-      this.categoriaService.deleteCategoria(categoryId).pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          this.toastr.success(response.mensaje || 'Categoría eliminada exitosamente.', '¡Eliminada!');
-          this.loadCategorias(); // Recargar la lista después de la eliminación
-        },
-        error: (err) => {
-          console.error('Error al eliminar categoría:', err);
-          const errorMessage = err.error?.mensaje || 'Error al eliminar categoría. Intente de nuevo.';
-          this.toastr.error(errorMessage, 'Error de Eliminación');
+  deleteCategory(id: string, nombre: string): void {
+    this.confirmDialogService.confirm(`¿Estás seguro de que quieres eliminar la categoría "${nombre}"? Esta acción es irreversible.`)
+      .then((confirmed) => {
+        if (confirmed) {
+          this.loading = true;
+          this.categoriaService.deleteCategoria(id).pipe(
+            catchError(error => {
+              this.errorMessage = error.message || 'Error al eliminar la categoría.';
+              this.toastr.error(this.errorMessage ?? 'Error al eliminar la categoría.', 'Error de Eliminación');
+              return of(null);
+            }),
+            finalize(() => this.loading = false)
+          ).subscribe(response => {
+            if (response) {
+              this.toastr.success('Categoría eliminada exitosamente.', 'Eliminación Exitosa');
+              this.loadCategorias(); // Recargar la lista de categorías
+            }
+          });
         }
       });
-    }
   }
 
-  /**
-   * Cambia el estado de una categoría (Activar/Desactivar).
-   * @param category La categoría a modificar.
-   */
   toggleCategoryStatus(category: ICategoria): void {
-    const action = category.estado ? 'desactivar' : 'activar';
-    const confirmMessage = `¿Estás seguro de que quieres ${action} la categoría "${category.nombre}"?`;
-
-    if (confirm(confirmMessage)) {
-      const observable = category.estado ?
-        this.categoriaService.desactivarCategoria(category._id) :
-        this.categoriaService.activarCategoria(category._id);
-
-      observable.pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          this.toastr.success(response.mensaje || `Categoría ${action === 'activar' ? 'activada' : 'desactivada'} exitosamente.`, '¡Estado Actualizado!');
-          this.loadCategorias(); // Recargar la lista para reflejar el cambio
-        },
-        error: (err) => {
-          console.error(`Error al ${action} categoría:`, err);
-          const errorMessage = err.error?.mensaje || `Error al ${action} la categoría. Intente de nuevo.`;
-          this.toastr.error(errorMessage, 'Error de Actualización');
-        }
-      });
+    if (!category._id) {
+      this.toastr.error('El ID de la categoría no está definido.', 'Error');
+      return;
     }
+
+    this.loading = true;
+    const action = category.estado ? 'desactivar' : 'activar';
+    let serviceCall;
+
+    // Corrección aquí: Usar category._id! para asegurar que no es undefined
+    if (category.estado) {
+      serviceCall = this.categoriaService.desactivarCategoria(category._id!);
+    } else {
+      serviceCall = this.categoriaService.activarCategoria(category._id!);
+    }
+
+    serviceCall.pipe(
+      catchError(error => {
+        this.errorMessage = `Error al ${action} la categoría: ` + (error.message || 'Error desconocido');
+        this.toastr.error(this.errorMessage, `Error al ${action} Categoría`);
+        return of(null);
+      }),
+      finalize(() => this.loading = false)
+    ).subscribe(response => {
+      if (response) {
+        this.toastr.success(`Categoría ${category.estado ? 'desactivada' : 'activada'} exitosamente.`, 'Estado Actualizado');
+        // Actualizar el estado en el objeto local para reflejar el cambio sin recargar todo
+        category.estado = !category.estado;
+      }
+    });
   }
 }

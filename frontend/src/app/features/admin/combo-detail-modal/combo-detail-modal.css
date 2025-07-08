@@ -1,0 +1,251 @@
+/* src/app/features/admin/combo-detail-modal/combo-detail-modal.component.css */
+
+/* Estilos para el contenedor principal del modal */
+.combo-detail-modal-container {
+    background: linear-gradient(135deg, rgba(40, 42, 54, 0.95), rgba(28, 30, 40, 0.95));
+    /* Degradado oscuro semi-transparente */
+    border-radius: 15px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+    /* Sombra más pronunciada */
+    backdrop-filter: blur(8px);
+    /* Efecto de desenfoque */
+    border: 1px solid rgba(139, 233, 253, 0.2);
+    /* Borde cian sutil */
+    color: #f8f8f2;
+    /* Texto claro */
+    padding: 25px;
+    max-width: 600px;
+    /* Ancho máximo para el modal */
+    width: 100%;
+    box-sizing: border-box;
+    /* Incluir padding y border en el ancho */
+}
+
+/* Título del modal */
+h2[mat-dialog-title] {
+    color: #8be9fd;
+    /* Cian brillante */
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-shadow: 0 2px 5px rgba(0, 255, 255, 0.3);
+    font-size: 1.8em;
+}
+
+/* Contenido del diálogo */
+mat-dialog-content {
+    padding: 0 10px 20px 10px;
+    /* Ajusta el padding interno */
+    overflow-y: auto;
+    /* Permite desplazamiento si el contenido es largo */
+}
+
+.combo-details-card {
+    display: flex;
+    flex-direction: column;
+    /* Columna por defecto, se hará fila en desktop */
+    gap: 20px;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.image-section img {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid #6272a4;
+    /* Borde sutil */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.info-section {
+    text-align: center;
+    width: 100%;
+}
+
+.info-section h3 {
+    color: #bd93f9;
+    /* Púrpura para el nombre del combo */
+    font-size: 1.6em;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.info-section p {
+    font-size: 1.05em;
+    line-height: 1.6;
+    margin-bottom: 8px;
+    color: #c0c0c0;
+}
+
+.info-section strong {
+    color: #f8f8f2;
+}
+
+.info-section h4 {
+    color: #8be9fd;
+    margin-top: 25px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(139, 233, 253, 0.1);
+    padding-bottom: 8px;
+    text-align: left;
+    /* Alineación para la lista de productos */
+}
+
+.info-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    /* Alineación para la lista de productos */
+}
+
+.info-section ul li {
+    background-color: rgba(98, 114, 164, 0.1);
+    /* Fondo de lista ligeramente transparente */
+    border-left: 3px solid #bd93f9;
+    /* Borde púrpura */
+    padding: 8px 15px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+    font-size: 0.95em;
+    color: #f8f8f2;
+}
+
+.status-active {
+    color: #50fa7b;
+    /* Verde para activo */
+    font-weight: bold;
+}
+
+.status-inactive {
+    color: #ff5555;
+    /* Rojo para inactivo */
+    font-weight: bold;
+}
+
+.loading-message,
+.error-message,
+.no-data-message {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    color: #f8f8f2;
+}
+
+.loading-message {
+    background-color: rgba(139, 233, 253, 0.15);
+    border: 1px solid #8be9fd;
+}
+
+.error-message {
+    background-color: rgba(255, 85, 85, 0.15);
+    color: #ff5555;
+    border: 1px solid #ff5555;
+}
+
+.no-data-message {
+    background-color: rgba(98, 114, 164, 0.1);
+    color: #bd93f9;
+    border: 1px solid #6272a4;
+}
+
+/* Acciones del diálogo (botones) */
+mat-dialog-actions {
+    padding-top: 20px;
+    border-top: 1px solid rgba(139, 233, 253, 0.1);
+    display: flex;
+    justify-content: flex-end;
+    /* Alinea los botones a la derecha */
+    gap: 10px;
+}
+
+mat-dialog-actions button {
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilos para los botones de Material */
+/* Botón Modificar (primary) */
+.mat-raised-button.mat-primary {
+    background-color: #bd93f9;
+    /* Púrpura */
+    color: #282a36;
+}
+
+.mat-raised-button.mat-primary:hover {
+    background-color: #a47ae8;
+    box-shadow: 0 4px 12px rgba(189, 147, 249, 0.4);
+}
+
+/* Botón Eliminar (warn) */
+.mat-raised-button.mat-warn {
+    background-color: #ff5555;
+    /* Rojo */
+    color: #f8f8f2;
+}
+
+.mat-raised-button.mat-warn:hover {
+    background-color: #e04c4c;
+    box-shadow: 0 4px 12px rgba(255, 85, 85, 0.4);
+}
+
+/* Botón Cerrar (mat-button) */
+.mat-button {
+    color: #8be9fd;
+    /* Cian */
+}
+
+.mat-button:hover {
+    background-color: rgba(139, 233, 253, 0.1);
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+    .combo-details-card {
+        flex-direction: row;
+        /* En desktop, la imagen y la info en fila */
+        text-align: left;
+    }
+
+    .image-section {
+        flex-shrink: 0;
+        /* Evita que la imagen se encoja */
+    }
+
+    .info-section {
+        text-align: left;
+    }
+}
+
+@media (max-width: 500px) {
+    h2[mat-dialog-title] {
+        font-size: 1.5em;
+    }
+
+    mat-dialog-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    mat-dialog-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+}

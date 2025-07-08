@@ -9,7 +9,7 @@ import { ToastrService } from 'ngx-toastr';
 
 // --- ¡IMPORTACIÓN CORRECTA Y ÚNICA DE INTERFACES! ---
 import { UsuarioService } from '../../../data/services/usuario';
-import { IUsuario, IRol, IClientePerfil, IRepartidorPerfil } from '../../../shared/interfaces';
+import { IUsuario, IRol, IClientePerfil, IRepartidor } from '../../../shared/interfaces';
 // --- FIN DE IMPORTACIÓN ---
 
 @Component({
@@ -99,7 +99,7 @@ export class EditUserComponent implements OnInit, OnDestroy {
             puntosCliente: clientePerfil.puntos
           });
         } else if (user.rolId && typeof user.rolId === 'object' && (user.rolId as IRol).nombre === 'repartidor' && user.repartidorId) {
-          const repartidorPerfil = user.repartidorId as IRepartidorPerfil;
+          const repartidorPerfil = user.repartidorId as IRepartidor;
           this.userForm.patchValue({
             vehiculoRepartidor: repartidorPerfil.vehiculo,
             numeroLicenciaRepartidor: repartidorPerfil.numeroLicencia

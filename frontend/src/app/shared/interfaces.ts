@@ -10,23 +10,11 @@ export interface IRol {
 
 export interface IClientePerfil {
     _id: string;
-    usuarioId: string;
+    usuarioId: string | IUsuario; // <--- ¡Asegúrate de que esto sea 'string | IUsuario'!
     direccion: string;
     fechaNacimiento?: string;
     preferenciasAlimentarias?: string[];
     puntos: number;
-}
-
-export interface IRepartidorPerfil {
-    _id: string;
-    usuarioId: string;
-    estado: string;
-    vehiculo: string;
-    numeroLicencia: string;
-    ubicacionActual?: { lat: number, lon: number };
-    historialEntregas?: any[];
-    calificacionPromedio?: number;
-    disponible?: boolean;
 }
 
 export interface IUsuario {
@@ -39,31 +27,111 @@ export interface IUsuario {
     rolId: IRol; // Ahora usa la interfaz IRol centralizada
     estado: boolean;
     clienteId?: IClientePerfil; // Usa la interfaz IClientePerfil centralizada
-    repartidorId?: IRepartidorPerfil; // Usa la interfaz IRepartidorPerfil centralizada
+    repartidorId?: IRepartidor; // Usa la interfaz IRepartidor centralizada (asumo que IRepartidorPerfil se renombra a IRepartidor)
     createdAt?: Date;
     updatedAt?: Date;
 }
 
-// --- NUEVAS INTERFACES PARA PRODUCTOS Y CATEGORÍAS ---
+// --- INTERFACES PARA PRODUCTOS Y CATEGORÍAS ---
 
 export interface ICategoria {
-  _id: string;
-  nombre: string;
-  descripcion?: string;
-  estado: boolean; // true para activo, false para inactivo
-  createdAt?: Date;
-  updatedAt?: Date;
+    _id?: string;
+    nombre: string;
+    descripcion?: string;
+    imagen?: string;
+    estado?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export interface IProducto {
-  _id: string;
+  _id?: string;
   nombre: string;
   descripcion?: string;
   precio: number;
-  categoriaId: ICategoria | string; // Puede ser el objeto completo o solo el ID
+  categoriaId: string; // O ICategoria['_id']
+  imagen?: string;
+  disponible: boolean;
   stock: number;
-  imagenUrl?: string; // URL de la imagen del producto
-  estado: boolean; // true para activo, false para inactivo
+  popularidad?: number; // Para ordenar por popularidad
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export interface IUbicacionActual {
+    lat: number | null;
+    lon: number | null;
+}
+
+export interface IHistorialEntrega {
+    pedidoId?: string;
+    fechaEntrega?: Date;
+    calificacionCliente?: number;
+}
+
+// Interfaz para el subdocumento detalleProductos
+export interface IDetalleProducto {
+    productoId: string;
+    nombreProducto: string;
+    cantidad: number;
+    precioUnitario: number;
+    subtotal?: number; // El backend lo calcula, pero puede venir en la respuesta
+}
+
+// Interfaz para el repartidor populado (si usuarioId está poblado)
+// Esta es la interfaz clave para tu dashboard de repartidor
+export interface IRepartidor {
+    _id: string;
+    usuarioId: IUsuario; // DEBE ser IUsuario (objeto poblado) para que el dashboard funcione
+    estado: string;
+    vehiculo?: string;
+    numeroLicencia?: string;
+    ubicacionActual?: IUbicacionActual;
+    historialEntregas?: IHistorialEntrega[];
+    calificacionPromedio?: number;
+    disponible?: boolean;
+}
+
+// Interfaz principal para un Pedido
+export interface IPedido {
+    _id?: string; // Opcional al crear
+    clienteId: IClientePerfil; // <--- ¡AHORA ESTO PUEDE CONTENER usuarioId: IUsuario!
+    fechaPedido?: Date;
+    estado: 'pendiente' | 'confirmado' | 'en_preparacion' | 'en_envio' | 'entregado' | 'cancelado';
+    direccionEntrega: string;
+    metodoPago: string;
+    subtotal?: number; // Calculado en el backend
+    descuentos?: number;
+    costoEnvio?: number;
+    total?: number; // Calculado en el backend
+    detalleProductos: IDetalleProducto[];
+    fechaEstimadaEntrega?: Date | null;
+    repartidorId?: string | IRepartidor | null; // Puede ser solo el ID, el objeto populado o null
+    observaciones?: string | null;
+    createdAt?: Date; // Si usas timestamps: true
+    updatedAt?: Date; // Si usas timestamps: true
+}
+// Nueva interfaz para Combo
+export interface ICombo {
+  _id?: string;
+  nombre: string;
+  descripcion?: string;
+  productosIds: string[]; // Array de IDs de productos (se usará para enviar al backend)
+  productosDetalles?: IProducto[]; // Para cuando los productosIds vienen populados del backend
+  precioCombo: number;
+  descuento?: number; // Porcentaje
+  imagen?: string;
+  activo?: boolean; // Coincide con 'estado' en el modelo de backend, aunque aquí usaremos 'activo'
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface ICliente {
+  _id: string;
+  usuarioId: IUsuario; // usuarioId DEBE ser del tipo IUsuario (el objeto poblado)
+  direccion: string;
+  fechaNacimiento?: Date;
+  preferenciasAlimentarias?: string[];
+  puntos?: number;
+}
+// -

@@ -75,8 +75,8 @@ export class HomePageComponent implements OnInit {
   }
 
   getProductImageUrl(product: IProducto): string {
-    if (product.imagenUrl && product.imagenUrl.length > 0) {
-      return product.imagenUrl[0];
+    if (product.imagen && product.imagen.length > 0) {
+      return product.imagen[0];
     }
     return 'assets/images/default-product.png'; // Asegúrate de tener una imagen por defecto
   }

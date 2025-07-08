@@ -1,0 +1,235 @@
+/* src/app/features/admin/oferta-detail-modal/oferta-detail-modal.component.css */
+
+.mat-dialog-container {
+    background-color: #282a36;
+    /* Fondo oscuro */
+    color: #f8f8f2;
+    /* Texto claro */
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(139, 233, 253, 0.1);
+    overflow: hidden;
+    /* Para que el borde redondeado se vea bien */
+}
+
+h2.mat-dialog-title {
+    background-color: #44475a;
+    color: #8be9fd;
+    /* Azul cielo para el título */
+    padding: 20px;
+    margin: 0;
+    border-bottom: 1px solid rgba(139, 233, 253, 0.2);
+    font-size: 1.8em;
+    font-weight: 700;
+    text-align: center;
+}
+
+.oferta-detail-content {
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-height: 70vh;
+    /* Altura máxima para el contenido */
+    overflow-y: auto;
+    /* Scroll si el contenido es demasiado largo */
+}
+
+.loading-state,
+.error-state {
+    text-align: center;
+    padding: 30px;
+    font-size: 1.1em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.loading-state i {
+    color: #8be9fd;
+}
+
+.error-state i {
+    color: #ff5555;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* Dos columnas por defecto */
+    gap: 15px 20px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 0;
+    border-bottom: 1px dashed rgba(98, 114, 164, 0.5);
+    /* Línea punteada sutil */
+}
+
+.detail-item:last-child,
+.detail-item.full-width:last-child {
+    border-bottom: none;
+    /* No hay borde en el último elemento */
+}
+
+.detail-item strong {
+    color: #bd93f9;
+    /* Color para los títulos de los campos */
+    font-size: 0.95em;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.detail-item span {
+    color: #f8f8f2;
+    font-size: 1em;
+    word-wrap: break-word;
+    /* Para texto largo */
+    white-space: normal;
+    /* Asegura que el texto se ajuste */
+}
+
+.detail-item.full-width {
+    grid-column: span 2;
+    /* Ocupa ambas columnas */
+}
+
+.highlight {
+    color: #ffb86c;
+    /* Color para resaltar el descuento */
+    font-weight: bold;
+}
+
+.status-active {
+    background-color: #50fa7b;
+    /* Verde para activo/vigente */
+    color: #282a36;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.9em;
+    display: inline-block;
+    /* Para que el padding y el border-radius funcionen */
+}
+
+.status-inactive {
+    background-color: #ff5555;
+    /* Rojo para inactivo/no vigente */
+    color: #f8f8f2;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.9em;
+    display: inline-block;
+}
+
+.no-data {
+    font-style: italic;
+    color: #999;
+}
+
+
+mat-dialog-actions {
+    padding: 15px 25px;
+    background-color: #44475a;
+    border-top: 1px solid rgba(139, 233, 253, 0.2);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-action-button {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    min-width: 100px;
+    justify-content: center;
+}
+
+.modal-action-button.edit-button {
+    background-color: #ffb86c;
+    /* Naranja */
+    color: #282a36;
+}
+
+.modal-action-button.edit-button:hover {
+    background-color: #e6a05e;
+    transform: translateY(-1px);
+}
+
+.modal-action-button.delete-button {
+    background-color: #ff5555;
+    /* Rojo */
+    color: #f8f8f2;
+}
+
+.modal-action-button.delete-button:hover {
+    background-color: #e04c4c;
+    transform: translateY(-1px);
+}
+
+.modal-action-button.close-button {
+    background-color: #6272a4;
+    /* Gris azulado */
+    color: #f8f8f2;
+}
+
+.modal-action-button.close-button:hover {
+    background-color: #55607b;
+    transform: translateY(-1px);
+}
+
+.modal-action-button[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    filter: grayscale(100%);
+}
+
+/* Scrollbar styling for `oferta-detail-content` */
+.oferta-detail-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.oferta-detail-content::-webkit-scrollbar-track {
+    background: #282a36;
+    border-radius: 10px;
+}
+
+.oferta-detail-content::-webkit-scrollbar-thumb {
+    background-color: #6272a4;
+    border-radius: 10px;
+    border: 2px solid #282a36;
+}
+
+.oferta-detail-content::-webkit-scrollbar-thumb:hover {
+    background-color: #bd93f9;
+}
+
+
+/* Responsive */
+@media (max-width: 600px) {
+    .detail-grid {
+        grid-template-columns: 1fr;
+        /* Una columna en pantallas pequeñas */
+    }
+
+    .detail-item.full-width {
+        grid-column: span 1;
+        /* También una columna */
+    }
+
+    mat-dialog-actions {
+        flex-direction: column;
+    }
+
+    .modal-action-button {
+        width: 100%;
+    }
+}

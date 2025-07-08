@@ -6,7 +6,7 @@ import { API_BASE_URL } from '../../core/constants/constants';
 import { AuthService } from '../../core/auth/auth';
 
 // --- ¡IMPORTACIÓN CORRECTA Y ÚNICA DE INTERFACES! ---
-import { IRol, IClientePerfil, IRepartidorPerfil, IUsuario } from '../../shared/interfaces';
+import { IRol, IClientePerfil, IRepartidor, IUsuario } from '../../shared/interfaces';
 // --- FIN DE IMPORTACIÓN ---
 
 const USUARIO_API = API_BASE_URL + '/usuario';

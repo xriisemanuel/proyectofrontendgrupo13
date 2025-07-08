@@ -1,0 +1,301 @@
+/* src/app/features/admin/create-combo/create-combo.component.css */
+
+.create-combo-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    /* Alinea al inicio verticalmente */
+    min-height: calc(100vh - 100px);
+    /* Ajusta si tienes header/footer */
+    padding: 40px 20px;
+    background-color: #1a1a2e;
+    /* Fondo oscuro */
+    color: #f8f8f2;
+    /* Color de texto principal */
+}
+
+.form-card {
+    background-color: rgba(40, 42, 54, 0.9);
+    /* Fondo ligeramente transparente */
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    padding: 35px;
+    width: 100%;
+    max-width: 700px;
+    /* Ancho máximo para el formulario */
+    border: 1px solid rgba(139, 233, 253, 0.1);
+    /* Borde sutil */
+    backdrop-filter: blur(5px);
+}
+
+h2 {
+    color: #8be9fd;
+    /* Cian vibrante */
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-shadow: 0 2px 5px rgba(0, 255, 255, 0.2);
+}
+
+p {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #c0c0c0;
+    font-size: 1.05em;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #f8f8f2;
+    /* Color de etiqueta */
+    font-weight: 600;
+    font-size: 1.05em;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="url"],
+.form-group textarea {
+    width: calc(100% - 24px);
+    /* Ancho completo menos padding */
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #6272a4;
+    /* Borde gris azulado */
+    background-color: #282a36;
+    /* Fondo oscuro del input */
+    color: #f8f8f2;
+    font-size: 1em;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #bd93f9;
+    /* Borde púrpura al enfocar */
+    box-shadow: 0 0 0 3px rgba(189, 147, 249, 0.3);
+    outline: none;
+}
+
+.form-group textarea {
+    resize: vertical;
+    /* Permite redimensionar verticalmente */
+    min-height: 80px;
+}
+
+/* Estilos para la selección de productos (checkbox grid) */
+.products-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    /* Columnas responsivas */
+    gap: 10px;
+    padding: 15px;
+    background-color: rgba(68, 71, 90, 0.4);
+    /* Fondo ligeramente más claro para la cuadrícula */
+    border-radius: 8px;
+    border: 1px solid rgba(139, 233, 253, 0.1);
+    max-height: 300px;
+    /* Altura máxima con scroll */
+    overflow-y: auto;
+}
+
+.product-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #44475a;
+    /* Fondo para cada item de producto */
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #6272a4;
+    font-size: 0.95em;
+    color: #f8f8f2;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.product-item:hover {
+    background-color: #6272a4;
+    border-color: #bd93f9;
+}
+
+.product-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #50fa7b;
+    /* Color de acento para el checkbox */
+    cursor: pointer;
+}
+
+.product-item label {
+    margin-bottom: 0;
+    cursor: pointer;
+    font-weight: 500;
+    color: #f8f8f2;
+    flex-grow: 1;
+    /* Permite que la etiqueta ocupe el espacio restante */
+}
+
+.required-star {
+    color: #ff5555;
+    /* Rojo para el asterisco de requerido */
+    margin-left: 4px;
+}
+
+.error-text {
+    color: #ff5555;
+    /* Rojo para mensajes de error */
+    font-size: 0.85em;
+    margin-top: 5px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.low-stock-warning {
+    color: #ffb86c;
+    /* Naranja para poco stock */
+    font-size: 0.8em;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.no-stock-warning {
+    color: #ff5555;
+    /* Rojo para sin stock */
+    font-size: 0.8em;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+/* Botones */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    /* Alinea los botones a la derecha */
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.submit-button,
+.cancel-button {
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.submit-button {
+    background-color: #50fa7b;
+    /* Verde vibrante */
+    color: #282a36;
+    border: 2px solid #50fa7b;
+    box-shadow: 0 4px 10px rgba(80, 250, 123, 0.3);
+}
+
+.submit-button:hover:not([disabled]) {
+    background-color: #44c76d;
+    border-color: #44c76d;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(80, 250, 123, 0.5);
+}
+
+.submit-button:disabled {
+    background-color: #6272a4;
+    /* Gris azulado para deshabilitado */
+    border-color: #6272a4;
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+}
+
+.cancel-button {
+    background-color: #ff5555;
+    /* Rojo vibrante */
+    color: #f8f8f2;
+    border: 2px solid #ff5555;
+    box-shadow: 0 4px 10px rgba(255, 85, 85, 0.3);
+}
+
+.cancel-button:hover {
+    background-color: #e04c4c;
+    border-color: #e04c4c;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(255, 85, 85, 0.5);
+}
+
+/* Mensajes de carga y error */
+.loading-message {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background-color: rgba(139, 233, 253, 0.15);
+    border: 1px solid #8be9fd;
+    color: #8be9fd;
+}
+
+.error-message {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background-color: rgba(255, 85, 85, 0.15);
+    color: #ff5555;
+    border: 1px solid #ff5555;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .form-card {
+        padding: 25px;
+        margin: 20px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .submit-button,
+    .cancel-button {
+        width: 100%;
+    }
+}

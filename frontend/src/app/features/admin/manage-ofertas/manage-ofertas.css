@@ -1,0 +1,250 @@
+/* src/app/features/admin/manage-ofertas/manage-ofertas.component.css */
+
+.manage-ofertas-container {
+    padding: 30px;
+    background-color: #1a1a2e;
+    min-height: calc(100vh - 60px);
+    color: #f8f8f2;
+}
+
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(139, 233, 253, 0.2);
+}
+
+.header-section h2 {
+    color: #8be9fd;
+    font-size: 2.2em;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-shadow: 0 2px 5px rgba(0, 255, 255, 0.2);
+}
+
+.description-text {
+    color: #c0c0c0;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+.create-button {
+    background-color: #50fa7b;
+    /* Verde para crear */
+    color: #282a36;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 10px rgba(80, 250, 123, 0.3);
+}
+
+.create-button:hover {
+    background-color: #43d96e;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(80, 250, 123, 0.5);
+}
+
+.loading-spinner {
+    text-align: center;
+    padding: 50px;
+    color: #8be9fd;
+}
+
+.loading-spinner i {
+    margin-bottom: 15px;
+}
+
+.error-message,
+.no-data-message {
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+    text-align: center;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.error-message {
+    background-color: rgba(255, 85, 85, 0.15);
+    color: #ff5555;
+    border: 1px solid #ff5555;
+}
+
+.no-data-message {
+    background-color: rgba(139, 233, 253, 0.15);
+    color: #8be9fd;
+    border: 1px solid #8be9fd;
+}
+
+.ofertas-table-container {
+    overflow-x: auto;
+    background-color: rgba(40, 42, 54, 0.9);
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(139, 233, 253, 0.1);
+    padding: 15px;
+}
+
+.ofertas-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #f8f8f2;
+}
+
+.ofertas-table th,
+.ofertas-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid rgba(139, 233, 253, 0.1);
+    white-space: nowrap;
+    /* Evita que el texto se rompa en varias líneas */
+}
+
+.ofertas-table th {
+    background-color: #44475a;
+    color: #8be9fd;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+
+.ofertas-table tbody tr:hover {
+    background-color: #6272a4;
+    cursor: pointer;
+}
+
+.ofertas-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Estilos de estado */
+.status-active {
+    background-color: #50fa7b;
+    /* Verde para activo/vigente */
+    color: #282a36;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+.status-inactive {
+    background-color: #ff5555;
+    /* Rojo para inactivo/no vigente */
+    color: #f8f8f2;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+.discount-cell {
+    font-weight: bold;
+    color: #ffb86c;
+    /* Naranja para el descuento */
+}
+
+.no-applicable {
+    color: #999;
+    font-style: italic;
+}
+
+/* Acciones */
+.actions-cell {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+}
+
+.action-button {
+    background: none;
+    border: none;
+    color: #f8f8f2;
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.action-button:hover {
+    background-color: rgba(139, 233, 253, 0.2);
+    transform: scale(1.1);
+}
+
+.view-button {
+    color: #8be9fd;
+}
+
+/* Azul claro */
+.edit-button {
+    color: #ffb86c;
+}
+
+/* Naranja */
+.delete-button {
+    color: #ff5555;
+}
+
+/* Rojo */
+
+.toggle-on {
+    color: #50fa7b;
+}
+
+/* Verde para estado on */
+.toggle-off {
+    color: #ff5555;
+}
+
+/* Rojo para estado off */
+
+/* Responsive design */
+@media (max-width: 1200px) {
+
+    .ofertas-table th,
+    .ofertas-table td {
+        padding: 12px 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .header-section h2 {
+        font-size: 1.8em;
+    }
+
+    .create-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .ofertas-table-container {
+        padding: 10px;
+    }
+}

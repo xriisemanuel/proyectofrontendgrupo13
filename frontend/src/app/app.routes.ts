@@ -105,7 +105,7 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['admin'] } // Solo admins pueden gestionar supervisores de cocina
   },
-   // --- ¡NUEVA RUTA PARA GESTIÓN DE SUPERVISORES DE VENTAS! ---
+  // --- ¡NUEVA RUTA PARA GESTIÓN DE SUPERVISORES DE VENTAS! ---
   {
     path: 'admin/supervisores-ventas/manage',
     loadComponent: () => import('./features/admin/manage-supervisores-ventas/manage-supervisores-ventas').then(m => m.ManageSupervisoresVentas),
@@ -139,6 +139,65 @@ export const routes: Routes = [
     loadComponent: () => import('./features/admin/manage-products/manage-products').then(m => m.ManageProducts),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['admin'] } // Solo admins pueden gestionar productos
+  },
+  // --- NUEVA RUTA: CREAR COMBO ---
+  {
+    path: 'admin/combos/create',
+    loadComponent: () => import('./features/admin/create-combo/create-combo').then(m => m.CreateComboComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin'] } // Solo admins pueden crear combos
+  },
+  // --- NUEVA RUTA: EDITAR COMBO ---
+  {
+    path: 'admin/combos/edit/:id', // Ruta para editar un combo específico
+    loadComponent: () => import('./features/admin/edit-combo/edit-combo').then(m => m.EditComboComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin'] } // Solo admins pueden editar combos
+  },
+  // --- NUEVA RUTA: GESTIONAR COMBOS ---
+  {
+    path: 'admin/combos', // Ruta principal para gestionar combos
+    loadComponent: () => import('./features/admin/manage-combos/manage-combos').then(m => m.ManageCombosComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin'] } // Solo admins pueden gestionar combos
+  },
+  {
+    path: 'admin/ofertas/create',
+    loadComponent: () => import('./features/admin/create-oferta/create-oferta').then(m => m.CreateOfertaComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin', 'supervisor_ventas'] } // Admin y Supervisor de Ventas pueden crear ofertas
+  },
+  {
+    path: 'admin/ofertas',
+    loadComponent: () => import('./features/admin/manage-ofertas/manage-ofertas').then(m => m.ManageOfertasComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin', 'supervisor_ventas'] } // Admin y Supervisor de Ventas pueden gestionar ofertas
+  },
+  {
+    path: 'admin/ofertas/edit/:id',
+    loadComponent: () => import('./features/admin/edit-oferta/edit-oferta').then(m => m.EditOfertaComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin', 'supervisor_ventas'] } // Admin y Supervisor de Ventas pueden editar ofertas
+  },
+  // --- ¡NUEVA RUTA PARA PERFIL DE REPARTIDOR! ---
+  {
+    path: 'delivery/dashboard',
+    loadComponent: () => import('./features/delivery-dashboard/delivery-dashboard').then(m => m.DeliveryDashboard),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['repartidor'] } // Solo los repartidores pueden acceder a este dashboard
+  },
+  // --- ¡NUEVA RUTA PARA DASHBOARD DE COCINA! ---
+  {
+    path: 'kitchen/dashboard',
+    loadComponent: () => import('./features/kitchen-dashboard/kitchen-dashboard').then(m => m.KitchenDashboard),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['supervisor_cocina'] } // Solo el supervisor de cocina puede acceder
+  },
+  {
+    path: 'cliente/dashboard',
+    loadComponent: () => import('./features/client-dashboard/client-dashboard').then(m => m.ClientDashboard),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['cliente'] } // Solo los clientes pueden acceder a este dashboard
   },
   { path: '**', redirectTo: 'home' }
 ];

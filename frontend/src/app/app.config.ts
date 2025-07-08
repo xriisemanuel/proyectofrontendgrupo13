@@ -8,6 +8,7 @@ import { provideToastr } from 'ngx-toastr';
 
 import { routes } from './app.routes';
 import { jwtInterceptor } from './core/interceptors/jwt-interceptor'; // Asegúrate de que esta ruta sea correcta
+import { MatDialogModule } from '@angular/material/dialog';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -28,5 +29,6 @@ export const appConfig: ApplicationConfig = {
       progressBar: true,
       closeButton: true,
     }),
+    MatDialogModule
   ]
 };

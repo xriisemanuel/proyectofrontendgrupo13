@@ -1,0 +1,80 @@
+<h2 mat-dialog-title>Detalles de la Oferta</h2>
+
+<mat-dialog-content class="mat-typography oferta-detail-content">
+    <div *ngIf="loading" class="loading-state">
+        <i class="fas fa-spinner fa-spin fa-2x"></i>
+        <p>Cargando detalles de la oferta...</p>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-state">
+        <i class="fas fa-exclamation-triangle"></i>
+        <p>{{ errorMessage }}</p>
+    </div>
+
+    <div *ngIf="oferta && !loading && !errorMessage" class="detail-grid">
+        <div class="detail-item">
+            <strong>Nombre:</strong>
+            <span>{{ oferta.nombre }}</span>
+        </div>
+        <div class="detail-item full-width">
+            <strong>Descripción:</strong>
+            <span>{{ oferta.descripcion || 'No proporcionada' }}</span>
+        </div>
+        <div class="detail-item">
+            <strong>Descuento:</strong>
+            <span class="highlight">{{ oferta.descuento }}%</span>
+        </div>
+        <div class="detail-item">
+            <strong>Fecha de Inicio:</strong>
+            <span>{{ formatDateForDisplay(oferta.fechaInicio) }}</span>
+        </div>
+        <div class="detail-item">
+            <strong>Fecha de Fin:</strong>
+            <span>{{ formatDateForDisplay(oferta.fechaFin) }}</span>
+        </div>
+        <div class="detail-item">
+            <strong>Estado:</strong>
+            <span [ngClass]="{'status-active': oferta.estado, 'status-inactive': !oferta.estado}">
+                {{ oferta.estado ? 'Activa' : 'Inactiva' }}
+            </span>
+        </div>
+        <div class="detail-item">
+            <strong>Vigencia:</strong>
+            <span [ngClass]="{'status-active': isOfertaVigente(oferta), 'status-inactive': !isOfertaVigente(oferta)}">
+                {{ isOfertaVigente(oferta) ? 'Vigente' : 'No Vigente' }}
+            </span>
+        </div>
+        <div class="detail-item full-width">
+            <strong>Productos Aplicables:</strong>
+            <span *ngIf="oferta.productosAplicables && oferta.productosAplicables.length > 0">
+                <span *ngFor="let prod of oferta.productosAplicables; let last = last">
+                    {{ prod.nombre }} ({{ prod.precio | currency:'USD':'symbol':'1.2-2' }})<span *ngIf="!last">, </span>
+                </span>
+            </span>
+            <span *ngIf="!oferta.productosAplicables || oferta.productosAplicables.length === 0"
+                class="no-data">Ninguno</span>
+        </div>
+        <div class="detail-item full-width">
+            <strong>Categorías Aplicables:</strong>
+            <span *ngIf="oferta.categoriasAplicables && oferta.categoriasAplicables.length > 0">
+                <span *ngFor="let cat of oferta.categoriasAplicables; let last = last">
+                    {{ cat.nombre }}<span *ngIf="!last">, </span>
+                </span>
+            </span>
+            <span *ngIf="!oferta.categoriasAplicables || oferta.categoriasAplicables.length === 0"
+                class="no-data">Ninguna</span>
+        </div>
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button class="modal-action-button edit-button" (click)="onEdit()" [disabled]="loading">
+        <i class="fas fa-pencil-alt"></i> Editar
+    </button>
+    <button mat-button class="modal-action-button delete-button" (click)="onDelete()" [disabled]="loading">
+        <i class="fas fa-trash-alt"></i> Eliminar
+    </button>
+    <button mat-button class="modal-action-button close-button" (click)="onClose()" [disabled]="loading">
+        <i class="fas fa-times"></i> Cerrar
+    </button>
+</mat-dialog-actions>

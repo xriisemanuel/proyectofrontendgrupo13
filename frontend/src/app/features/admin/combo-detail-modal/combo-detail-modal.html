@@ -1,0 +1,55 @@
+<!-- src/app/features/admin/combo-detail-modal/combo-detail-modal.component.html -->
+
+<div class="combo-detail-modal-container">
+    <h2 mat-dialog-title><i class="fas fa-info-circle"></i> Detalles del Combo</h2>
+
+    <mat-dialog-content class="mat-typography">
+        <div *ngIf="loading" class="loading-message">
+            <i class="fas fa-spinner fa-spin"></i> Cargando detalles del combo...
+        </div>
+        <div *ngIf="errorMessage" class="error-message">
+            <i class="fas fa-exclamation-triangle"></i> {{ errorMessage }}
+        </div>
+
+        <div *ngIf="combo && !loading" class="combo-details-card">
+            <div class="image-section">
+                <img [src]="combo.imagen || 'https://placehold.co/200x200/cccccc/ffffff?text=Combo'"
+                    alt="Imagen del Combo">
+            </div>
+            <div class="info-section">
+                <h3>{{ combo.nombre }}</h3>
+                <p><strong>Descripción:</strong> {{ combo.descripcion || 'Sin descripción' }}</p>
+                <p><strong>Precio Combo:</strong> {{ combo.precioCombo | currency:'USD':'symbol':'1.2-2' }}</p>
+                <p><strong>Descuento:</strong> {{ combo.descuento || 0 }}%</p>
+                <p><strong>Estado:</strong>
+                    <span [ngClass]="{'status-active': combo.activo, 'status-inactive': !combo.activo}">
+                        {{ combo.activo ? 'Activo' : 'Inactivo' | titlecase }}
+                    </span>
+                </p>
+                <p><strong>Fecha de Creación:</strong> {{ combo.createdAt | date:'short' }}</p>
+                <p><strong>Última Actualización:</strong> {{ combo.updatedAt | date:'short' }}</p>
+
+                <h4>Productos Incluidos:</h4>
+                <ul *ngIf="productosEnCombo.length > 0; else noProducts">
+                    <li *ngFor="let prod of productosEnCombo">
+                        {{ prod.nombre }} ({{ prod.precio | currency:'USD':'symbol':'1.2-2' }}) - Stock: {{ prod.stock
+                        }}
+                    </li>
+                </ul>
+                <ng-template #noProducts>
+                    <p class="no-data-message">No se encontraron productos para este combo.</p>
+                </ng-template>
+            </div>
+        </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+        <button mat-raised-button color="primary" (click)="onModify()">
+            <mat-icon>edit</mat-icon> Modificar
+        </button>
+        <button mat-raised-button color="warn" (click)="onDelete()">
+            <mat-icon>delete</mat-icon> Eliminar
+        </button>
+        <button mat-button (click)="closeDialog('closed')">Cerrar</button>
+    </mat-dialog-actions>
+</div>

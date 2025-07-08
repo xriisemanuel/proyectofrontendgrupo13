@@ -171,4 +171,14 @@ export class AuthService {
   isAuthenticated(): boolean {
     return !!this.getToken(); // Depende de getToken() que ahora valida la expiración
   }
+
+  getLoggedInUserId(): string | null {
+    if (this.isBrowser) {
+      const userResponse = this.currentUserSubject.value;
+      const userId = userResponse && userResponse.usuario && (userResponse.usuario.id || userResponse.usuario._id) ? 
+                     (userResponse.usuario.id || userResponse.usuario._id) : null;
+      return userId;
+    }
+    return null;
+  }
 }

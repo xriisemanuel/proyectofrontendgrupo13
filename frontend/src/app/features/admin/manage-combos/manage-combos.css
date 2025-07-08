@@ -1,0 +1,264 @@
+/* src/app/features/admin/manage-combos/manage-combos.component.css */
+
+.manage-combos-container {
+    padding: 40px 20px;
+    background-color: #1a1a2e;
+    /* Fondo oscuro */
+    color: #f8f8f2;
+    /* Color de texto principal */
+    min-height: calc(100vh - 100px);
+    /* Ajusta según tu layout */
+}
+
+.header-section {
+    text-align: center;
+    margin-bottom: 40px;
+    background-color: rgba(40, 42, 54, 0.9);
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(139, 233, 253, 0.1);
+}
+
+.header-section h2 {
+    color: #8be9fd;
+    font-weight: 700;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-shadow: 0 2px 5px rgba(0, 255, 255, 0.2);
+}
+
+.header-section p {
+    color: #c0c0c0;
+    font-size: 1.05em;
+    margin-bottom: 25px;
+}
+
+.actions-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.add-new-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 25px;
+    background-color: #50fa7b;
+    /* Verde vibrante */
+    color: #282a36;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(80, 250, 123, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.add-new-button:hover {
+    background-color: #44c76d;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(80, 250, 123, 0.5);
+}
+
+/* Mensajes de estado */
+.loading-message,
+.error-message,
+.no-data-message {
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px auto;
+    text-align: center;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    max-width: 800px;
+}
+
+.loading-message {
+    background-color: rgba(139, 233, 253, 0.15);
+    border: 1px solid #8be9fd;
+    color: #8be9fd;
+}
+
+.error-message {
+    background-color: rgba(255, 85, 85, 0.15);
+    color: #ff5555;
+    border: 1px solid #ff5555;
+}
+
+.no-data-message {
+    background-color: rgba(98, 114, 164, 0.15);
+    color: #6272a4;
+    border: 1px solid #6272a4;
+}
+
+/* Tabla de Combos */
+.combos-table-container {
+    background-color: rgba(40, 42, 54, 0.9);
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    overflow-x: auto;
+    /* Permite scroll horizontal en pantallas pequeñas */
+    margin-top: 30px;
+    border: 1px solid rgba(139, 233, 253, 0.1);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+    /* Asegura que la tabla no sea demasiado estrecha */
+}
+
+th,
+td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #44475a;
+    /* Línea divisoria más suave */
+    color: #f8f8f2;
+}
+
+th {
+    background-color: #44475a;
+    /* Fondo de encabezado */
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9em;
+    letter-spacing: 0.5px;
+}
+
+tbody tr:hover {
+    background-color: #282a36;
+    /* Cambio de color al pasar el mouse */
+}
+
+/* Estilos para el estado (activo/inactivo) */
+.status-active {
+    color: #50fa7b;
+    /* Verde para activo */
+    font-weight: bold;
+}
+
+.status-inactive {
+    color: #ff5555;
+    /* Rojo para inactivo */
+    font-weight: bold;
+}
+
+/* Celdas de acciones */
+.actions-cell {
+    white-space: nowrap;
+    /* Evita que los botones se envuelvan */
+}
+
+.action-button {
+    background: none;
+    border: none;
+    color: #8be9fd;
+    /* Color de icono por defecto */
+    font-size: 1.1em;
+    cursor: pointer;
+    margin: 0 5px;
+    padding: 8px;
+    border-radius: 50%;
+    /* Botones redondos */
+    transition: all 0.3s ease;
+    width: 40px;
+    /* Tamaño fijo para botones redondos */
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-button:hover {
+    background-color: rgba(139, 233, 253, 0.2);
+    transform: scale(1.1);
+}
+
+.view-button {
+    color: #f1fa8c;
+}
+
+/* Amarillo */
+.view-button:hover {
+    background-color: rgba(241, 250, 140, 0.2);
+}
+
+.edit-button {
+    color: #bd93f9;
+}
+
+/* Púrpura */
+.edit-button:hover {
+    background-color: rgba(189, 147, 249, 0.2);
+}
+
+.delete-button {
+    color: #ff5555;
+}
+
+/* Rojo */
+.delete-button:hover {
+    background-color: rgba(255, 85, 85, 0.2);
+}
+
+/* Botones de activar/desactivar */
+.toggle-status-button {
+    color: #6272a4;
+    /* Gris por defecto */
+}
+
+.toggle-status-button.toggle-active {
+    color: #50fa7b;
+    /* Verde para activar */
+}
+
+.toggle-status-button.toggle-inactive {
+    color: #ffb86c;
+    /* Naranja para desactivar */
+}
+
+.toggle-status-button:hover {
+    background-color: rgba(98, 114, 164, 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .header-section {
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    .add-new-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    table {
+        font-size: 0.9em;
+    }
+
+    th,
+    td {
+        padding: 10px;
+    }
+
+    .action-button {
+        font-size: 1em;
+        width: 35px;
+        height: 35px;
+        margin: 0 3px;
+    }
+}

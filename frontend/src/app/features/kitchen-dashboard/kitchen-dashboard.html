@@ -1,0 +1,109 @@
+<!-- src/app/components/kitchen-dashboard/kitchen-dashboard.component.html -->
+<div class="kitchen-dashboard-container">
+  <!-- Nueva sección de cabecera para el título y el botón de cerrar sesión -->
+  <div class="dashboard-header">
+    <h1><i class="fas fa-utensils"></i> Dashboard de Cocina</h1>
+    <button (click)="logout()" class="logout-button">
+      <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+    </button>
+  </div>
+  <p>Gestión y seguimiento de pedidos para preparación.</p>
+
+  <!-- === SECCIÓN DE MENSAJES === -->
+  <div *ngIf="loading" class="loading-message">
+    <i class="fas fa-spinner fa-spin"></i> Cargando pedidos...
+  </div>
+  <div *ngIf="errorMessage" class="error-message">
+    <i class="fas fa-exclamation-triangle"></i> {{ errorMessage }}
+  </div>
+  <div *ngIf="successMessage" class="success-message">
+    <i class="fas fa-check-circle"></i> {{ successMessage }}
+  </div>
+  <!-- === FIN SECCIÓN DE MENSAJES === -->
+
+  <!-- Controles de filtro -->
+  <div class="filters">
+    <div class="filter-group">
+      <label for="estadoFilter"><i class="fas fa-filter"></i> Filtrar por Estado:</label>
+      <select id="estadoFilter" [(ngModel)]="selectedEstado" (change)="loadPedidos()">
+        <option value="pendiente">Pendiente</option>
+        <option value="confirmado">Confirmado</option>
+        <option value="en_preparacion">En Preparación</option>
+        <option value="en_envio">En Envío</option>
+        <option value="entregado">Entregado</option>
+        <option value="cancelado">Cancelado</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="searchFilter"><i class="fas fa-search"></i> Buscar:</label>
+      <input type="text" id="searchFilter" [(ngModel)]="searchTerm" placeholder="ID, cliente, producto..." (keyup.enter)="loadPedidos()">
+    </div>
+    <button (click)="loadPedidos()"><i class="fas fa-sync-alt"></i> Aplicar Filtros / Recargar</button>
+  </div>
+
+  <!-- Tabla de Pedidos -->
+  <div class="orders-table-container">
+    <h2 *ngIf="pedidos.length > 0"><i class="fas fa-clipboard-list"></i> Pedidos (Estado: {{ selectedEstado | titlecase }})</h2>
+    <div *ngIf="pedidos.length === 0 && !loading" class="no-data-message">
+      <i class="fas fa-info-circle"></i> No hay pedidos con los filtros aplicados.
+    </div>
+
+    <table *ngIf="pedidos.length > 0">
+      <thead>
+        <tr>
+          <th>ID Pedido</th>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Estado</th>
+          <th>Total</th>
+          <th>Detalle Productos</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Usar trackBy para mejorar el rendimiento de la lista -->
+        <tr *ngFor="let pedido of pedidos; trackBy: trackByPedidoId">
+          <td>{{ pedido._id }}</td>
+          <td>{{ pedido.fechaPedido | date:'short' }}</td>
+          <td>{{ getClienteFullName(pedido.clienteId) }}</td>
+          <td>
+            <span [ngClass]="{
+              'status-pendiente': pedido.estado === 'pendiente',
+              'status-confirmado': pedido.estado === 'confirmado',
+              'status-en-preparacion': pedido.estado === 'en_preparacion',
+              'status-en-envio': pedido.estado === 'en_envio',
+              'status-entregado': pedido.estado === 'entregado',
+              'status-cancelado': pedido.estado === 'cancelado'
+            }">
+              {{ pedido.estado | titlecase }}
+            </span>
+          </td>
+          <td>${{ pedido.total | number:'1.2-2' }}</td>
+          <td>
+            <ul>
+              <li *ngFor="let item of pedido.detalleProductos">
+                {{ item.cantidad }} x {{ item.nombreProducto }} (${{ item.precioUnitario | number:'1.2-2' }})
+              </li>
+            </ul>
+          </td>
+          <td>
+            <!-- Botones de acción para cambiar el estado -->
+            <button *ngIf="pedido.estado === 'pendiente'" (click)="changeOrderStatus(pedido._id!, 'confirmado')">
+              <i class="fas fa-check"></i> Confirmar
+            </button>
+            <button *ngIf="pedido.estado === 'confirmado'" (click)="changeOrderStatus(pedido._id!, 'en_preparacion')">
+              <i class="fas fa-hourglass-half"></i> En Preparación
+            </button>
+            <button *ngIf="pedido.estado === 'en_preparacion'" (click)="changeOrderStatus(pedido._id!, 'en_envio')">
+              <i class="fas fa-truck"></i> Listo para Envío
+            </button>
+            <button *ngIf="pedido.estado !== 'cancelado' && pedido.estado !== 'entregado'" (click)="changeOrderStatus(pedido._id!, 'cancelado')" class="cancel-button">
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

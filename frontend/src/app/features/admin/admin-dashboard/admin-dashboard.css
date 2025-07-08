@@ -1,468 +1,809 @@
 /* src/app/features/admin/components/admin-dashboard/admin-dashboard.css */
 
-/* Variables de color para fácil mantenimiento */
-:root {
-    --color-lettuce-light: #e0ffe0; /* Verde lechuga muy claro */
-    --color-lettuce-medium: #a8e6cf; /* Verde lechuga medio */
-    --color-lettuce-dark: #7bdcb5; /* Verde lechuga oscuro */
-
-    --color-cyan-light: #e0f7fa; /* Cyan muy claro */
-    --color-cyan-medium: #8ac6d1; /* Cyan medio */
-    --color-cyan-dark: #5bc0de; /* Cyan oscuro */
-
-    --color-gray-light: #f5f7fa; /* Gris muy claro */
-    --color-gray-medium: #e0e0e0; /* Gris medio */
-    --color-gray-dark: #6c757d; /* Gris oscuro */
-
-    --color-text-primary: #2c3e50;
-    --color-text-secondary: #666;
-    --color-accent-blue: #3498db;
-    --color-alert-red: #e74c3c;
+/* Estilos Globales para el Dashboard */
+body {
+    margin: 0;
+    padding: 0;
+    background: #0A192F;
+    /* Azul medianoche muy oscuro para el fondo global */
+    color: #CCD6F6;
+    /* Gris azulado muy claro para el texto principal */
+    font-family: 'Montserrat', sans-serif;
+    /* Tipografía moderna y legible */
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    /* Suavizado de fuentes */
+    -moz-osx-font-smoothing: grayscale;
 }
 
-/* Estilos Globales para el Dashboard */
 .admin-dashboard-container {
-    font-family: 'Inter', sans-serif;
-    padding: 30px;
-    background-color: var(--color-gray-light); /* Fondo suave */
-    min-height: calc(100vh - 60px);
-    color: var(--color-text-primary);
+    padding: 60px;
+    /* Más padding para una sensación premium */
+    background: #0A192F;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    gap: 40px; /* Más espacio entre secciones */
+    gap: 60px;
+    /* Más espacio entre secciones */
+    box-sizing: border-box;
+    /* Incluir padding en el tamaño total */
 }
 
 .dashboard-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--color-gray-medium);
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(100, 255, 218, 0.2);
+    /* Línea divisoria sutil con color de acento */
+    margin-bottom: 40px;
 }
 
 .dashboard-header h2 {
-    font-size: 2.8em; /* Título más grande */
-    color: var(--color-text-primary);
-    margin-bottom: 0;
-    font-weight: 800; /* Más audaz */
+    font-size: 3.8em;
+    /* Título principal grande y audaz */
+    color: #CCD6F6;
+    font-weight: 900;
+    /* Extra bold */
+    margin: 0;
+    text-align: center;
+    flex-grow: 1;
+    text-shadow: 0 8px 25px rgba(0, 0, 0, 0.7), 0 0 15px rgba(100, 255, 218, 0.1);
+    /* Sombra intensa con un toque de brillo */
+    letter-spacing: -0.03em;
+    /* Ajuste para un look más moderno */
 }
 
+/* Botón de Cerrar Sesión */
 .btn-logout {
-    background-color: var(--color-alert-red);
-    color: rgb(0, 0, 0);
+    background: linear-gradient(45deg, #EF476F 0%, #B80F3A 100%);
+    /* Degradado de rosa coral a rojo oscuro */
+    color: #CCD6F6;
     border: none;
-    border-radius: 10px; /* Más redondeado */
-    padding: 12px 25px; /* Más padding */
-    font-size: 1.1em;
-    font-weight: 600;
+    border-radius: 12px;
+    /* Redondez suave */
+    padding: 16px 32px;
+    font-size: 1.15em;
+    font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    /* Sombra base */
     display: flex;
     align-items: center;
-    gap: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    gap: 15px;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    /* Transición suave */
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    position: relative;
+    /* Para el efecto de "gotita" */
+    overflow: hidden;
+    z-index: 1;
+    /* Asegura que el contenido esté sobre el pseudo-elemento */
 }
 
 .btn-logout:hover {
-    background-color: #c0392b;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(45deg, #B80F3A 0%, #EF476F 100%);
+    /* Invierte el degradado al hover */
+    transform: translateY(-8px) scale(1.03);
+    /* Más elevación y escala */
+    box-shadow: 0 15px 30px rgba(239, 71, 111, 0.6), 0 0 20px rgba(239, 71, 111, 0.4);
+    /* Sombra con glow rojo */
 }
 
 .btn-logout i {
-    font-size: 1.2em;
+    font-size: 1.4em;
+    transition: transform 0.3s ease-out;
+    /* Transición para el ícono */
 }
 
-p {
-    font-size: 1.1em;
-    color: var(--color-text-secondary);
+.btn-logout:hover i {
+    transform: rotate(5deg);
+    /* Pequeña rotación al ícono */
+}
+
+.dashboard-intro-text {
+    font-size: 1.4em;
+    color: #8892B0;
+    /* Gris azulado medio */
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 60px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.8;
+    font-weight: 300;
+    /* Ligero */
 }
 
-/* Estilos para las Secciones de Gestión (Usuarios, Productos, Categorías) */
-.management-section {
-    background-color: #dbd760;
-    border-radius: 18px; /* Más redondeado */
-    box-shadow: 0 8px 30px rgba(137, 35, 35, 0.08); /* Sombra más pronunciada */
-    padding: 35px;
-    margin-bottom: 30px;
-}
-
-.management-section h3 {
-    font-size: 2em; /* Subtítulos más grandes */
-    color: var(--color-text-primary);
-    margin-bottom: 30px;
-    border-bottom: 2px solid var(--color-gray-medium);
-    padding-bottom: 15px;
-    font-weight: 700;
-    text-align: center;
-}
-
-.management-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Tarjetas más grandes */
-    gap: 30px; /* Más espacio entre tarjetas */
-}
-
-.management-card {
-    border: none; /* Quitamos el borde para que el gradiente sea el protagonista */
-    border-radius: 15px; /* Bordes muy redondeados */
-    padding: 30px;
-    text-align: center;
+/* CLASE BASE PARA TODAS LAS TARJETAS INTERACTIVAS (EL EFECTO "GOTITA DE AGUA") */
+.interactive-card {
+    border-radius: 25px;
+    /* Bordes muy redondeados */
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    /* Sombra base profunda */
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        box-shadow 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        border-radius 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     text-decoration: none;
-    color: rgb(0, 0, 0); /* Texto blanco para contrastar con los gradientes */
-    transition: transform 0.4s ease, box-shadow 0.4s ease, filter 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    /* Crucial para el efecto de brillo */
+    will-change: transform, box-shadow, border-radius;
+    cursor: pointer;
+    perspective: 1000px;
+    /* Para efectos 3D si se necesitan */
+}
+
+.interactive-card::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle at center, rgba(100, 255, 218, 0.2) 0%, transparent 70%);
+    /* Brillo sutil */
+    border-radius: 50%;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    /* Centra inicialmente */
+    transition: width 0.7s ease-out, height 0.7s ease-out, opacity 0.7s ease-out;
+    /* Transición más lenta y expansiva */
+    z-index: 0;
+    pointer-events: none;
+    /* Asegura que no bloquee el clic */
+}
+
+.interactive-card:hover {
+    transform: scale(1.08) translateY(-20px);
+    /* Más grande y elevado */
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 0 40px rgba(100, 255, 218, 0.5);
+    /* Sombra más grande con glow de acento */
+    border-radius: 30px;
+    /* Se redondea aún más, "suaviza" */
+}
+
+.interactive-card:hover::before {
+    width: 300%;
+    /* Expande el círculo de brillo */
+    height: 300%;
+    opacity: 1;
+}
+
+/* Asegura que el contenido esté por encima del pseudo-elemento */
+.interactive-card>*:not(::before) {
+    position: relative;
+    z-index: 1;
+    transition: color 0.3s ease-out, transform 0.3s ease-out;
+    /* Transición para el contenido */
+}
+
+
+/* Contenedor principal para las secciones de "Crear" y "Gestionar" */
+.main-management-section {
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+}
+
+.management-category-row {
+    background: #172A45;
+    /* Fondo de panel azul oscuro */
+    border-radius: 30px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+    /* Sombra profunda para el panel */
+    padding: 50px;
+    /* Más padding */
+}
+
+.management-category-row h3 {
+    font-size: 2.8em;
+    /* Título de sección más grande y audaz */
+    color: #CCD6F6;
+    font-weight: 800;
+    margin-bottom: 45px;
+    /* Más espacio */
+    text-align: center;
+    padding-bottom: 25px;
+    border-bottom: 2px solid rgba(100, 255, 218, 0.15);
+    /* Borde sutil */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    text-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    letter-spacing: -0.02em;
+}
+
+.management-category-row h3 i {
+    font-size: 1.4em;
+    color: #64FFDA;
+    /* Iconos de título en color de acento */
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 45px;
+    /* Más espacio entre tarjetas */
+}
+
+/* Estilos base para todas las management-card */
+.management-card {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 220px; /* Altura mínima para las tarjetas */
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Sombra inicial */
-    position: relative; /* Para el efecto de brillo */
-    overflow: hidden; /* Para contener el brillo */
-}
-
-.management-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(45deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-}
-
-.management-card:hover::before {
-    opacity: 1;
+    padding: 40px;
+    /* Más padding interno */
+    color: #CCD6F6;
+    /* Texto blanco por defecto para contraste */
+    text-align: center;
+    min-height: 300px;
+    /* Altura mínima para consistencia */
+    background-size: 200% 200%;
+    /* Para el efecto de movimiento del degradado en hover */
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .management-card:hover {
-    transform: translateY(-12px); /* Efecto de elevación más pronunciado */
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25); /* Sombra más grande y oscura */
-    filter: brightness(1.05); /* Ligeramente más brillante al pasar el ratón */
+    background-position: right center;
+    /* Mueve el degradado al hover */
 }
 
+
 .management-card i {
-    font-size: 4.5em; /* Iconos más grandes */
-    margin-bottom: 20px;
-    color: rgba(0, 0, 0, 0.9); /* Iconos blancos semi-transparentes */
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Sombra para los iconos */
+    font-size: 6em;
+    /* Íconos aún más grandes y prominentes */
+    margin-bottom: 30px;
+    color: #CCD6F6;
+    /* Ícono claro */
+    text-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+    /* Sombra intensa para el ícono */
+    transition: all 0.3s ease-out;
+}
+
+.management-card:hover i {
+    transform: translateY(-5px) scale(1.05);
+    /* Pequeña elevación y escala del ícono */
+    color: #64FFDA;
+    /* Cambio de color al acento en hover */
 }
 
 .management-card h4 {
-    font-size: 1.6em; /* Título de tarjeta más grande */
-    margin-bottom: 12px;
-    font-weight: 700;
-    color: rgb(209, 53, 53);
+    font-size: 2.2em;
+    /* Títulos de tarjeta más grandes y audaces */
+    margin-bottom: 18px;
+    font-weight: 800;
+    color: #CCD6F6;
+    text-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    letter-spacing: -0.01em;
 }
 
 .management-card p {
-    font-size: 1em;
-    color: rgb(0, 0, 0); /* Descripción más clara */
-    line-height: 1.5;
+    font-size: 1.25em;
+    /* Descripción más grande y legible */
+    color: #8892B0;
+    /* Texto de descripción más suave */
+    line-height: 1.7;
     margin-bottom: 0;
+    font-weight: 300;
 }
 
-/* Colores específicos para tipos de tarjetas con gradientes */
+/* Degradados y efectos de hover específicos para tarjetas de CREAR (Más vibrantes) */
 .create-user-card {
-    background: linear-gradient(135deg, var(--color-lettuce-medium) 0%, var(--color-lettuce-dark) 100%);
+    background: linear-gradient(135deg, #4A2270 0%, #8E30C0 100%);
 }
+
+.create-user-card:hover {
+    background: linear-gradient(135deg, #8E30C0 0%, #4A2270 100%);
+}
+
+.create-product-card {
+    background: linear-gradient(135deg, #006D5B 0%, #00BF9F 100%);
+}
+
+.create-product-card:hover {
+    background: linear-gradient(135deg, #00BF9F 0%, #006D5B 100%);
+}
+
+.create-category-card {
+    background: linear-gradient(135deg, #D43E6B 0%, #FF6C8B 100%);
+}
+
+.create-category-card:hover {
+    background: linear-gradient(135deg, #FF6C8B 0%, #D43E6B 100%);
+}
+
+.create-combo-card {
+    background: linear-gradient(135deg, #3A576F 0%, #5C7B99 100%);
+}
+
+.create-combo-card:hover {
+    background: linear-gradient(135deg, #5C7B99 0%, #3A576F 100%);
+}
+
+.create-offer-card {
+    background: linear-gradient(135deg, #E68A00 0%, #FFA800 100%);
+}
+
+.create-offer-card:hover {
+    background: linear-gradient(135deg, #FFA800 0%, #E68A00 100%);
+}
+
+/* Degradados y efectos de hover específicos para tarjetas de GESTIONAR (Más sobrios/informativos) */
 .manage-users-card {
-    background: linear-gradient(135deg, var(--color-cyan-medium) 0%, var(--color-cyan-dark) 100%);
+    background: linear-gradient(135deg, #0D2036 0%, #203A58 100%);
 }
-.create-item-card {
-    background: linear-gradient(135deg, #f7b731 0%, #fc602c 100%); /* Naranja a rojo */
+
+.manage-users-card:hover {
+    background: linear-gradient(135deg, #203A58 0%, #0D2036 100%);
 }
-.manage-items-card {
-    background: linear-gradient(135deg, #a770ef 0%, #cf8bf3 50%, #fbc2eb 100%); /* Morado a rosa */
+
+.manage-products-card {
+    background: linear-gradient(135deg, #2C3E50 0%, #4A6572 100%);
 }
-/* Reutilizamos los colores para Categorías o puedes definir nuevos */
-.management-section:nth-of-type(3) .management-card:nth-child(1) { /* Crear Nueva Categoría */
-    background: linear-gradient(135deg, #80b314 0%, #00f2fe 100%); /* Azul a Cyan */
+
+.manage-products-card:hover {
+    background: linear-gradient(135deg, #4A6572 0%, #2C3E50 100%);
 }
-.management-section:nth-of-type(3) .management-card:nth-child(2) { /* Gestionar Categorías */
-    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%); /* Rosa a Naranja claro */
+
+.manage-categories-card {
+    background: linear-gradient(135deg, #34495E 0%, #5B7A8D 100%);
+}
+
+.manage-categories-card:hover {
+    background: linear-gradient(135deg, #5B7A8D 0%, #34495E 100%);
+}
+
+.manage-combos-card {
+    background: linear-gradient(135deg, #1C2833 0%, #34495E 100%);
+}
+
+.manage-combos-card:hover {
+    background: linear-gradient(135deg, #34495E 0%, #1C2833 100%);
+}
+
+.manage-offers-card {
+    background: linear-gradient(135deg, #3E2F40 0%, #5A475C 100%);
+}
+
+.manage-offers-card:hover {
+    background: linear-gradient(135deg, #5A475C 0%, #3E2F40 100%);
 }
 
 
-/* Estilos para las Tarjetas de Resumen (Widgets) */
-.summary-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Más grandes */
-    gap: 30px;
-    margin-bottom: 40px;
+/* Estilos para Paneles Generales (Estadísticas, Otras Gestiones, Actividad Reciente) */
+.dashboard-panel {
+    background: #172A45;
+    /* Fondo de panel azul oscuro */
+    padding: 50px;
+    border-radius: 30px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
 }
 
-.summary-cards .card {
-    background-color: #bbafaf;
-    border-radius: 15px; /* Más redondeado */
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    padding: 30px;
+.dashboard-panel h3 {
+    font-size: 2.8em;
+    color: #CCD6F6;
+    font-weight: 800;
+    margin-bottom: 45px;
     text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid var(--color-gray-medium); /* Borde sutil */
-}
-
-.summary-cards .card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-}
-
-.summary-cards .card h3 {
-    font-size: 1.4em;
-    color: var(--color-text-primary);
-    margin-bottom: 12px;
-    font-weight: 700;
-}
-
-.summary-cards .card .metric {
-    font-size: 2.8em; /* Métrica más grande */
-    font-weight: 800; /* Más audaz */
-    color: var(--color-accent-blue); /* Azul para métricas */
-    margin-bottom: 10px;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.summary-cards .card .description {
-    font-size: 0.95em;
-    color: var(--color-text-secondary);
-}
-
-.summary-cards .alert-card {
-    background-color: var(--color-alert-red); /* Fondo rojo para alertas */
-    color: rgb(207, 202, 202); /* Texto blanco en tarjeta de alerta */
-    border: none;
-    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3); /* Sombra roja */
-}
-
-.summary-cards .alert-card h3,
-.summary-cards .alert-card .metric,
-.summary-cards .alert-card .description {
-    color: rgb(229, 229, 229); /* Asegura que todo el texto sea blanco */
-}
-
-.summary-cards .alert-card .metric {
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-
-/* Estilos para la Sección de Navegación Rápida */
-.quick-links {
-    background-color: #ffffff;
-    border-radius: 18px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-    padding: 35px;
-    margin-bottom: 30px;
-}
-
-.quick-links h3 {
-    font-size: 2em;
-    color: var(--color-text-primary);
-    margin-bottom: 30px;
-    border-bottom: 2px solid var(--color-gray-medium);
-    padding-bottom: 15px;
-    font-weight: 700;
-    text-align: center;
-}
-
-.link-group {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    padding-bottom: 25px;
+    border-bottom: 2px solid rgba(100, 255, 218, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     gap: 20px;
+    text-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    letter-spacing: -0.02em;
+}
+
+.dashboard-panel h3 i {
+    font-size: 1.4em;
+    color: #64FFDA;
+}
+
+/* Grid para Tarjetas de Resumen */
+.summary-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 45px;
+}
+
+.summary-card {
+    background: #0B2239;
+    /* Fondo ligeramente más oscuro para estas tarjetas */
+    padding: 35px;
+    text-align: center;
+    color: #CCD6F6;
+    border: 1px solid rgba(100, 255, 218, 0.1);
+    /* Borde sutil con acento */
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    border-radius: 20px;
+    /* Ligeramente menos redondeado que las management cards */
+}
+
+.summary-card:hover {
+    box-shadow: 0 18px 35px rgba(0, 0, 0, 0.7), 0 0 30px rgba(100, 255, 218, 0.4);
+}
+
+.summary-card h3 {
+    font-size: 2em;
+    color: #CCD6F6;
+    margin-bottom: 18px;
+    font-weight: 700;
+    border-bottom: none;
+    padding-bottom: 0;
+    text-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+.summary-card .metric {
+    font-size: 4em;
+    /* Métricas muy grandes y impactantes */
+    font-weight: 900;
+    color: #64FFDA;
+    /* Color de acento para las métricas */
+    margin-bottom: 15px;
+    text-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(100, 255, 218, 0.3);
+    line-height: 1;
+    /* Ajustar para evitar espacios excesivos */
+}
+
+.summary-card .description {
+    font-size: 1.2em;
+    color: #8892B0;
+    font-weight: 300;
+}
+
+.summary-card.alert-card {
+    background: linear-gradient(135deg, #EF476F 0%, #D02B52 100%);
+    /* Degradado de alerta vibrante */
+    color: #CCD6F6;
+    border-color: rgba(239, 71, 111, 0.5);
+}
+
+.summary-card.alert-card h3,
+.summary-card.alert-card .metric,
+.summary-card.alert-card .description {
+    color: #CCD6F6;
+}
+
+.summary-card.alert-card .metric {
+    color: #FFB56B;
+    /* Naranja durazno para la métrica de alerta */
+    text-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 181, 107, 0.3);
+}
+
+.summary-card.alert-card:hover {
+    box-shadow: 0 18px 35px rgba(0, 0, 0, 0.7), 0 0 30px rgba(239, 71, 111, 0.5);
+}
+
+
+/* Grid para Otras Gestiones Rápidas (botones más pequeños pero elegantes) */
+.quick-links-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
 }
 
 .quick-link-btn {
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 18px 25px; /* Más padding */
-    background-color: var(--color-cyan-light); /* Fondo cyan claro */
-    color: var(--color-text-primary);
-    border-radius: 12px; /* Más redondeado */
-    text-decoration: none;
+    justify-content: flex-start;
+    padding: 22px 30px;
+    background: #0B2239;
+    /* Fondo de botón más oscuro */
+    color: #CCD6F6;
     font-weight: 600;
-    font-size: 1.05em;
-    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    border: 1px solid var(--color-cyan-medium);
+    font-size: 1.15em;
+    border: 1px solid rgba(100, 255, 218, 0.08);
+    gap: 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    /* Sombra sutil */
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .quick-link-btn:hover {
-    background-color: var(--color-cyan-medium); /* Cyan medio al hover */
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    color: white; /* Texto blanco al hover */
+    background: linear-gradient(45deg, #64FFDA 0%, #34B399 100%);
+    /* Degradado cian/turquesa vibrante */
+    color: #0A192F;
+    /* Texto oscuro al hover para mejor contraste */
+    transform: translateY(-5px) scale(1.02);
+    /* Pequeño lift y escala */
+    box-shadow: 0 12px 25px rgba(100, 255, 218, 0.5);
+    /* Sombra con glow */
 }
 
 .quick-link-btn:hover i {
-    color: white; /* Icono blanco al hover */
+    color: #0A192F;
+    /* Icono oscuro al hover */
+    transform: translateX(5px);
+    /* Pequeño movimiento del ícono */
 }
 
 .quick-link-btn i {
-    margin-right: 12px;
-    font-size: 1.3em;
-    color: var(--color-accent-blue); /* Iconos azules */
-    transition: color 0.3s ease;
+    font-size: 1.8em;
+    color: #64FFDA;
+    transition: color 0.3s ease-out, transform 0.3s ease-out;
 }
 
-/* Sección de Actividad Reciente */
-.recent-activity {
-    background-color: #ffffff;
-    border-radius: 18px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-    padding: 35px;
-}
 
-.recent-activity h3 {
-    font-size: 2em;
-    color: var(--color-text-primary);
-    margin-bottom: 30px;
-    border-bottom: 2px solid var(--color-gray-medium);
-    padding-bottom: 15px;
-    font-weight: 700;
-    text-align: center;
+/* Últimos Pedidos / Actividad Reciente */
+.recent-activity-panel {
+    /* Estilos base ya definidos por .dashboard-panel y .interactive-card */
 }
 
 .table-placeholder {
-    background-color: var(--color-gray-light);
-    border: 1px dashed var(--color-gray-medium);
-    border-radius: 10px;
-    padding: 25px;
+    background: #0B2239;
+    /* Fondo oscuro para el placeholder */
+    border: 1px dashed rgba(100, 255, 218, 0.25);
+    /* Borde punteado de acento */
+    border-radius: 20px;
+    padding: 40px;
     text-align: center;
-    color: var(--color-text-secondary);
+    color: #8892B0;
     font-style: italic;
+    margin-bottom: 35px;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3);
+    /* Sombra interna sutil */
+}
+
+.table-placeholder p {
+    font-size: 1.3em;
+    margin-bottom: 25px;
 }
 
 .table-placeholder ul {
     list-style: none;
     padding: 0;
-    margin-top: 20px;
+    margin-top: 30px;
+    text-align: left;
 }
 
 .table-placeholder li {
-    background-color: var(--color-gray-medium);
-    margin-bottom: 10px;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 1em;
-    color: var(--color-text-primary);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    background: #172A45;
+    /* Fondo de ítem de lista igual que los paneles */
+    margin-bottom: 18px;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 1.2em;
+    color: #CCD6F6;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(100, 255, 218, 0.08);
+    font-weight: 300;
+    transition: all 0.3s ease-out;
+}
+
+.table-placeholder li:hover {
+    transform: translateX(8px);
+    /* Pequeño movimiento al hover */
+    background-color: #1F3858;
+    /* Ligeramente más claro al hover */
 }
 
 .view-all-link {
     display: inline-block;
-    margin-top: 25px;
-    padding: 12px 25px;
-    background-color: var(--color-accent-blue);
-    color: white;
-    text-decoration: none;
-    border-radius: 10px;
-    font-weight: 600;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 40px;
+    padding: 20px 40px;
+    background: linear-gradient(45deg, #FFB56B 0%, #E08A22 100%);
+    /* Degradado naranja durazno */
+    color: #0A192F;
+    /* Texto oscuro */
+    font-weight: 700;
+    font-size: 1.25em;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .view-all-link:hover {
-    background-color: #2980b9;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(45deg, #E08A22 0%, #FFB56B 100%);
+    /* Invierte el degradado */
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(255, 181, 107, 0.6), 0 0 20px rgba(255, 181, 107, 0.4);
+    /* Sombra con glow naranja */
 }
 
+
 /* Media Queries para Responsividad */
-@media (max-width: 1024px) {
-    .management-cards, .summary-cards, .link-group {
+@media (max-width: 1400px) {
+    .admin-dashboard-container {
+        padding: 50px;
+        gap: 50px;
+    }
+
+    .cards-grid,
+    .quick-links-grid,
+    .summary-cards-grid {
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 35px;
+    }
+
+    .management-card {
+        min-height: 280px;
+        padding: 35px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .admin-dashboard-container {
+        padding: 40px;
+        gap: 40px;
+    }
+
+    .dashboard-header h2 {
+        font-size: 3.2em;
+    }
+
+    .btn-logout {
+        padding: 14px 28px;
+        font-size: 1.05em;
+    }
+
+    .management-category-row h3,
+    .dashboard-panel h3 {
+        font-size: 2.5em;
+        margin-bottom: 40px;
+    }
+
+    .cards-grid,
+    .quick-links-grid,
+    .summary-cards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 30px;
+    }
+
+    .management-card {
+        min-height: 260px;
+        padding: 30px;
+    }
+
+    .management-card i {
+        font-size: 5.5em;
+    }
+
+    .management-card h4 {
+        font-size: 2em;
+    }
+
+    .summary-card .metric {
+        font-size: 3.5em;
+    }
+}
+
+@media (max-width: 992px) {
+    .admin-dashboard-container {
+        padding: 30px;
+        gap: 30px;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        align-items: center;
+        gap: 25px;
+        text-align: center;
+    }
+
+    .dashboard-header h2 {
+        font-size: 2.8em;
+    }
+
+    .btn-logout {
+        padding: 12px 25px;
+        font-size: 1em;
+    }
+
+    .management-category-row h3,
+    .dashboard-panel h3 {
+        font-size: 2.2em;
+        margin-bottom: 30px;
+    }
+
+    .cards-grid,
+    .quick-links-grid,
+    .summary-cards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 25px;
+    }
+
+    .management-card {
+        min-height: 220px;
+        padding: 25px;
+    }
+
+    .management-card i {
+        font-size: 4.5em;
+    }
+
+    .management-card h4 {
+        font-size: 1.8em;
+    }
+
+    .summary-card .metric {
+        font-size: 3em;
+    }
+
+    .quick-link-btn {
+        justify-content: center;
+        /* Centrar contenido en móviles si el espacio es limitado */
     }
 }
 
 @media (max-width: 768px) {
     .admin-dashboard-container {
         padding: 20px;
-        gap: 30px;
-    }
-
-    .dashboard-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
+        gap: 25px;
     }
 
     .dashboard-header h2 {
         font-size: 2.2em;
-        text-align: center;
-        width: 100%;
     }
 
-    .btn-logout {
-        width: 100%;
-        justify-content: center;
-        padding: 10px 20px;
-        font-size: 1em;
+    .dashboard-intro-text {
+        font-size: 1.1em;
+        margin-bottom: 30px;
     }
 
-    .management-section, .quick-links, .recent-activity {
-        padding: 25px;
-        border-radius: 15px;
+    .management-category-row h3,
+    .dashboard-panel h3 {
+        font-size: 1.9em;
+        margin-bottom: 25px;
+        flex-direction: column;
+        gap: 10px;
     }
 
-    .management-section h3,
-    .quick-links h3,
-    .recent-activity h3 {
-        font-size: 1.8em;
-        margin-bottom: 20px;
+    .management-category-row h3 i,
+    .dashboard-panel h3 i {
+        font-size: 1.2em;
     }
 
-    .management-cards, .summary-cards, .link-group {
-        grid-template-columns: 1fr; /* Una columna en pantallas pequeñas */
-        gap: 25px;
+    .cards-grid,
+    .quick-links-grid,
+    .summary-cards-grid {
+        grid-template-columns: 1fr;
+        /* Una columna en pantallas pequeñas */
+        gap: 20px;
     }
 
     .management-card {
-        min-height: 180px;
-        padding: 25px;
+        min-height: 200px;
+        padding: 20px;
     }
 
     .management-card i {
         font-size: 4em;
+        margin-bottom: 20px;
     }
 
     .management-card h4 {
-        font-size: 1.5em;
+        font-size: 1.6em;
     }
 
-    .summary-cards .card {
-        padding: 25px;
-        border-radius: 12px;
-    }
-
-    .summary-cards .card .metric {
-        font-size: 2.5em;
+    .summary-card .metric {
+        font-size: 2.8em;
     }
 
     .quick-link-btn {
-        padding: 15px 20px;
+        padding: 18px 20px;
         font-size: 1em;
     }
 
     .quick-link-btn i {
-        font-size: 1.2em;
-    }
-
-    .table-placeholder {
-        padding: 20px;
-    }
-
-    .table-placeholder li {
-        padding: 10px;
+        font-size: 1.4em;
     }
 
     .view-all-link {
-        padding: 10px 20px;
-        font-size: 1em;
+        padding: 15px 30px;
+        font-size: 1.05em;
+    }
+
+    .table-placeholder ul {
+        text-align: center;
     }
 }
 
@@ -475,10 +816,18 @@ p {
         font-size: 1.8em;
     }
 
-    .management-section h3,
-    .quick-links h3,
-    .recent-activity h3 {
+    .btn-logout {
+        padding: 10px 20px;
+        font-size: 0.9em;
+    }
+
+    .management-category-row h3,
+    .dashboard-panel h3 {
         font-size: 1.6em;
+    }
+
+    .management-card {
+        min-height: 180px;
     }
 
     .management-card i {
@@ -486,10 +835,10 @@ p {
     }
 
     .management-card h4 {
-        font-size: 1.3em;
+        font-size: 1.4em;
     }
 
-    .summary-cards .card .metric {
-        font-size: 2em;
+    .summary-card .metric {
+        font-size: 2.5em;
     }
 }
