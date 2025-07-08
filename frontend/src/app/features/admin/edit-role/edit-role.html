@@ -1,0 +1,49 @@
+<!-- src/app/features/admin/components/admin/edit-role/edit-role.html -->
+
+<div class="edit-role-container">
+    <h2>Editar Rol</h2>
+    <p>Modifica los detalles del rol seleccionado.</p>
+
+    <div *ngIf="isLoading" class="loading-message">
+        <i class="fas fa-spinner fa-spin"></i> Cargando detalles del rol...
+    </div>
+
+    <div *ngIf="!isLoading && !roleForm.valid && roleForm.touched" class="error-message">
+        Por favor, corrija los errores en el formulario.
+    </div>
+
+    <form *ngIf="!isLoading" [formGroup]="roleForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label for="nombre">Nombre del Rol:</label>
+            <input id="nombre" type="text" formControlName="nombre" placeholder="Ej: admin, cliente, repartidor">
+            <div *ngIf="f['nombre'].invalid && (f['nombre'].dirty || f['nombre'].touched)" class="validation-error">
+                <div *ngIf="f['nombre'].errors?.['required']">El nombre del rol es requerido.</div>
+                <div *ngIf="f['nombre'].errors?.['minlength']">El nombre debe tener al menos 3 caracteres.</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="estado">Estado:</label>
+            <select id="estado" formControlName="estado">
+                <option [ngValue]="true">Activo</option>
+                <option [ngValue]="false">Inactivo</option>
+            </select>
+            <div *ngIf="f['estado'].invalid && (f['estado'].dirty || f['estado'].touched)" class="validation-error">
+                <div *ngIf="f['estado'].errors?.['required']">El estado es requerido.</div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" [disabled]="roleForm.invalid || isSaving" class="btn btn-primary">
+                <i class="fas fa-save"></i> {{ isSaving ? 'Guardando...' : 'Guardar Cambios' }}
+            </button>
+            <a routerLink="/admin/roles/manage" class="btn btn-secondary">
+                <i class="fas fa-times-circle"></i> Cancelar
+            </a>
+        </div>
+    </form>
+
+    <div class="back-link">
+        <a routerLink="/admin/roles/manage"><i class="fas fa-arrow-left"></i> Volver a Administrar Roles</a>
+    </div>
+</div>

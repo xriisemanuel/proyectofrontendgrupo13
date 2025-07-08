@@ -4,14 +4,14 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { API_BASE_URL } from '../../core/constants/constants';
-import { IUsuario, IRol } from '../../data/services/usuario'; // Asegúrate de que esta ruta y las interfaces sean correctas
+import { API_BASE_URL } from '../../core/constants/constants'; // Asegúrate de que esta ruta sea correcta
 
-// NUEVO: Importar la interfaz de registro
+// Importar la interfaz de registro
 import { IRegisterUserPayload, IRegisterSuccessResponse } from './auth.interface';
 
-// NUEVO: Importar jwt-decode
-import { jwtDecode } from 'jwt-decode'; // Importar jwtDecode directamente
+// Importar jwt-decode
+import { jwtDecode } from 'jwt-decode';
+import { IUsuario } from '../../shared/interfaces'; // Asegúrate de que esta ruta sea correcta
 
 const AUTH_API = API_BASE_URL + '/auth/';
 
@@ -31,8 +31,9 @@ export class AuthService {
 
     let initialUser = null;
     if (this.isBrowser) {
-      const storedUser = localStorage.getItem('user');
-      console.log('AuthService constructor: Usuario almacenado en localStorage:', storedUser);
+      // --- CAMBIO CLAVE: Usar sessionStorage en lugar de localStorage ---
+      const storedUser = sessionStorage.getItem('user');
+      console.log('AuthService constructor: Usuario almacenado en sessionStorage:', storedUser);
       if (storedUser) {
         try {
           const parsedUser = JSON.parse(storedUser);
@@ -40,13 +41,13 @@ export class AuthService {
           if (parsedUser && parsedUser.token && !this.isTokenExpired(parsedUser.token)) {
             initialUser = parsedUser;
           } else {
-            // Si el token está expirado o es inválido, limpiamos localStorage
-            localStorage.removeItem('user');
-            console.log('AuthService constructor: Token expirado o inválido en localStorage. Sesión limpiada.');
+            // Si el token está expirado o es inválido, limpiamos sessionStorage
+            sessionStorage.removeItem('user');
+            console.log('AuthService constructor: Token expirado o inválido en sessionStorage. Sesión limpiada.');
           }
         } catch (e) {
-          console.error('AuthService constructor: Error al parsear usuario de localStorage:', e);
-          localStorage.removeItem('user'); // Limpiar si hay error al parsear
+          console.error('AuthService constructor: Error al parsear usuario de sessionStorage:', e);
+          sessionStorage.removeItem('user'); // Limpiar si hay error al parsear
         }
       }
     }
@@ -75,9 +76,10 @@ export class AuthService {
         if (this.isBrowser && response && response.token) {
           // Almacenar solo si el token no está expirado inmediatamente
           if (!this.isTokenExpired(response.token)) {
-            localStorage.setItem('user', JSON.stringify(response));
+            // --- CAMBIO CLAVE: Usar sessionStorage en lugar de localStorage ---
+            sessionStorage.setItem('user', JSON.stringify(response));
             this.currentUserSubject.next(response);
-            console.log('AuthService login: Usuario guardado en localStorage y BehaviorSubject.');
+            console.log('AuthService login: Usuario guardado en sessionStorage y BehaviorSubject.');
           } else {
             console.warn('AuthService login: Token recibido ya expirado. No se guarda la sesión.');
             this.logout(); // Limpiar por si acaso
@@ -89,8 +91,9 @@ export class AuthService {
 
   logout() {
     if (this.isBrowser) {
-      localStorage.removeItem('user');
-      console.log('AuthService logout: Usuario eliminado de localStorage.');
+      // --- CAMBIO CLAVE: Usar sessionStorage en lugar de localStorage ---
+      sessionStorage.removeItem('user');
+      console.log('AuthService logout: Usuario eliminado de sessionStorage.');
     }
     this.currentUserSubject.next(null);
   }

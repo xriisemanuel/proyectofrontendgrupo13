@@ -1,20 +1,16 @@
 // proyecto/frontend/src/app/core/auth/auth.interface.ts
 export interface IRegisterUserPayload {
     username: string;
-    passwordHash: string; // Coincide con cómo lo espera el backend ahora
+    password: string; // <--- ¡Cambia esto de 'passwordHash' a 'password'!
     email: string;
-    telefono: string | null; // Puede ser string o null
-    rolName: string; // Nombre del rol
+    telefono: string | null;
+    rolName: string;
     nombre: string;
     apellido: string;
-
-    // Campos específicos de Cliente (opcionales)
     direccionCliente?: string | null;
-    fechaNacimientoCliente?: string | null; // Se envía como string 'YYYY-MM-DD'
-    preferenciasAlimentariasCliente?: string[] | null; // Se envía como array de strings
+    fechaNacimientoCliente?: string | null;
+    preferenciasAlimentariasCliente?: string[] | null;
     puntosCliente?: number | null;
-
-    // Campos específicos de Repartidor (opcionales)
     vehiculoRepartidor?: string | null;
     numeroLicenciaRepartidor?: string | null;
 }

@@ -1,64 +1,28 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { AuthService } from '../../core/auth/auth'; // Ruta corregida
+// src/app/core/auth/role-guard.ts
+import { CanActivateFn, Router } from '@angular/router';
+import { inject } from '@angular/core';
+import { AuthService } from './auth';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class roleGuard implements CanActivate { // Mantengo el nombre de clase como 'roleGuard'
+export const roleGuard: CanActivateFn = (route, state) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
 
-  constructor(private authService: AuthService, private router: Router) { }
+  const requiredRoles = route.data['roles'] as string[]; // Obtiene los roles requeridos de la ruta
 
-  canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
-
-    // Obtiene los roles permitidos para esta ruta desde los datos de la ruta (definidos en app.routes.ts)
-    const expectedRoles = route.data['roles'] as Array<string>;
-
-    // Si no se especifican roles en la ruta, y AuthGuard ya se ejecutó, permite el acceso
-    // Esto es una salvaguarda, pero todas las rutas con RoleGuard deberían tener 'data: { roles: [...] }'
-    if (!expectedRoles || expectedRoles.length === 0) {
-      return true;
-    }
-
-    // Obtiene el rol del usuario actual desde AuthService
-    const userRole = this.authService.getRole();
-
-    // Si el usuario tiene un rol y ese rol está incluido en la lista de roles esperados
-    if (userRole && expectedRoles.includes(userRole)) {
-      return true; // Permite el acceso
-    } else {
-      // Si el rol no está permitido, redirige a una página de acceso denegado o al dashboard principal
-      console.warn(`Acceso denegado: Usuario con rol '${userRole}' intentó acceder a ruta protegida con roles: ${expectedRoles.join(', ')}`);
-      // Redirige a un dashboard genérico si está logueado, o al login si no
-      if (this.authService.isAuthenticated()) {
-        const currentUserRole = this.authService.getRole();
-        switch (currentUserRole) {
-          case 'admin':
-            this.router.navigate(['/admin/dashboard']);
-            break;
-          case 'cliente':
-            this.router.navigate(['/cliente/dashboard']);
-            break;
-          case 'repartidor':
-            this.router.navigate(['/repartidor/dashboard']);
-            break;
-          case 'supervisor_cocina':
-            this.router.navigate(['/cocina/dashboard']);
-            break;
-          case 'supervisor_ventas':
-            this.router.navigate(['/ventas/dashboard']);
-            break;
-          default:
-            this.router.navigate(['/dashboard']); // Dashboard genérico
-            break;
-        }
-      } else {
-        this.router.navigate(['/login']); // Si no está autenticado, al login
-      }
-      return false; // Deniega el acceso
-    }
+  if (!requiredRoles || requiredRoles.length === 0) {
+    return true; // Si no se especifican roles, permite el acceso (aunque esto no debería pasar en rutas protegidas por roleGuard)
   }
-}
+
+  const userRole = authService.getRole(); // Obtiene el rol del usuario logueado
+  console.log('roleGuard: Rol del usuario:', userRole, 'Roles requeridos:', requiredRoles);
+
+  if (userRole && requiredRoles.includes(userRole)) {
+    console.log('roleGuard: Rol autorizado. Permitiendo acceso.');
+    return true; // Permite el acceso si el usuario tiene uno de los roles requeridos
+  } else {
+    console.log('roleGuard: Rol NO autorizado. Redirigiendo a home o a una página de acceso denegado.');
+    // Puedes redirigir a una página de "acceso denegado" o a la página de inicio
+    router.navigate(['/home']); // O a '/access-denied' si tienes una
+    return false; // No permite el acceso
+  }
+};

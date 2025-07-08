@@ -1,5 +1,13 @@
+<!-- src/app/features/admin/components/admin-dashboard/admin-dashboard.html -->
+
 <div class="admin-dashboard-container">
-  <h2>Bienvenido, Administrador {{ currentUser?.usuario?.username }}!</h2>
+  <!-- Encabezado de Bienvenida y Botón de Cerrar Sesión -->
+  <div class="dashboard-header">
+    <h2>Bienvenido, Administrador {{ currentUser?.usuario?.username }}!</h2>
+    <button (click)="onLogout()" class="btn-logout">
+      <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+    </button>
+  </div>
   <p>Este es tu panel de control central para gestionar la aplicación.</p>
 
   <!-- Sección Principal de Gestión de Usuarios -->
@@ -27,14 +35,14 @@
     <h3>Gestión de Productos</h3>
     <div class="management-cards">
       <!-- Tarjeta 1: Crear Nuevo Producto -->
-      <a routerLink="/admin/productos/create" class="management-card create-item-card">
+      <a routerLink="/admin/products/create" class="management-card create-item-card">
         <i class="fas fa-box-open"></i> <!-- Icono de caja abierta/producto -->
         <h4>Crear Nuevo Producto</h4>
         <p>Registra un nuevo producto en el catálogo.</p>
       </a>
 
       <!-- Tarjeta 2: Gestionar Productos -->
-      <a routerLink="/admin/productos/manage" class="management-card manage-items-card">
+      <a routerLink="/admin/products" class="management-card manage-items-card">
         <i class="fas fa-boxes"></i> <!-- Icono de varias cajas/productos -->
         <h4>Gestionar Productos</h4>
         <p>Visualiza, edita y elimina productos existentes.</p>
@@ -47,14 +55,14 @@
     <h3>Gestión de Categorías</h3>
     <div class="management-cards">
       <!-- Tarjeta 1: Crear Nueva Categoría -->
-      <a routerLink="/admin/categorias/create" class="management-card create-item-card">
+      <a routerLink="/admin/categories/create" class="management-card create-item-card">
         <i class="fas fa-tags"></i> <!-- Icono de etiquetas/categorías -->
         <h4>Crear Nueva Categoría</h4>
         <p>Define nuevas categorías para organizar los productos.</p>
       </a>
 
       <!-- Tarjeta 2: Gestionar Categorías -->
-      <a routerLink="/admin/categorias/manage" class="management-card manage-items-card">
+      <a routerLink="/admin/categories" class="management-card manage-items-card">
         <i class="fas fa-sitemap"></i> <!-- Icono de mapa del sitio/estructura -->
         <h4>Gestionar Categorías</h4>
         <p>Visualiza, edita y elimina categorías existentes.</p>
@@ -62,7 +70,7 @@
     </div>
   </div>
 
-  <!-- Sección de Resumen General (Widgets/Tarjetas) - Se mantiene para una visión rápida -->
+  <!-- Sección de Resumen General (Widgets/Tarjetas) -->
   <div class="summary-cards">
     <div class="card">
       <h3>Pedidos Pendientes</h3>
@@ -96,11 +104,10 @@
     </div>
   </div>
 
-  <!-- Sección de Navegación Rápida (Otros enlaces de gestión) - Se mantiene o se adapta según necesidad -->
+  <!-- Sección de Navegación Rápida (Otros enlaces de gestión) -->
   <div class="quick-links">
     <h3>Otras Gestiones</h3>
     <div class="link-group">
-      <!-- Estos enlaces ya están bien si apuntan a dashboards específicos de gestión -->
       <a routerLink="/admin/pedidos" class="quick-link-btn">
         <i class="fas fa-clipboard-list"></i> Gestión de Pedidos
       </a>
@@ -122,13 +129,13 @@
       <a routerLink="/admin/supervisores-cocina/manage" class="quick-link-btn">
         <i class="fas fa-utensils"></i> Gestión Supervisores Cocina
       </a>
-      <a routerLink="/admin/supervisores-ventas/manage" class="quick-link-btn">
+      <a routerLink="/admin/users/manage-supervisores-ventas" class="quick-link-btn">
         <i class="fas fa-chart-pie"></i> Gestión Supervisores Ventas
       </a>
     </div>
   </div>
 
-  <!-- Sección de Actividad Reciente o Tablas Clave - Se mantiene -->
+  <!-- Sección de Actividad Reciente o Tablas Clave -->
   <div class="recent-activity">
     <h3>Últimos Pedidos</h3>
     <div class="table-placeholder">

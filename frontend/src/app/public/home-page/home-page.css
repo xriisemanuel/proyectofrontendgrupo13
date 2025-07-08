@@ -10,7 +10,7 @@
 }
 
 .hero-section {
-    background: linear-gradient(135deg, #007bff, #0056b3);
+    background: linear-gradient(135deg, #929910, #2f3703);
     /* Gradiente */
     color: white;
     text-align: center;
@@ -115,7 +115,7 @@
     /* Línea más ancha */
     height: 5px;
     /* Línea más gruesa */
-    background-color: #007bff;
+    background-color: #1c1f21;
     margin: 15px auto 0;
     border-radius: 3px;
 }
@@ -188,7 +188,7 @@
 .product-card-price {
     font-size: 1.8em;
     font-weight: 700;
-    color: #007bff;
+    color: #03412c;
     margin-top: auto;
     /* Empuja el precio y el botón hacia abajo */
     margin-bottom: 20px;
@@ -198,7 +198,7 @@
     display: block;
     width: 100%;
     padding: 12px;
-    background-color: #007bff;
+    background-color: #101c02;
     color: white;
     border: none;
     border-radius: 6px;

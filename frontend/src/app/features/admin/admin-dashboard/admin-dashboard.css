@@ -1,0 +1,495 @@
+/* src/app/features/admin/components/admin-dashboard/admin-dashboard.css */
+
+/* Variables de color para fácil mantenimiento */
+:root {
+    --color-lettuce-light: #e0ffe0; /* Verde lechuga muy claro */
+    --color-lettuce-medium: #a8e6cf; /* Verde lechuga medio */
+    --color-lettuce-dark: #7bdcb5; /* Verde lechuga oscuro */
+
+    --color-cyan-light: #e0f7fa; /* Cyan muy claro */
+    --color-cyan-medium: #8ac6d1; /* Cyan medio */
+    --color-cyan-dark: #5bc0de; /* Cyan oscuro */
+
+    --color-gray-light: #f5f7fa; /* Gris muy claro */
+    --color-gray-medium: #e0e0e0; /* Gris medio */
+    --color-gray-dark: #6c757d; /* Gris oscuro */
+
+    --color-text-primary: #2c3e50;
+    --color-text-secondary: #666;
+    --color-accent-blue: #3498db;
+    --color-alert-red: #e74c3c;
+}
+
+/* Estilos Globales para el Dashboard */
+.admin-dashboard-container {
+    font-family: 'Inter', sans-serif;
+    padding: 30px;
+    background-color: var(--color-gray-light); /* Fondo suave */
+    min-height: calc(100vh - 60px);
+    color: var(--color-text-primary);
+    display: flex;
+    flex-direction: column;
+    gap: 40px; /* Más espacio entre secciones */
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--color-gray-medium);
+}
+
+.dashboard-header h2 {
+    font-size: 2.8em; /* Título más grande */
+    color: var(--color-text-primary);
+    margin-bottom: 0;
+    font-weight: 800; /* Más audaz */
+}
+
+.btn-logout {
+    background-color: var(--color-alert-red);
+    color: rgb(0, 0, 0);
+    border: none;
+    border-radius: 10px; /* Más redondeado */
+    padding: 12px 25px; /* Más padding */
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-logout:hover {
+    background-color: #c0392b;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.btn-logout i {
+    font-size: 1.2em;
+}
+
+p {
+    font-size: 1.1em;
+    color: var(--color-text-secondary);
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Estilos para las Secciones de Gestión (Usuarios, Productos, Categorías) */
+.management-section {
+    background-color: #dbd760;
+    border-radius: 18px; /* Más redondeado */
+    box-shadow: 0 8px 30px rgba(137, 35, 35, 0.08); /* Sombra más pronunciada */
+    padding: 35px;
+    margin-bottom: 30px;
+}
+
+.management-section h3 {
+    font-size: 2em; /* Subtítulos más grandes */
+    color: var(--color-text-primary);
+    margin-bottom: 30px;
+    border-bottom: 2px solid var(--color-gray-medium);
+    padding-bottom: 15px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.management-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Tarjetas más grandes */
+    gap: 30px; /* Más espacio entre tarjetas */
+}
+
+.management-card {
+    border: none; /* Quitamos el borde para que el gradiente sea el protagonista */
+    border-radius: 15px; /* Bordes muy redondeados */
+    padding: 30px;
+    text-align: center;
+    text-decoration: none;
+    color: rgb(0, 0, 0); /* Texto blanco para contrastar con los gradientes */
+    transition: transform 0.4s ease, box-shadow 0.4s ease, filter 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 220px; /* Altura mínima para las tarjetas */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Sombra inicial */
+    position: relative; /* Para el efecto de brillo */
+    overflow: hidden; /* Para contener el brillo */
+}
+
+.management-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.management-card:hover::before {
+    opacity: 1;
+}
+
+.management-card:hover {
+    transform: translateY(-12px); /* Efecto de elevación más pronunciado */
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25); /* Sombra más grande y oscura */
+    filter: brightness(1.05); /* Ligeramente más brillante al pasar el ratón */
+}
+
+.management-card i {
+    font-size: 4.5em; /* Iconos más grandes */
+    margin-bottom: 20px;
+    color: rgba(0, 0, 0, 0.9); /* Iconos blancos semi-transparentes */
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Sombra para los iconos */
+}
+
+.management-card h4 {
+    font-size: 1.6em; /* Título de tarjeta más grande */
+    margin-bottom: 12px;
+    font-weight: 700;
+    color: rgb(209, 53, 53);
+}
+
+.management-card p {
+    font-size: 1em;
+    color: rgb(0, 0, 0); /* Descripción más clara */
+    line-height: 1.5;
+    margin-bottom: 0;
+}
+
+/* Colores específicos para tipos de tarjetas con gradientes */
+.create-user-card {
+    background: linear-gradient(135deg, var(--color-lettuce-medium) 0%, var(--color-lettuce-dark) 100%);
+}
+.manage-users-card {
+    background: linear-gradient(135deg, var(--color-cyan-medium) 0%, var(--color-cyan-dark) 100%);
+}
+.create-item-card {
+    background: linear-gradient(135deg, #f7b731 0%, #fc602c 100%); /* Naranja a rojo */
+}
+.manage-items-card {
+    background: linear-gradient(135deg, #a770ef 0%, #cf8bf3 50%, #fbc2eb 100%); /* Morado a rosa */
+}
+/* Reutilizamos los colores para Categorías o puedes definir nuevos */
+.management-section:nth-of-type(3) .management-card:nth-child(1) { /* Crear Nueva Categoría */
+    background: linear-gradient(135deg, #80b314 0%, #00f2fe 100%); /* Azul a Cyan */
+}
+.management-section:nth-of-type(3) .management-card:nth-child(2) { /* Gestionar Categorías */
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%); /* Rosa a Naranja claro */
+}
+
+
+/* Estilos para las Tarjetas de Resumen (Widgets) */
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Más grandes */
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.summary-cards .card {
+    background-color: #bbafaf;
+    border-radius: 15px; /* Más redondeado */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid var(--color-gray-medium); /* Borde sutil */
+}
+
+.summary-cards .card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.summary-cards .card h3 {
+    font-size: 1.4em;
+    color: var(--color-text-primary);
+    margin-bottom: 12px;
+    font-weight: 700;
+}
+
+.summary-cards .card .metric {
+    font-size: 2.8em; /* Métrica más grande */
+    font-weight: 800; /* Más audaz */
+    color: var(--color-accent-blue); /* Azul para métricas */
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.summary-cards .card .description {
+    font-size: 0.95em;
+    color: var(--color-text-secondary);
+}
+
+.summary-cards .alert-card {
+    background-color: var(--color-alert-red); /* Fondo rojo para alertas */
+    color: rgb(207, 202, 202); /* Texto blanco en tarjeta de alerta */
+    border: none;
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3); /* Sombra roja */
+}
+
+.summary-cards .alert-card h3,
+.summary-cards .alert-card .metric,
+.summary-cards .alert-card .description {
+    color: rgb(229, 229, 229); /* Asegura que todo el texto sea blanco */
+}
+
+.summary-cards .alert-card .metric {
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+
+/* Estilos para la Sección de Navegación Rápida */
+.quick-links {
+    background-color: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    padding: 35px;
+    margin-bottom: 30px;
+}
+
+.quick-links h3 {
+    font-size: 2em;
+    color: var(--color-text-primary);
+    margin-bottom: 30px;
+    border-bottom: 2px solid var(--color-gray-medium);
+    padding-bottom: 15px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.link-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+.quick-link-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 25px; /* Más padding */
+    background-color: var(--color-cyan-light); /* Fondo cyan claro */
+    color: var(--color-text-primary);
+    border-radius: 12px; /* Más redondeado */
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.05em;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--color-cyan-medium);
+}
+
+.quick-link-btn:hover {
+    background-color: var(--color-cyan-medium); /* Cyan medio al hover */
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    color: white; /* Texto blanco al hover */
+}
+
+.quick-link-btn:hover i {
+    color: white; /* Icono blanco al hover */
+}
+
+.quick-link-btn i {
+    margin-right: 12px;
+    font-size: 1.3em;
+    color: var(--color-accent-blue); /* Iconos azules */
+    transition: color 0.3s ease;
+}
+
+/* Sección de Actividad Reciente */
+.recent-activity {
+    background-color: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    padding: 35px;
+}
+
+.recent-activity h3 {
+    font-size: 2em;
+    color: var(--color-text-primary);
+    margin-bottom: 30px;
+    border-bottom: 2px solid var(--color-gray-medium);
+    padding-bottom: 15px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.table-placeholder {
+    background-color: var(--color-gray-light);
+    border: 1px dashed var(--color-gray-medium);
+    border-radius: 10px;
+    padding: 25px;
+    text-align: center;
+    color: var(--color-text-secondary);
+    font-style: italic;
+}
+
+.table-placeholder ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+.table-placeholder li {
+    background-color: var(--color-gray-medium);
+    margin-bottom: 10px;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 1em;
+    color: var(--color-text-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.view-all-link {
+    display: inline-block;
+    margin-top: 25px;
+    padding: 12px 25px;
+    background-color: var(--color-accent-blue);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.view-all-link:hover {
+    background-color: #2980b9;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Media Queries para Responsividad */
+@media (max-width: 1024px) {
+    .management-cards, .summary-cards, .link-group {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-dashboard-container {
+        padding: 20px;
+        gap: 30px;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .dashboard-header h2 {
+        font-size: 2.2em;
+        text-align: center;
+        width: 100%;
+    }
+
+    .btn-logout {
+        width: 100%;
+        justify-content: center;
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+
+    .management-section, .quick-links, .recent-activity {
+        padding: 25px;
+        border-radius: 15px;
+    }
+
+    .management-section h3,
+    .quick-links h3,
+    .recent-activity h3 {
+        font-size: 1.8em;
+        margin-bottom: 20px;
+    }
+
+    .management-cards, .summary-cards, .link-group {
+        grid-template-columns: 1fr; /* Una columna en pantallas pequeñas */
+        gap: 25px;
+    }
+
+    .management-card {
+        min-height: 180px;
+        padding: 25px;
+    }
+
+    .management-card i {
+        font-size: 4em;
+    }
+
+    .management-card h4 {
+        font-size: 1.5em;
+    }
+
+    .summary-cards .card {
+        padding: 25px;
+        border-radius: 12px;
+    }
+
+    .summary-cards .card .metric {
+        font-size: 2.5em;
+    }
+
+    .quick-link-btn {
+        padding: 15px 20px;
+        font-size: 1em;
+    }
+
+    .quick-link-btn i {
+        font-size: 1.2em;
+    }
+
+    .table-placeholder {
+        padding: 20px;
+    }
+
+    .table-placeholder li {
+        padding: 10px;
+    }
+
+    .view-all-link {
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-dashboard-container {
+        padding: 15px;
+    }
+
+    .dashboard-header h2 {
+        font-size: 1.8em;
+    }
+
+    .management-section h3,
+    .quick-links h3,
+    .recent-activity h3 {
+        font-size: 1.6em;
+    }
+
+    .management-card i {
+        font-size: 3.5em;
+    }
+
+    .management-card h4 {
+        font-size: 1.3em;
+    }
+
+    .summary-cards .card .metric {
+        font-size: 2em;
+    }
+}

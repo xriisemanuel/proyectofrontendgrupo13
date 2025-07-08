@@ -1,0 +1,145 @@
+<!-- src/app/features/admin/components/admin/edit-user/edit-user.html -->
+
+<div class="edit-user-container">
+    <h2>Editar Usuario</h2>
+    <p>Modifica los detalles del usuario y su perfil asociado.</p>
+
+    <div *ngIf="isLoading" class="loading-message">
+        <i class="fas fa-spinner fa-spin"></i> Cargando detalles del usuario...
+    </div>
+
+    <div *ngIf="!isLoading && userForm.invalid && userForm.touched" class="error-message">
+        Por favor, corrija los errores en el formulario.
+    </div>
+
+    <form *ngIf="!isLoading" [formGroup]="userForm" (ngSubmit)="onSubmit()">
+        <!-- Campos Comunes del Usuario -->
+        <div class="form-section">
+            <h3>Información General</h3>
+            <div class="form-group">
+                <label for="username">Nombre de Usuario:</label>
+                <input id="username" type="text" formControlName="username" placeholder="Nombre de usuario único">
+                <div *ngIf="f['username'].invalid && (f['username'].dirty || f['username'].touched)"
+                    class="validation-error">
+                    <div *ngIf="f['username'].errors?.['required']">El nombre de usuario es requerido.</div>
+                    <div *ngIf="f['username'].errors?.['minlength']">El nombre de usuario debe tener al menos 3
+                        caracteres.</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input id="email" type="email" formControlName="email" placeholder="ejemplo@dominio.com">
+                <div *ngIf="f['email'].invalid && (f['email'].dirty || f['email'].touched)" class="validation-error">
+                    <div *ngIf="f['email'].errors?.['required']">El email es requerido.</div>
+                    <div *ngIf="f['email'].errors?.['email']">Formato de email inválido.</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="nombre">Nombre:</label>
+                <input id="nombre" type="text" formControlName="nombre" placeholder="Nombre del usuario">
+                <div *ngIf="f['nombre'].invalid && (f['nombre'].dirty || f['nombre'].touched)" class="validation-error">
+                    <div *ngIf="f['nombre'].errors?.['required']">El nombre es requerido.</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="apellido">Apellido:</label>
+                <input id="apellido" type="text" formControlName="apellido" placeholder="Apellido del usuario">
+                <div *ngIf="f['apellido'].invalid && (f['apellido'].dirty || f['apellido'].touched)"
+                    class="validation-error">
+                    <div *ngIf="f['apellido'].errors?.['required']">El apellido es requerido.</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="telefono">Teléfono:</label>
+                <input id="telefono" type="text" formControlName="telefono" placeholder="+5491112345678 (Opcional)">
+                <div *ngIf="f['telefono'].invalid && (f['telefono'].dirty || f['telefono'].touched)"
+                    class="validation-error">
+                    <div *ngIf="f['telefono'].errors?.['pattern']">Formato de teléfono inválido.</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="rolId">Rol Asignado:</label>
+                <!-- El rol se muestra pero no se puede editar directamente aquí -->
+                <!-- ¡CORRECCIÓN AQUÍ! Eliminado el atributo 'disabled' del HTML -->
+                <input id="rolId" type="text" [value]="getRoleName(userForm.get('rolId')?.value)"
+                    formControlName="rolId">
+                <small class="form-hint">El rol del usuario no puede ser modificado desde esta interfaz.</small>
+            </div>
+        </div>
+
+        <!-- Campos Específicos del Perfil de Cliente -->
+        <div *ngIf="selectedRoleName === 'cliente'" class="form-section">
+            <h3>Perfil de Cliente</h3>
+            <div class="form-group">
+                <label for="direccionCliente">Dirección:</label>
+                <input id="direccionCliente" type="text" formControlName="direccionCliente"
+                    placeholder="Dirección del cliente">
+                <div *ngIf="f['direccionCliente'].invalid && (f['direccionCliente'].dirty || f['direccionCliente'].touched)"
+                    class="validation-error">
+                    <div *ngIf="f['direccionCliente'].errors?.['required']">La dirección es requerida para clientes.
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="fechaNacimientoCliente">Fecha de Nacimiento:</label>
+                <input id="fechaNacimientoCliente" type="date" formControlName="fechaNacimientoCliente">
+            </div>
+
+            <div class="form-group">
+                <label for="preferenciasAlimentariasCliente">Preferencias Alimentarias (separadas por comas):</label>
+                <input id="preferenciasAlimentariasCliente" type="text"
+                    formControlName="preferenciasAlimentariasCliente" placeholder="Vegetariano, Sin Gluten">
+            </div>
+
+            <div class="form-group">
+                <label for="puntosCliente">Puntos de Fidelidad:</label>
+                <input id="puntosCliente" type="number" formControlName="puntosCliente">
+            </div>
+        </div>
+
+        <!-- Campos Específicos del Perfil de Repartidor -->
+        <div *ngIf="selectedRoleName === 'repartidor'" class="form-section">
+            <h3>Perfil de Repartidor</h3>
+            <div class="form-group">
+                <label for="vehiculoRepartidor">Vehículo:</label>
+                <input id="vehiculoRepartidor" type="text" formControlName="vehiculoRepartidor"
+                    placeholder="Moto, Bicicleta, Coche">
+                <div *ngIf="f['vehiculoRepartidor'].invalid && (f['vehiculoRepartidor'].dirty || f['vehiculoRepartidor'].touched)"
+                    class="validation-error">
+                    <div *ngIf="f['vehiculoRepartidor'].errors?.['required']">El vehículo es requerido para
+                        repartidores.</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="numeroLicenciaRepartidor">Número de Licencia:</label>
+                <input id="numeroLicenciaRepartidor" type="text" formControlName="numeroLicenciaRepartidor"
+                    placeholder="Número de licencia de conducir">
+                <div *ngIf="f['numeroLicenciaRepartidor'].invalid && (f['numeroLicenciaRepartidor'].dirty || f['numeroLicenciaRepartidor'].touched)"
+                    class="validation-error">
+                    <div *ngIf="f['numeroLicenciaRepartidor'].errors?.['required']">El número de licencia es requerido
+                        para repartidores.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" [disabled]="userForm.invalid || isSaving" class="btn btn-primary">
+                <i class="fas fa-save"></i> {{ isSaving ? 'Guardando...' : 'Guardar Cambios' }}
+            </button>
+            <a routerLink="/admin/users/manage-by-role" class="btn btn-secondary">
+                <i class="fas fa-times-circle"></i> Cancelar
+            </a>
+        </div>
+    </form>
+
+    <div class="back-link">
+        <a routerLink="/admin/users/manage-by-role"><i class="fas fa-arrow-left"></i> Volver a Gestión de Usuarios</a>
+    </div>
+</div>

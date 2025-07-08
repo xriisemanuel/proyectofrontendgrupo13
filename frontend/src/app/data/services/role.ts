@@ -1,67 +1,52 @@
+// src/app/data/services/rol.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { API_BASE_URL } from '../../core/constants/constants'; // Importa la URL base de tu API
+import { API_BASE_URL } from '../../core/constants/constants';
+import { AuthService } from '../../core/auth/auth';
 
-// Define la interfaz para un Rol (opcional pero recomendado para tipado)
-export interface RoleInterface {
-  _id?: string; // El ID es opcional al crear
-  nombre: string;
-  estado: boolean;
-  fechaCreacion?: Date;
-}
+// --- ¡IMPORTACIÓN CORRECTA Y ÚNICA DE IRol! ---
+import { IRol } from '../../shared/interfaces';
+// --- FIN DE IMPORTACIÓN ---
 
-const ROLE_API = API_BASE_URL + '/rol'; // Ruta base de la API para roles
+const ROLES_API = API_BASE_URL + '/rol';
 
 @Injectable({
   providedIn: 'root'
 })
-export class Role {
+export class RolService {
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) { }
 
-  /**
-   * @description Obtiene todos los roles del backend.
-   * @returns Un Observable con un array de roles.
-   */
-  getRoles(): Observable<RoleInterface[]> {
-    return this.http.get<RoleInterface[]>(ROLE_API);
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+    return headers;
   }
 
-  /**
-   * @description Crea un nuevo rol en el backend.
-   * @param roleData Los datos del nuevo rol (nombre, estado).
-   * @returns Un Observable con la respuesta del backend.
-   */
-  createRole(roleData: { nombre: string, estado: boolean }): Observable<any> {
-    return this.http.post(ROLE_API, roleData);
+  getRoles(): Observable<IRol[]> {
+    return this.http.get<IRol[]>(ROLES_API, { headers: this.getAuthHeaders() });
   }
 
-  /**
-   * @description Actualiza un rol existente en el backend.
-   * @param id El ID del rol a actualizar.
-   * @param roleData Los datos actualizados del rol.
-   * @returns Un Observable con la respuesta del backend.
-   */
-  updateRole(id: string, roleData: { nombre?: string, estado?: boolean }): Observable<any> {
-    return this.http.put(`${ROLE_API}/${id}`, roleData);
+  createRole(roleData: Partial<IRol>): Observable<any> {
+    return this.http.post<any>(ROLES_API, roleData, { headers: this.getAuthHeaders() });
   }
 
-  /**
-   * @description Elimina un rol del backend.
-   * @param id El ID del rol a eliminar.
-   * @returns Un Observable con la respuesta del backend.
-   */
-  deleteRole(id: string): Observable<any> {
-    return this.http.delete(`${ROLE_API}/${id}`);
+  getRolById(id: string): Observable<IRol> {
+    return this.http.get<IRol>(`${ROLES_API}/${id}`, { headers: this.getAuthHeaders() });
   }
 
-  /**
-   * @description Obtiene un rol por su ID.
-   * @param id El ID del rol a obtener.
-   * @returns Un Observable con el rol.
-   */
-  getRoleById(id: string): Observable<RoleInterface> {
-    return this.http.get<RoleInterface>(`${ROLE_API}/${id}`);
+  updateRol(id: string, roleData: Partial<IRol>): Observable<any> {
+    return this.http.put<any>(`${ROLES_API}/${id}`, roleData, { headers: this.getAuthHeaders() });
+  }
+
+  deleteRol(id: string): Observable<any> {
+    return this.http.delete<any>(`${ROLES_API}/${id}`, { headers: this.getAuthHeaders() });
   }
 }

@@ -1,3 +1,5 @@
+<!-- src/app/features/admin/manage-roles/manage-roles.html -->
+
 <div class="manage-roles-container">
     <h2>Administrar Roles</h2>
     <p>Gestiona los roles existentes en el sistema. Puedes editar su estado o eliminarlos.</p>
@@ -15,6 +17,7 @@
         {{ errorMessage }}
     </div>
 
+    <!-- Tabla de Roles Existente -->
     <div class="roles-table-container">
         <table class="roles-table">
             <thead>
@@ -47,11 +50,60 @@
         </table>
     </div>
 
-    <div *ngIf="roles.length === 0" class="no-roles-message">
+    <div *ngIf="roles.length === 0 && !isLoadingRoles" class="no-roles-message">
         No hay roles para mostrar.
     </div>
 
+    <!-- --- NUEVA SECCIÓN: Usuarios Administradores --- -->
+    <h2 class="section-title-spacing">Usuarios Administradores</h2>
+    <p>Lista de usuarios que tienen asignado el rol de "admin".</p>
+
+    <div *ngIf="isLoadingAdminUsers" class="loading-message">
+        <i class="fas fa-spinner fa-spin"></i> Cargando usuarios administradores...
+    </div>
+
+    <div *ngIf="!isLoadingAdminUsers && adminUsers.length === 0" class="no-data-message">
+        <i class="fas fa-info-circle"></i> No hay usuarios con rol de administrador.
+    </div>
+
+    <div *ngIf="!isLoadingAdminUsers && adminUsers.length > 0" class="users-table-responsive">
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Usuario</th>
+                    <th>Nombre Completo</th>
+                    <th>Email</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let user of adminUsers">
+                    <td>{{ user._id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.nombre }} {{ user.apellido }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <span [class.active-status]="user.estado" [class.inactive-status]="!user.estado">
+                            {{ user.estado ? 'Activo' : 'Inactivo' }}
+                        </span>
+                    </td>
+                    <td class="actions-cell">
+                        <button (click)="editUser(user._id)" class="btn-action btn-edit">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button (click)="deleteUser(user._id)" class="btn-action btn-delete">
+                            <i class="fas fa-trash-alt"></i> Eliminar
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- --- FIN NUEVA SECCIÓN --- -->
+
     <div class="back-link">
-        <a routerLink="/admin/users/manage-by-role"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+        <a routerLink="/admin/dashboard"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
     </div>
 </div>

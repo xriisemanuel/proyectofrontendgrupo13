@@ -5,11 +5,10 @@ import { CommonModule } from '@angular/common'; // Necesario para directivas com
 import { FormsModule } from '@angular/forms'; // Necesario para ngModel
 import { ToastrService } from 'ngx-toastr'; // <--- Usamos ToastrService para alertas
 
-// --- CAMBIOS CLAVE AQUÍ ---
-// Ruta corregida para AuthService y añade la importación de la interfaz de payload
-import { AuthService } from '../../../core/auth/auth'; // Asegúrate de que esta es la ruta correcta a auth.service.ts
+// --- Importaciones corregidas ---
+import { AuthService } from '../../../core/auth/auth'; // Ruta corregida a auth.service.ts
 import { IRegisterUserPayload } from '../../../core/auth/auth.interface'; // Importa la interfaz del payload
-// --- FIN CAMBIOS CLAVE ---
+// --- Fin Importaciones corregidas ---
 
 @Component({
   selector: 'app-register',
@@ -25,7 +24,7 @@ export class RegisterComponent implements OnInit {
   telefono = '';
   nombre = '';
   apellido = '';
-  rolName = 'cliente'; // <--- Por defecto, los registros públicos son para clientes.
+  rolName = 'cliente'; // Por defecto, los registros públicos son para clientes.
 
   // --- ELIMINADAS: errorMessage y isSuccessful ya no son necesarias aquí, Toastr las maneja. ---
   // errorMessage = '';
@@ -65,7 +64,7 @@ export class RegisterComponent implements OnInit {
     // --- CAMBIO CLAVE: Construir el payload de registro según IRegisterUserPayload ---
     const registerPayload: IRegisterUserPayload = {
       username: this.username,
-      passwordHash: this.password, // Mapea password del formulario a passwordHash para el payload
+      password: this.password, // <--- Ahora coincide con la interfaz IRegisterUserPayload y el backend
       email: this.email,
       telefono: this.telefono || null, // Asegura que sea null si está vacío
       rolName: this.rolName,
@@ -81,8 +80,8 @@ export class RegisterComponent implements OnInit {
       numeroLicenciaRepartidor: null
     };
 
-    // Llama al método register del AuthService con el objeto payload
-    this.authService.register(registerPayload).subscribe({ // <--- Pasa el objeto payload completo
+    // Llama al método register del AuthService con el objeto payload completo
+    this.authService.register(registerPayload).subscribe({
       next: data => {
         console.log('Registro exitoso:', data);
         this.toastr.success('Tu cuenta ha sido creada. Ahora puedes iniciar sesión.', '¡Registro Exitoso!'); // <--- Usando Toastr
