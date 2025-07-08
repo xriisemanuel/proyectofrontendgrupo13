@@ -218,5 +218,11 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['cliente'] } // Solo los clientes pueden ver sus pedidos
   },
+  {
+    path: 'client/profile/edit', // <-- Nueva ruta para editar perfil
+    loadComponent: () => import('./features/cliente/client-profile-edit/client-profile-edit').then(m => m.ClientProfileEditComponent), // Asegúrate de que el componente esté correctamente importado
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['cliente', 'admin'] } // Permite que un admin también pueda editar perfiles de cliente si es necesario
+  },
   { path: '**', redirectTo: 'home' }
 ];
