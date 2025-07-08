@@ -2,18 +2,18 @@
 
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms'; // Importa ReactiveFormsModule
-import { Router, RouterLink } from '@angular/router'; // Importa RouterLink
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 
 import { IRol } from '../../../shared/interfaces';
-import { RolService } from '../../../data/services/role';
+import { RolService } from '../../../data/services/role'; // Asegúrate de que esta ruta sea correcta
 
 @Component({
   selector: 'app-add-role',
-  imports: [ReactiveFormsModule, CommonModule, RouterLink], // <--- ¡Asegurado aquí!
+  imports: [ReactiveFormsModule, CommonModule, RouterLink],
   templateUrl: './add-role.html',
   styleUrl: './add-role.css',
   standalone: true
@@ -22,12 +22,14 @@ import { RolService } from '../../../data/services/role';
 export class AddRole implements OnInit, OnDestroy {
   roleForm: FormGroup;
   isSaving: boolean = false;
+  errorMessage: string | null = null; // Añadido para mensajes de error en el HTML
+  successMessage: string | null = null; // Añadido para mensajes de éxito en el HTML
 
   private destroy$ = new Subject<void>();
 
   constructor(
-    private fb: FormBuilder, // Inyección de FormBuilder
-    private router: Router, // Inyección de Router
+    private fb: FormBuilder,
+    private router: Router,
     private rolService: RolService,
     private toastr: ToastrService
   ) {
@@ -45,6 +47,10 @@ export class AddRole implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
+    // Limpiar mensajes anteriores al intentar guardar
+    this.errorMessage = null;
+    this.successMessage = null;
+
     if (this.roleForm.valid) {
       this.isSaving = true;
       const newRoleData: Partial<IRol> = this.roleForm.value;
@@ -53,8 +59,8 @@ export class AddRole implements OnInit, OnDestroy {
 
       this.rolService.createRole(newRoleData).pipe(takeUntil(this.destroy$)).subscribe({
         next: (response) => {
-          const successMsg = response.mensaje || 'Rol creado exitosamente!';
-          this.toastr.success(successMsg, '¡Éxito!');
+          this.successMessage = response.mensaje || 'Rol creado exitosamente!';
+          this.toastr.success('¡Éxito!');
           this.roleForm.reset({ nombre: '', estado: true });
           console.log('Respuesta del backend:', response);
           this.isSaving = false;
@@ -64,8 +70,8 @@ export class AddRole implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al crear el rol:', err);
-          const errorMsg = err.error?.mensaje || 'Error al crear el rol. Por favor, intente de nuevo.';
-          this.toastr.error(errorMsg, 'Error');
+          this.errorMessage = err.error?.mensaje || 'Error al crear el rol. Por favor, intente de nuevo.';
+          this.toastr.error('Error');
           this.isSaving = false;
         }
       });
@@ -73,6 +79,7 @@ export class AddRole implements OnInit, OnDestroy {
     } else {
       this.toastr.warning('Por favor, complete todos los campos requeridos y válidos.', 'Validación');
       this.roleForm.markAllAsTouched();
+      this.isSaving = false; // Asegurarse de que isSaving se resetee si el formulario es inválido
     }
   }
 

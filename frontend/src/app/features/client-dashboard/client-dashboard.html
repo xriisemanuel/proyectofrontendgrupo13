@@ -1,20 +1,75 @@
 <!-- src/app/components/client-dashboard/client-dashboard.component.html -->
 <div class="client-dashboard-container">
-  <h1>Bienvenido, {{ usuario?.nombre || 'Cliente' }}!</h1>
+  <div class="dashboard-header">
+    <h1>Bienvenido, {{ usuario?.nombre || 'Cliente' }}!</h1>
+    <button (click)="onLogout()" class="btn-logout">
+      <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+    </button>
+  </div>
   <p class="dashboard-intro">Aquí puedes gestionar tu cuenta y tus pedidos.</p>
 
   <div *ngIf="isLoading" class="loading-message">
     <i class="fas fa-spinner fa-spin"></i> Cargando tu información...
   </div>
 
-  <div *ngIf="errorMessage" class="error-message">
+  <div *ngIf="errorMessage" class="message-panel error-message">
     <i class="fas fa-exclamation-triangle"></i> {{ errorMessage }}
   </div>
 
   <div *ngIf="!isLoading && !errorMessage && cliente && usuario" class="dashboard-content">
-    
+    <!-- Sección de Categorías -->
+    <section class="content-section categories-section" *ngIf="categories.length > 0">
+      <div class="section-header">
+        <h2>Explorar Categorías</h2>
+        <p>Encuentra tus favoritos con nuestras colecciones exclusivas.</p>
+      </div>
+      <div class="categories-grid">
+        <div class="category-card app-interactive-card" *ngFor="let category of categories">
+          <div class="card-image-container">
+            <img [src]="getCategoryImageUrl(category)" alt="{{ category.nombre }}" class="category-card-image">
+          </div>
+          <div class="card-content">
+            <h3 class="category-card-title">{{ category.nombre }}</h3>
+            <p class="category-card-description">{{ category.descripcion | slice:0:100 }}...</p>
+            <button class="btn-view-category" [routerLink]="['/client/categories', category._id]">Ver Categoría</button>
+          </div>
+        </div>
+      </div>
+      <div class="text-center mt-4">
+        <button class="btn-outline-primary-custom app-interactive-card" [routerLink]="['/client/categories']">Ver Todas
+          las Categorías</button>
+      </div>
+    </section>
+
+    <!-- Sección de Productos Destacados -->
+    <section class="content-section products-section" *ngIf="products.length > 0">
+      <div class="section-header">
+        <h2>Productos Destacados</h2>
+        <p>Nuestras selecciones más populares y recién llegadas.</p>
+      </div>
+      <div class="products-grid">
+        <div class="product-card app-interactive-card" *ngFor="let product of products">
+          <div class="card-image-container">
+            <img [src]="getProductImageUrl(product)" alt="{{ product.nombre }}" class="product-card-image">
+          </div>
+          <div class="product-card-body">
+            <h3 class="product-card-title">{{ product.nombre }}</h3>
+            <p class="product-card-description">{{ product.descripcion | slice:0:70 }}...</p>
+            <div class="product-card-price">{{ product.precio | currency:'USD':'symbol':'1.2-2' }}</div>
+            <button class="btn-buy" (click)="comprarProducto(product)">
+              <i class="fas fa-shopping-cart"></i> Comprar
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="text-center mt-4">
+        <button class="btn-outline-primary-custom app-interactive-card" [routerLink]="['/client/products']">Ver Todos
+          los Productos</button>
+      </div>
+    </section>
+
     <!-- Sección de Resumen Personal -->
-    <div class="dashboard-section personal-info-card">
+    <div class="dashboard-section personal-info-card app-interactive-card">
       <h3>Tu Perfil</h3>
       <div class="info-grid">
         <div class="info-item">
@@ -33,17 +88,19 @@
           <strong>Dirección Principal:</strong> <span>{{ cliente.direccion || 'No especificada' }}</span>
         </div>
         <div class="info-item">
-          <strong>Fecha Nacimiento:</strong> <span>{{ cliente.fechaNacimiento ? (cliente.fechaNacimiento | date:'dd/MM/yyyy') : 'No especificada' }}</span>
+          <strong>Fecha Nacimiento:</strong> <span>{{ cliente.fechaNacimiento ? (cliente.fechaNacimiento |
+            date:'dd/MM/yyyy') : 'No especificada' }}</span>
         </div>
         <div class="info-item">
-          <strong>Preferencias Alimentarias:</strong> 
-          <span>{{ cliente.preferenciasAlimentarias?.length ? cliente.preferenciasAlimentarias?.join(', ') : 'Ninguna' }}</span>
+          <strong>Preferencias Alimentarias:</strong>
+          <span>{{ cliente.preferenciasAlimentarias?.length ? cliente.preferenciasAlimentarias?.join(', ') : 'Ninguna'
+            }}</span>
         </div>
         <div class="info-item">
           <strong>Puntos de Lealtad:</strong> <span class="points-value">{{ cliente.puntos || 0 }}</span>
         </div>
       </div>
-      <button class="btn btn-primary edit-profile-btn" [routerLink]="['/client/profile/edit']">
+      <button class="btn-edit-profile app-interactive-card" (click)="goToEditProfile()">
         <i class="fas fa-user-edit"></i> Editar Perfil
       </button>
     </div>
@@ -52,37 +109,34 @@
     <div class="dashboard-section quick-actions-grid">
       <h3>Acciones Rápidas</h3>
       <div class="action-cards">
-        <a routerLink="/mis-pedidos" class="action-card">
+        <a (click)="goToMisPedidos()" class="action-card app-interactive-card">
           <i class="fas fa-clipboard-list"></i>
           <h4>Mis Pedidos</h4>
           <p>Revisa el estado de tus pedidos y tu historial.</p>
         </a>
-        <a routerLink="/calificaciones" class="action-card">
+        <a (click)="goToCalificaciones()" class="action-card app-interactive-card">
           <i class="fas fa-star"></i>
           <h4>Calificar Pedidos</h4>
           <p>Comparte tu experiencia y califica tus pedidos.</p>
         </a>
-        <a routerLink="/ofertas" class="action-card">
+        <a routerLink="/client/ofertas" class="action-card app-interactive-card">
           <i class="fas fa-tags"></i>
           <h4>Ver Ofertas</h4>
           <p>Descubre las últimas promociones y descuentos.</p>
         </a>
-        <a routerLink="/" class="action-card">
+        <a routerLink="/client/combos" class="action-card app-interactive-card">
           <i class="fas fa-box-open"></i>
           <h4>Explorar Combos</h4>
           <p>Encuentra combinaciones especiales a mejor precio.</p>
         </a>
       </div>
     </div>
-
-    <!-- Puedes añadir más secciones aquí, como: -->
-    <!-- Historial de Notificaciones, Métodos de Pago, etc. -->
-
   </div>
 
   <!-- Mensaje si no se pudo cargar el cliente o no es cliente -->
   <div *ngIf="!isLoading && errorMessage" class="unauthorized-message">
     <p>{{ errorMessage }}</p>
     <p>Por favor, asegúrate de haber iniciado sesión con una cuenta de cliente.</p>
+    <button class="btn-go-to-login" [routerLink]="['/login']">Ir a Iniciar Sesión</button>
   </div>
 </div>

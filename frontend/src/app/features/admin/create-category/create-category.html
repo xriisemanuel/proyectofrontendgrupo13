@@ -1,47 +1,89 @@
-<!-- src/app/features/admin/create-category/create-category.html -->
-
 <div class="create-category-container">
-    <h2>Crear Nueva Categoría</h2>
-    <p>Define una nueva categoría para organizar los productos en el sistema.</p>
+    <div class="header-section">
+        <h2><i class="fas fa-plus-circle"></i> Crear Nueva Categoría</h2>
+        <p>Define una nueva categoría para organizar los productos en el sistema.</p>
+    </div>
 
-    <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
-        <div class="form-group">
-            <label for="nombre">Nombre de la Categoría:</label>
-            <input id="nombre" type="text" formControlName="nombre" placeholder="Ej: Pizzas, Bebidas, Postres">
-            <div *ngIf="f['nombre'].invalid && (f['nombre'].dirty || f['nombre'].touched)" class="validation-error">
-                <div *ngIf="f['nombre'].errors?.['required']">El nombre de la categoría es requerido.</div>
-                <div *ngIf="f['nombre'].errors?.['minlength']">El nombre debe tener al menos 3 caracteres.</div>
+    <div *ngIf="isSaving" class="loading-indicator">
+        <i class="fas fa-spinner fa-spin"></i> Guardando categoría...
+    </div>
+    <div *ngIf="errorMessage" class="message-panel error-message">
+        <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+    </div>
+    <div *ngIf="successMessage" class="message-panel success-message">
+        <i class="fas fa-check-circle"></i> {{ successMessage }}
+    </div>
+
+    <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()" class="category-form interactive-card">
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="nombre">Nombre de la Categoría:</label>
+                <input id="nombre" type="text" formControlName="nombre" placeholder="Ej: Pizzas, Bebidas, Postres">
+                <div *ngIf="f['nombre'].invalid && (f['nombre'].dirty || f['nombre'].touched)" class="validation-error">
+                    <div *ngIf="f['nombre'].errors?.['required']">El nombre de la categoría es requerido.</div>
+                    <div *ngIf="f['nombre'].errors?.['minlength']">El nombre debe tener al menos 3 caracteres.</div>
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            <label for="descripcion">Descripción:</label>
-            <textarea id="descripcion" formControlName="descripcion" rows="3"
-                placeholder="Una breve descripción de la categoría..."></textarea>
-        </div>
+            <div class="form-group">
+                <label for="descripcion">Descripción:</label>
+                <textarea id="descripcion" formControlName="descripcion" rows="3"
+                    placeholder="Una breve descripción de la categoría..."></textarea>
+            </div>
 
-        <div class="form-group">
-            <label for="estado">Estado:</label>
-            <select id="estado" formControlName="estado">
-                <option [ngValue]="true">Activo</option>
-                <option [ngValue]="false">Inactivo</option>
-            </select>
-            <div *ngIf="f['estado'].invalid && (f['estado'].dirty || f['estado'].touched)" class="validation-error">
-                <div *ngIf="f['estado'].errors?.['required']">El estado es requerido.</div>
+            <div class="form-group">
+                <label for="imagenPrompt">Generar Imagen (Descripción):</label>
+                <input id="imagenPrompt" type="text" formControlName="imagenPrompt"
+                    placeholder="Ej: Plato de pizza con queso derretido">
+                <button type="button" class="btn-generate-image" (click)="buscarImagen()">
+                    <i class="fas fa-image"></i> Buscar Imagen
+                </button>
+
+                <div *ngIf="isSearchingImage" class="image-loading">
+                    <i class="fas fa-spinner fa-spin"></i> Buscando imagen...
+                </div>
+
+                <div *ngIf="generatedImageUrl" class="image-preview-area">
+                    <label>Imagen Generada:</label>
+                    <img [src]="generatedImageUrl" alt="Imagen de categoría generada" class="generated-image-preview">
+                    <button type="button" class="btn-use-generated" (click)="usarImagenGenerada()">
+                        <i class="fas fa-check-circle"></i> Usar esta Imagen
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="imagen">URL de la Imagen:</label>
+                <input id="imagen" type="url" formControlName="imagen"
+                    placeholder="Ej: https://ejemplo.com/categoria.png">
+                <div *ngIf="f['imagen'].invalid && (f['imagen'].dirty || f['imagen'].touched)" class="validation-error">
+                    <div *ngIf="f['imagen'].errors?.['pattern']">Por favor, introduce una URL de imagen válida.</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="estado">Estado:</label>
+                <select id="estado" formControlName="estado">
+                    <option [ngValue]="true">Activo</option>
+                    <option [ngValue]="false">Inactivo</option>
+                </select>
+                <div *ngIf="f['estado'].invalid && (f['estado'].dirty || f['estado'].touched)" class="validation-error">
+                    <div *ngIf="f['estado'].errors?.['required']">El estado es requerido.</div>
+                </div>
             </div>
         </div>
 
         <div class="form-actions">
-            <button type="submit" [disabled]="categoryForm.invalid || isSaving" class="btn btn-primary">
+            <button type="submit" [disabled]="categoryForm.invalid || isSaving" class="btn-save-changes">
                 <i class="fas fa-plus-circle"></i> {{ isSaving ? 'Creando...' : 'Crear Categoría' }}
             </button>
-            <a routerLink="/admin/dashboard" class="btn btn-secondary">
+            <button type="button" routerLink="/admin/categories" class="btn-cancel">
                 <i class="fas fa-times-circle"></i> Cancelar
-            </a>
+            </button>
         </div>
     </form>
 
     <div class="back-link">
-        <a routerLink="/admin/dashboard"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+        <a routerLink="/admin/categories"><i class="fas fa-arrow-left"></i> Volver a Gestión de Categorías</a>
     </div>
 </div>

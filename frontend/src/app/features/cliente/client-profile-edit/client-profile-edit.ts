@@ -135,6 +135,6 @@ export class ClientProfileEditComponent implements OnInit {
 
   // Método para volver al dashboard
   goBackToDashboard(): void {
-    this.router.navigate(['/client/dashboard']);
+    this.router.navigate(['cliente/dashboard']);
   }
 }

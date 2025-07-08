@@ -12,54 +12,53 @@
   <div *ngIf="loading" class="loading-message">
     <i class="fas fa-spinner fa-spin"></i> Cargando categorías...
   </div>
-  <div *ngIf="errorMessage" class="error-message">
+  <div *ngIf="errorMessage" class="message-panel error-message">
     <i class="fas fa-exclamation-triangle"></i> {{ errorMessage }}
+  </div>
+  <div *ngIf="successMessage" class="message-panel success-message">
+    <i class="fas fa-check-circle"></i> {{ successMessage }}
   </div>
 
   <div *ngIf="!loading && categorias.length === 0" class="no-data-message">
-    <i class="fas fa-info-circle"></i> No hay categorías registradas. ¡Crea una nueva!
+    <p><i class="fas fa-info-circle"></i> No hay categorías registradas. ¡Crea una nueva!</p>
   </div>
 
-  <div *ngIf="!loading && categorias.length > 0" class="categories-table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Descripción</th>
-          <th>Imagen</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let categoria of categorias">
-          <td>{{ categoria.nombre }}</td>
-          <td>{{ categoria.descripcion || 'Sin descripción' }}</td>
-          <td>
-            <img [src]="categoria.imagen || 'https://via.placeholder.com/50'" alt="Imagen de Categoría" class="category-image">
-          </td>
-          <td>
-            <span [ngClass]="{'status-active': categoria.estado, 'status-inactive': !categoria.estado}">
-              {{ categoria.estado ? 'Activa' : 'Inactiva' }}
-            </span>
-          </td>
-          <td class="actions-cell">
-            <button class="action-button edit-button" title="Editar Categoría" (click)="editCategory(categoria._id!)">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button
-              class="action-button toggle-status-button"
-              [ngClass]="{'toggle-active': !categoria.estado, 'toggle-inactive': categoria.estado}"
-              [title]="categoria.estado ? 'Desactivar Categoría' : 'Activar Categoría'"
-              (click)="toggleCategoryStatus(categoria)">
-              <i class="fas" [ngClass]="{'fa-toggle-on': categoria.estado, 'fa-toggle-off': !categoria.estado}"></i>
-            </button>
-            <button class="action-button delete-button" title="Eliminar Categoría" (click)="deleteCategory(categoria._id!, categoria.nombre)">
-              <i class="fas fa-trash-alt"></i>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div *ngIf="!loading && categorias.length > 0" class="categories-grid">
+    <div *ngFor="let categoria of categorias" class="category-card interactive-card">
+      <div class="card-image-container">
+        <img [src]="categoria.imagen || 'https://placehold.co/150x100/172A45/CCD6F6?text=No+Image'"
+          alt="Imagen de Categoría" class="category-image">
+      </div>
+      <div class="card-content">
+        <h3>{{ categoria.nombre }}</h3>
+        <p class="description">{{ categoria.descripcion || 'Sin descripción' }}</p>
+        <div class="status-indicator">
+          <span [ngClass]="{'status-active': categoria.estado, 'status-inactive': !categoria.estado}">
+            {{ categoria.estado ? 'Activa' : 'Inactiva' }}
+          </span>
+        </div>
+      </div>
+      <div class="card-actions">
+        <button class="action-button btn-edit" title="Editar Categoría" (click)="editCategory(categoria._id!)">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="action-button btn-toggle-status"
+          [ngClass]="{'toggle-active': !categoria.estado, 'toggle-inactive': categoria.estado}"
+          [title]="categoria.estado ? 'Desactivar Categoría' : 'Activar Categoría'"
+          (click)="toggleCategoryStatus(categoria)">
+          <i class="fas" [ngClass]="{'fa-toggle-on': categoria.estado, 'fa-toggle-off': !categoria.estado}"></i>
+        </button>
+        <button class="action-button btn-delete" title="Eliminar Categoría"
+          (click)="deleteCategory(categoria._id!, categoria.nombre)">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="back-link-container">
+    <a routerLink="/admin/dashboard" class="back-to-menu-button">
+      <i class="fas fa-arrow-left"></i> Volver al Dashboard
+    </a>
   </div>
 </div>

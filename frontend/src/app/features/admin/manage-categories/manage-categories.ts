@@ -2,9 +2,9 @@
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, Router } from '@angular/router'; // Importa Router
+import { RouterLink, Router } from '@angular/router';
 import { CategoriaService } from '../../../data/services/categoria';
-import { ICategoria } from '../../../shared/interfaces'; // Asegúrate de que la ruta es correcta
+import { ICategoria } from '../../../shared/interfaces';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
@@ -24,12 +24,13 @@ export class ManageCategories implements OnInit {
   categorias: ICategoria[] = [];
   loading = false;
   errorMessage: string | null = null;
+  successMessage: string | null = null;
 
   constructor(
     private categoriaService: CategoriaService,
     private toastr: ToastrService,
     private confirmDialogService: ConfirmDialogService,
-    private router: Router // Inyecta Router
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -39,6 +40,7 @@ export class ManageCategories implements OnInit {
   loadCategorias(): void {
     this.loading = true;
     this.errorMessage = null;
+    this.successMessage = null;
     this.categoriaService.getCategorias().pipe(
       catchError(error => {
         this.errorMessage = 'Error al cargar las categorías: ' + (error.message || 'Error desconocido');
@@ -69,7 +71,8 @@ export class ManageCategories implements OnInit {
             finalize(() => this.loading = false)
           ).subscribe(response => {
             if (response) {
-              this.toastr.success('Categoría eliminada exitosamente.', 'Eliminación Exitosa');
+              this.successMessage = 'Categoría eliminada exitosamente.';
+              this.toastr.success(this.successMessage, 'Eliminación Exitosa');
               this.loadCategorias(); // Recargar la lista de categorías
             }
           });
@@ -87,11 +90,10 @@ export class ManageCategories implements OnInit {
     const action = category.estado ? 'desactivar' : 'activar';
     let serviceCall;
 
-    // Corrección aquí: Usar category._id! para asegurar que no es undefined
     if (category.estado) {
-      serviceCall = this.categoriaService.desactivarCategoria(category._id!);
+      serviceCall = this.categoriaService.desactivarCategoria(category._id);
     } else {
-      serviceCall = this.categoriaService.activarCategoria(category._id!);
+      serviceCall = this.categoriaService.activarCategoria(category._id);
     }
 
     serviceCall.pipe(
@@ -103,8 +105,8 @@ export class ManageCategories implements OnInit {
       finalize(() => this.loading = false)
     ).subscribe(response => {
       if (response) {
-        this.toastr.success(`Categoría ${category.estado ? 'desactivada' : 'activada'} exitosamente.`, 'Estado Actualizado');
-        // Actualizar el estado en el objeto local para reflejar el cambio sin recargar todo
+        this.successMessage = `Categoría ${category.estado ? 'desactivada' : 'activada'} exitosamente.`;
+        this.toastr.success(this.successMessage, 'Estado Actualizado');
         category.estado = !category.estado;
       }
     });

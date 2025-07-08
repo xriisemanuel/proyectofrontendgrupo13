@@ -31,6 +31,10 @@ export const routes: Routes = [
     // ELIMINADO: canActivate: [authRedirectGuard]
     // ELIMINADO: data: { roles: ['admin', 'cliente'] }
   },
+  {
+    path: 'cliente/register',
+    loadComponent: () => import('./features/auth/register/register').then(m => m.RegisterComponent),
+  },
 
   // Rutas protegidas por AuthGuard y RoleGuard
 

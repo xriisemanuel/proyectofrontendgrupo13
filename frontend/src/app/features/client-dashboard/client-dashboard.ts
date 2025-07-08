@@ -1,10 +1,18 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { AuthService } from '../../core/auth/auth';
+import { RouterLink, Router } from '@angular/router'; // Importa Router
+import { AuthService } from '../../core/auth/auth'; // Asegúrate de que la ruta sea correcta
 import { ICliente, IUsuario } from '../../shared/interfaces'; // Importa ICliente y IUsuario
 import { Subscription } from 'rxjs';
 import { ClienteService } from '../../data/services/cliente'; // Asegúrate de que la ruta sea correcta
+import { Observable, forkJoin, of } from 'rxjs';
+import { take, tap, catchError, finalize } from 'rxjs/operators';
+
+// Importa tus modelos y servicios
+import { ProductoService } from '../../data/services/producto'; // Tu servicio de productos
+import { CategoriaService } from '../../data/services/categoria'; // Tu servicio de categorías
+import { IProducto, ICategoria } from '../../shared/interfaces'; // Tus modelos de producto y categoría
+
 @Component({
   selector: 'app-client-dashboard',
   standalone: true,
@@ -18,12 +26,21 @@ export class ClientDashboard implements OnInit, OnDestroy {
   isLoading: boolean = true;
   errorMessage: string = '';
 
+  products: IProducto[] = []; // Para almacenar productos destacados
+  categories: ICategoria[] = []; // Para almacenar categorías
+
   private authService = inject(AuthService);
   private clienteService = inject(ClienteService);
+  private productoService = inject(ProductoService); // Inyecta ProductoService
+  private categoriaService = inject(CategoriaService); // Inyecta CategoriaService
+  private router = inject(Router); // Inyecta Router
+
   private subscriptions: Subscription[] = [];
 
   ngOnInit(): void {
     this.loadClientData();
+    this.loadProducts();
+    this.loadCategories();
   }
 
   ngOnDestroy(): void {
@@ -36,7 +53,7 @@ export class ClientDashboard implements OnInit, OnDestroy {
     this.cliente = null;
     this.usuario = null;
 
-    const loggedInUserId = this.authService.getLoggedInUserId(); // Obtiene el ID del usuario logueado
+    const loggedInUserId = this.authService.getLoggedInUserId();
     const userRole = this.authService.getRole();
 
     console.log('ClientDashboard DEBUG: Usuario logueado ID:', loggedInUserId);
@@ -49,43 +66,102 @@ export class ClientDashboard implements OnInit, OnDestroy {
       return;
     }
 
-    // Usar el nuevo método para obtener el perfil de cliente por el ID del usuario
     this.subscriptions.push(
-      this.clienteService.getClienteByUsuarioId(loggedInUserId).subscribe({
-        next: (data) => {
+      this.clienteService.getClienteByUsuarioId(loggedInUserId).pipe(
+        tap(data => {
           this.cliente = data;
-          this.usuario = data.usuarioId; // usuarioId ya está poblado como IUsuario en la respuesta del backend
-          this.isLoading = false;
+          this.usuario = data.usuarioId;
           console.log('ClientDashboard: Datos del cliente cargados:', this.cliente);
-        },
-        error: (err) => {
+        }),
+        catchError(err => {
           console.error('ClientDashboard: Error al cargar datos del cliente:', err);
           this.errorMessage = err.error?.mensaje || 'Error al cargar tu perfil de cliente. Asegúrate de que tu perfil de cliente exista.';
-          this.isLoading = false;
-        }
-      })
+          return of(null); // Retorna un observable nulo para que la cadena no se rompa
+        }),
+        finalize(() => {
+          // Si hay un error en la carga del cliente, isLoading ya se habrá puesto en false
+          // Si no hubo error, se pone en false aquí.
+          if (!this.errorMessage) {
+            this.isLoading = false;
+          }
+        })
+      ).subscribe()
     );
+  }
+
+  loadProducts(): void {
+    // Puedes ajustar el número de productos a cargar o añadir filtros
+    this.productoService.getProducts().pipe(
+      take(1), // Solo toma la primera emisión
+      tap(products => {
+        this.products = products.filter(p => p.disponible && p.stock > 0).slice(0, 8); // Mostrar algunos productos disponibles
+        console.log('Productos cargados:', this.products.length);
+      }),
+      catchError(err => {
+        console.error('Error al cargar productos:', err);
+        // this.errorMessage = 'Error al cargar productos destacados.'; // Podrías añadir un mensaje específico
+        return of([]);
+      })
+    ).subscribe();
+  }
+
+  loadCategories(): void {
+    // Puedes ajustar el número de categorías a cargar o añadir filtros
+    this.categoriaService.getCategorias(true).pipe( // Cargar solo categorías activas
+      take(1),
+      tap(categories => {
+        this.categories = categories.slice(0, 6); // Mostrar algunas categorías
+        console.log('Categorías cargadas:', this.categories.length);
+      }),
+      catchError(err => {
+        console.error('Error al cargar categorías:', err);
+        // this.errorMessage = 'Error al cargar categorías.'; // Podrías añadir un mensaje específico
+        return of([]);
+      })
+    ).subscribe();
+  }
+
+  getProductImageUrl(product: IProducto): string {
+    // Asegúrate de que 'product.imagen' sea una cadena o un array de cadenas y tenga al menos un elemento
+    if (product.imagen && typeof product.imagen === 'string' && product.imagen.trim() !== '') {
+      return product.imagen;
+    }
+    // Si 'product.imagen' es un array (como en tu interfaz ICategoria), puedes adaptarlo así:
+    // if (Array.isArray(product.imagen) && product.imagen.length > 0 && typeof product.imagen[0] === 'string') {
+    //   return product.imagen[0];
+    // }
+    // Ruta de la imagen por defecto si no hay imagen
+    return 'https://placehold.co/300x200/172A45/CCD6F6?text=Producto';
+  }
+
+  getCategoryImageUrl(category: ICategoria): string {
+    // Asegúrate de que 'category.imagen' sea una cadena o un array de cadenas y tenga al menos un elemento
+    if (category.imagen && typeof category.imagen === 'string' && category.imagen.trim() !== '') {
+      return category.imagen;
+    }
+    // Ruta de la imagen por defecto si no hay imagen
+    return 'https://placehold.co/300x200/172A45/CCD6F6?text=Categoría';
+  }
+
+  comprarProducto(product: IProducto): void {
+    console.log('Comprar producto:', product.nombre);
+    this.router.navigate(['/client/realizar-pedido'], { queryParams: { productId: product._id, quantity: 1 } });
   }
 
   // Métodos de navegación a otras partes del dashboard
   goToCalificaciones(): void {
-    // Aquí puedes usar el Router directamente si no tienes un método navigateTo en AuthService
-    // O si lo tienes, asegúrate de que esté inyectado y funcione.
-    // import { Router } from '@angular/router';
-    // private router = inject(Router);
-    // this.router.navigate(['/calificaciones']);
-    window.location.href = '/calificaciones'; // Alternativa simple si Router no está funcionando bien
+    this.router.navigate(['/calificaciones']);
   }
 
   goToMisPedidos(): void {
-    window.location.href = '/mis-pedidos'; // Ruta que necesitarás definir
+    this.router.navigate(['/mis-pedidos']);
   }
 
   goToEditProfile(): void {
-    // Esto podría llevar a un formulario de edición de perfil de usuario o cliente
-    // Si tienes un formulario genérico para editar usuarios:
-    // window.location.href = `/admin/users/update/${this.usuario?._id}`; // Si el admin puede editar usuarios
-    // O una ruta específica para que el cliente edite su propio perfil:
-    window.location.href = `/perfil`; // Una ruta genérica para editar el perfil del usuario logueado
+    this.router.navigate(['/client/profile/edit']); // Ruta específica para editar el perfil del cliente
+  }
+  onLogout(): void {
+    this.authService.logout();
+    this.router.navigate(['/home']);
   }
 }

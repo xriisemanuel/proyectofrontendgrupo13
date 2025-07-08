@@ -3,283 +3,429 @@
 .manage-categories-container {
     font-family: 'Inter', sans-serif;
     padding: 30px;
-    max-width: 1000px;
-    margin: 40px auto;
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    color: #333;
-    text-align: center;
-}
-
-h2 {
-    font-size: 2.5em;
-    color: #2c3e50;
-    margin-bottom: 10px;
-    font-weight: 700;
-}
-
-p {
-    font-size: 1.1em;
-    color: #666;
-    margin-bottom: 30px;
-}
-
-.top-actions {
+    background-color: #0A192F;
+    /* Fondo oscuro principal */
+    min-height: 100vh;
+    color: #CCD6F6;
+    /* Texto claro */
     display: flex;
-    justify-content: flex-end;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    box-sizing: border-box;
+}
+
+.header-section {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.header-section h2 {
+    font-size: 3.2em;
+    color: #FFB56B;
+    /* Color de acento para categorías/productos */
+    font-weight: 800;
+    margin-bottom: 10px;
+    text-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    letter-spacing: -0.05em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.header-section h2 i {
+    font-size: 1.2em;
+}
+
+.header-section p {
+    font-size: 1.2em;
+    color: #8892B0;
     margin-bottom: 30px;
 }
 
-.create-category-btn {
-    background-color: #007bff;
-    /* Azul para crear */
-    color: white;
+/* Botón de Añadir Nueva Categoría */
+.actions-row {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.add-new-button {
+    background: linear-gradient(45deg, #64FFDA 0%, #34B399 100%);
+    color: #0A192F;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     padding: 12px 25px;
     font-size: 1.1em;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease-out;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     text-decoration: none;
+    /* Asegura que no tenga subrayado de enlace */
 }
 
-.create-category-btn:hover {
-    background-color: #0056b3;
-    transform: translateY(-2px);
+.add-new-button:hover {
+    background: linear-gradient(45deg, #34B399 0%, #64FFDA 100%);
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 8px 20px rgba(100, 255, 218, 0.4);
 }
 
-/* Mensajes de Carga y Vacío */
+
+/* Mensajes de estado (loading, error, success) */
 .loading-message,
+.message-panel,
 .no-data-message {
-    text-align: center;
     padding: 20px;
-    font-size: 1.1em;
-    border-radius: 8px;
-    margin-top: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-radius: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 800px;
 }
 
 .loading-message {
-    background-color: #e6f7ff;
-    color: #0056b3;
-    border: 1px solid #99d6ff;
+    background-color: rgba(100, 255, 218, 0.1);
+    color: #64FFDA;
+    border: 1px solid #64FFDA;
+}
+
+.loading-message i {
+    animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.error-message {
+    background-color: rgba(239, 71, 111, 0.2);
+    color: #EF476F;
+    border: 1px solid #EF476F;
+}
+
+.success-message {
+    background-color: rgba(80, 250, 123, 0.2);
+    color: #50FA7B;
+    border: 1px solid #50FA7B;
 }
 
 .no-data-message {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeeba;
+    background-color: rgba(136, 146, 176, 0.1);
+    color: #8892B0;
+    border: 1px solid #8892B0;
 }
 
-.no-data-message i,
-.loading-message i {
-    margin-right: 10px;
+.no-data-message i {
+    font-size: 1.5em;
 }
 
-/* Estilos de la Tabla de Categorías */
-.categories-table-container {
-    overflow-x: auto;
-    /* Permite scroll horizontal en pantallas pequeñas */
-    margin-top: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
-}
-
-table {
+/* Cuadrícula de Categorías (sustituye la tabla) */
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    min-width: 600px;
-    /* Asegura que la tabla no sea demasiado estrecha */
+    max-width: 1200px;
+    /* Ajusta según el diseño deseado */
 }
 
-thead {
-    background-color: #3498db;
-    /* Azul para el encabezado */
-    color: white;
-}
-
-th {
-    padding: 15px 20px;
-    text-align: left;
-    font-weight: 600;
-    font-size: 1em;
-    white-space: nowrap;
-}
-
-th:first-child {
-    border-top-left-radius: 10px;
-}
-
-th:last-child {
-    border-top-right-radius: 10px;
-}
-
-tbody tr {
-    background-color: #ffffff;
-    border-bottom: 1px solid #e0e0e0;
-    transition: background-color 0.2s ease;
-}
-
-tbody tr:last-child {
-    border-bottom: none;
-}
-
-tbody tr:hover {
-    background-color: #f0f8ff;
-}
-
-td {
-    padding: 15px 20px;
-    text-align: left;
-    vertical-align: middle;
-    color: #495057;
-    font-size: 0.95em;
-}
-
-td:last-child {
+.category-card {
+    background: #172A45;
+    /* Fondo de tarjeta oscuro */
+    padding: 25px;
+    border-radius: 25px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 320px;
+    /* Altura mínima para las tarjetas */
     text-align: center;
 }
 
-.actions-column {
-    white-space: nowrap;
+/* Base interactive-card style (replicated for consistency) */
+.interactive-card {
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        box-shadow 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        border-radius 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+    will-change: transform, box-shadow, border-radius;
+    perspective: 1000px;
 }
 
-.btn-edit,
-.btn-delete,
-.btn-toggle-active,
-.btn-toggle-inactive {
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 1.2em;
-    margin: 0 5px;
-    padding: 8px;
-    border-radius: 5px;
-    transition: all 0.3s ease;
+.interactive-card::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle at center, rgba(255, 181, 107, 0.2) 0%, transparent 70%);
+    /* Naranja de acento */
+    border-radius: 50%;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    transition: width 0.7s ease-out, height 0.7s ease-out, opacity 0.7s ease-out;
+    z-index: 0;
+    pointer-events: none;
 }
 
-.btn-edit {
-    color: #007bff;
+.interactive-card:hover {
+    transform: scale(1.02) translateY(-8px);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 181, 107, 0.4);
+    border-radius: 28px;
 }
 
-.btn-edit:hover {
-    background-color: #007bff20;
-    color: #0056b3;
+.interactive-card:hover::before {
+    width: 250%;
+    height: 250%;
+    opacity: 1;
 }
 
-.btn-delete {
-    color: #dc3545;
+.interactive-card>*:not(::before) {
+    position: relative;
+    z-index: 1;
+    transition: color 0.3s ease-out, transform 0.3s ease-out;
 }
 
-.btn-delete:hover {
-    background-color: #dc354520;
-    color: #b02a37;
+.card-image-container {
+    margin-bottom: 15px;
+    border-radius: 10px;
+    overflow: hidden;
+    width: 100%;
+    height: 150px;
+    /* Altura fija para las imágenes */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #0B2239;
+    /* Fondo para imágenes sin cargar */
 }
 
-/* Estilos para el botón de activar/desactivar */
-.btn-toggle-active {
-    color: #28a745;
-    /* Verde para activar (cuando está inactivo) */
+.category-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Asegura que la imagen cubra el área sin distorsionarse */
+    display: block;
 }
 
-.btn-toggle-active:hover {
-    background-color: #28a74520;
-    color: #218838;
+.card-content {
+    flex-grow: 1;
+    margin-bottom: 20px;
 }
 
-.btn-toggle-inactive {
-    color: #6c757d;
-    /* Gris para desactivar (cuando está activo) */
+.card-content h3 {
+    font-size: 1.8em;
+    color: #64FFDA;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-weight: 700;
+    border-bottom: 1px solid rgba(100, 255, 218, 0.2);
+    padding-bottom: 8px;
 }
 
-.btn-toggle-inactive:hover {
-    background-color: #6c757d20;
-    color: #5a6268;
+.card-content .description {
+    font-size: 1em;
+    color: #E6E6E6;
+    margin-bottom: 15px;
 }
 
-/* Estilos para el estado de la categoría */
-.status-active {
-    color: #28a745;
-    /* Verde */
+.status-indicator {
+    font-size: 0.9em;
     font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+.status-active {
+    background-color: rgba(80, 250, 123, 0.2);
+    color: #50FA7B;
+    border: 1px solid #50FA7B;
 }
 
 .status-inactive {
-    color: #dc3545;
+    background-color: rgba(239, 71, 111, 0.2);
+    color: #EF476F;
+    border: 1px solid #EF476F;
+}
+
+.card-actions {
+    display: flex;
+    justify-content: center;
+    /* Centrar los botones */
+    gap: 10px;
+    margin-top: auto;
+    /* Empuja los botones hacia abajo */
+}
+
+.action-button {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 15px;
+    font-size: 1em;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    color: #0A192F;
+    /* Color de texto oscuro para todos los botones */
+}
+
+.action-button i {
+    font-size: 1.1em;
+}
+
+/* Estilos específicos para cada tipo de botón de acción */
+.btn-edit {
+    background: linear-gradient(45deg, #FFB56B 0%, #E08A22 100%);
+    /* Naranja */
+}
+
+.btn-edit:hover {
+    background: linear-gradient(45deg, #E08A22 0%, #FFB56B 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(255, 181, 107, 0.4);
+}
+
+.btn-toggle-status {
+    background: linear-gradient(45deg, #64FFDA 0%, #34B399 100%);
+    /* Cian/Verde */
+}
+
+.btn-toggle-status:hover {
+    background: linear-gradient(45deg, #34B399 0%, #64FFDA 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(100, 255, 218, 0.4);
+}
+
+.btn-delete {
+    background: linear-gradient(45deg, #EF476F 0%, #CC335C 100%);
     /* Rojo */
-    font-weight: 600;
 }
 
+.btn-delete:hover {
+    background: linear-gradient(45deg, #CC335C 0%, #EF476F 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(239, 71, 111, 0.4);
+}
 
-.back-link {
-    margin-top: 30px;
+/* Botón "Volver al menú" */
+.back-link-container {
+    margin-top: 40px;
     text-align: center;
+    width: 100%;
 }
 
-.back-link a {
-    color: #3498db;
-    text-decoration: none;
-    font-weight: 500;
+.back-to-menu-button {
+    background: linear-gradient(45deg, #8892B0 0%, #5C677D 100%);
+    /* Gris */
+    color: #0A192F;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease-out;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    transition: color 0.3s ease;
+    gap: 10px;
+    text-decoration: none;
 }
 
-.back-link a:hover {
-    color: #2980b9;
-    text-decoration: underline;
+.back-to-menu-button:hover {
+    background: linear-gradient(45deg, #5C677D 0%, #8892B0 100%);
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 8px 20px rgba(136, 146, 176, 0.4);
 }
 
 /* Media Queries para Responsividad */
 @media (max-width: 992px) {
-    .categories-table-container {
-        overflow-x: scroll;
+    .manage-categories-container {
+        padding: 25px;
+    }
+
+    .header-section h2 {
+        font-size: 2.8em;
+    }
+
+    .header-section p {
+        font-size: 1.1em;
+    }
+
+    .categories-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .category-card {
+        padding: 20px;
+        min-height: 300px;
     }
 }
 
 @media (max-width: 768px) {
     .manage-categories-container {
         padding: 20px;
-        margin: 20px auto;
+        gap: 20px;
     }
 
-    h2 {
-        font-size: 2em;
+    .header-section h2 {
+        font-size: 2.5em;
     }
 
-    p {
+    .header-section p {
         font-size: 1em;
     }
 
-    .top-actions {
-        justify-content: center;
+    .categories-grid {
+        grid-template-columns: 1fr;
+        /* Una columna en pantallas pequeñas */
     }
 
-    .create-category-btn {
+    .category-card {
+        min-height: auto;
+    }
+
+    .add-new-button,
+    .back-to-menu-button {
         width: 100%;
         justify-content: center;
-        padding: 10px 15px;
     }
 
-    th,
-    td {
-        padding: 10px 15px;
-        font-size: 0.9em;
+    .card-actions {
+        flex-wrap: wrap;
+        /* Permite que los botones se envuelvan en pantallas pequeñas */
     }
 
-    .btn-edit,
-    .btn-delete,
-    .btn-toggle-active,
-    .btn-toggle-inactive {
-        font-size: 1em;
-        padding: 6px;
+    .action-button {
+        width: 100%;
+        /* Ocupa todo el ancho disponible */
     }
 }
 
@@ -288,7 +434,20 @@ td:last-child {
         padding: 15px;
     }
 
-    h2 {
-        font-size: 1.8em;
+    .header-section h2 {
+        font-size: 2.2em;
+    }
+
+    .header-section p {
+        font-size: 0.9em;
+    }
+
+    .category-card h3 {
+        font-size: 1.6em;
+    }
+
+    .action-button {
+        font-size: 0.9em;
+        padding: 8px 12px;
     }
 }
