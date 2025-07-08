@@ -21,6 +21,13 @@ body {
   /* Color de texto principal claro */
 }
 
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
 /* Contenedor principal del formulario de login */
 .login-container {
   background: #1E293B;
