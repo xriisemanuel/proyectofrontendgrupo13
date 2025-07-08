@@ -1,1 +1,88 @@
-<p>client-dashboard works!</p>
+<!-- src/app/components/client-dashboard/client-dashboard.component.html -->
+<div class="client-dashboard-container">
+  <h1>Bienvenido, {{ usuario?.nombre || 'Cliente' }}!</h1>
+  <p class="dashboard-intro">Aquí puedes gestionar tu cuenta y tus pedidos.</p>
+
+  <div *ngIf="isLoading" class="loading-message">
+    <i class="fas fa-spinner fa-spin"></i> Cargando tu información...
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">
+    <i class="fas fa-exclamation-triangle"></i> {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!isLoading && !errorMessage && cliente && usuario" class="dashboard-content">
+    
+    <!-- Sección de Resumen Personal -->
+    <div class="dashboard-section personal-info-card">
+      <h3>Tu Perfil</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <strong>Usuario:</strong> <span>{{ usuario.username }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Email:</strong> <span>{{ usuario.email }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Nombre Completo:</strong> <span>{{ usuario.nombre }} {{ usuario.apellido }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Teléfono:</strong> <span>{{ usuario.telefono || 'N/A' }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Dirección Principal:</strong> <span>{{ cliente.direccion || 'No especificada' }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Fecha Nacimiento:</strong> <span>{{ cliente.fechaNacimiento ? (cliente.fechaNacimiento | date:'dd/MM/yyyy') : 'No especificada' }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Preferencias Alimentarias:</strong> 
+          <span>{{ cliente.preferenciasAlimentarias?.length ? cliente.preferenciasAlimentarias?.join(', ') : 'Ninguna' }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Puntos de Lealtad:</strong> <span class="points-value">{{ cliente.puntos || 0 }}</span>
+        </div>
+      </div>
+      <button class="btn btn-primary edit-profile-btn" (click)="goToEditProfile()">
+        <i class="fas fa-user-edit"></i> Editar Perfil
+      </button>
+    </div>
+
+    <!-- Sección de Acciones Rápidas -->
+    <div class="dashboard-section quick-actions-grid">
+      <h3>Acciones Rápidas</h3>
+      <div class="action-cards">
+        <a routerLink="/mis-pedidos" class="action-card">
+          <i class="fas fa-clipboard-list"></i>
+          <h4>Mis Pedidos</h4>
+          <p>Revisa el estado de tus pedidos y tu historial.</p>
+        </a>
+        <a routerLink="/calificaciones" class="action-card">
+          <i class="fas fa-star"></i>
+          <h4>Calificar Pedidos</h4>
+          <p>Comparte tu experiencia y califica tus pedidos.</p>
+        </a>
+        <a routerLink="/ofertas" class="action-card">
+          <i class="fas fa-tags"></i>
+          <h4>Ver Ofertas</h4>
+          <p>Descubre las últimas promociones y descuentos.</p>
+        </a>
+        <a routerLink="/combos" class="action-card">
+          <i class="fas fa-box-open"></i>
+          <h4>Explorar Combos</h4>
+          <p>Encuentra combinaciones especiales a mejor precio.</p>
+        </a>
+      </div>
+    </div>
+
+    <!-- Puedes añadir más secciones aquí, como: -->
+    <!-- Historial de Notificaciones, Métodos de Pago, etc. -->
+
+  </div>
+
+  <!-- Mensaje si no se pudo cargar el cliente o no es cliente -->
+  <div *ngIf="!isLoading && errorMessage" class="unauthorized-message">
+    <p>{{ errorMessage }}</p>
+    <p>Por favor, asegúrate de haber iniciado sesión con una cuenta de cliente.</p>
+  </div>
+</div>

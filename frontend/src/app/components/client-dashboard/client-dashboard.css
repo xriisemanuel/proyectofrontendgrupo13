@@ -1,0 +1,282 @@
+/* src/app/components/client-dashboard/client-dashboard.component.css */
+
+.client-dashboard-container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    font-family: 'Inter', sans-serif; /* Usando la variable de fuente si está en styles.css */
+    color: #333;
+    text-align: center;
+}
+
+h1 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 2.8em;
+    font-weight: 700;
+}
+
+.dashboard-intro {
+    color: #666;
+    margin-bottom: 40px;
+    font-size: 1.1em;
+}
+
+/* Mensajes de estado */
+.loading-message, .error-message, .unauthorized-message {
+    padding: 20px;
+    margin: 20px auto;
+    border-radius: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.loading-message {
+    background-color: #e9f7ef;
+    color: #28a745;
+    border: 1px solid #28a745;
+}
+
+.error-message {
+    background-color: #ffe0e6;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+}
+
+.unauthorized-message {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+/* Contenido del Dashboard */
+.dashboard-content {
+    display: grid;
+    grid-template-columns: 1fr; /* Por defecto una columna */
+    gap: 30px;
+}
+
+@media (min-width: 768px) {
+    .dashboard-content {
+        grid-template-columns: 1.5fr 1fr; /* Dos columnas: info personal más grande, acciones más pequeña */
+    }
+}
+
+.dashboard-section {
+    background-color: #f9f9f9;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e0e0e0;
+    text-align: left;
+}
+
+.dashboard-section h3 {
+    color: #34495e;
+    font-size: 1.8em;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #4CAF50; /* Color primario */
+    padding-bottom: 10px;
+    display: inline-block; /* Para que la línea se ajuste al texto */
+}
+
+/* Profile Picture Styles */
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.profile-picture {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #4CAF50;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px;
+}
+
+.profile-name {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+
+/* Info Personal Card */
+.personal-info-card .info-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+@media (min-width: 576px) {
+    .personal-info-card .info-grid {
+        grid-template-columns: 1fr 1fr; /* Dos columnas para campos de info */
+    }
+}
+
+.info-item {
+    font-size: 1em;
+    color: #555;
+}
+
+.info-item strong {
+    color: #2c3e50;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.points-value {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #FFC107; /* Color de acento para los puntos */
+}
+
+.edit-profile-btn {
+    background-color: #007bff; /* Azul para editar */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.edit-profile-btn:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+/* Quick Actions Grid */
+.quick-actions-grid .action-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.action-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    border-color: #4CAF50; /* Resaltar con color primario */
+}
+
+.action-card i {
+    font-size: 2.5em;
+    color: #4CAF50; /* Iconos con color primario */
+    margin-bottom: 15px;
+}
+
+.action-card h4 {
+    font-size: 1.2em;
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.action-card p {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 0;
+    flex-grow: 1;
+}
+
+/* Estilos para el nuevo botón de página principal */
+.action-card.action-home-page i {
+    color: #007bff; /* Un color diferente para el icono de inicio */
+}
+.action-card.action-home-page:hover {
+    border-color: #007bff;
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+    .client-dashboard-container {
+        padding: 20px;
+        margin: 20px auto;
+    }
+
+    h1 {
+        font-size: 2.2em;
+    }
+
+    .dashboard-intro {
+        font-size: 1em;
+    }
+
+    .dashboard-content {
+        grid-template-columns: 1fr; /* Una sola columna en móviles */
+    }
+
+    .dashboard-section h3 {
+        font-size: 1.5em;
+    }
+
+    .personal-info-card .info-grid {
+        grid-template-columns: 1fr; /* Una columna para info personal en móviles */
+    }
+
+    .action-card {
+        padding: 15px;
+    }
+
+    .action-card i {
+        font-size: 2em;
+    }
+
+    .action-card h4 {
+        font-size: 1.1em;
+    }
+}
+
+@media (max-width: 480px) {
+    .client-dashboard-container {
+        padding: 15px;
+        margin: 15px auto;
+    }
+
+    h1 {
+        font-size: 1.8em;
+    }
+
+    .dashboard-intro {
+        font-size: 0.9em;
+    }
+
+    .action-cards {
+        grid-template-columns: 1fr; /* Una sola columna para acciones en móviles pequeños */
+    }
+}

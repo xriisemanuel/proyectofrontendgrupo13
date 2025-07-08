@@ -1,12 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http'; // Importar HttpHeaders
 import { Observable } from 'rxjs';
-import { API_BASE_URL } from '../core/constants'; // Importa la URL base de tu API
+import { API_BASE_URL } from '../core/constants';
+import { AuthService } from './auth'; // Importar AuthService para obtener el token
 
-// --- Definiciones de Interfaces para un tipado estricto (si no las tienes ya en un archivo de tipos global) ---
-// Es buena práctica tener estas interfaces centralizadas, por ejemplo, en un archivo `src/app/shared/interfaces.ts`
-// y luego importarlas donde se necesiten. Por ahora, las incluimos aquí para que el servicio funcione.
-
+// --- Definiciones de Interfaces (mantenerlas aquí o centralizarlas si ya lo hiciste) ---
 export interface IRol {
   _id: string;
   nombre: string;
@@ -23,7 +21,7 @@ export interface IUsuario {
   apellido: string;
   rolId: IRol; // rolId DEBE ser del tipo IRol (el objeto poblado)
   estado: boolean;
-  clienteId?: string;
+  // clienteId?: string; // Esta propiedad no viene directamente en IUsuario del backend si no la poblas explícitamente en el endpoint de usuario
 }
 
 export interface ICliente {
@@ -37,7 +35,6 @@ export interface ICliente {
 // --- Fin de Definiciones de Interfaces ---
 
 
-// ¡CORRECCIÓN AQUÍ! La ruta base ahora es '/cliente' (singular)
 const CLIENTE_API = API_BASE_URL + '/cliente'; // URL base para la API de clientes
 
 @Injectable({
@@ -45,7 +42,15 @@ const CLIENTE_API = API_BASE_URL + '/cliente'; // URL base para la API de client
 })
 export class ClienteService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authService: AuthService) { } // Inyectar AuthService
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': token ? `Bearer ${token}` : ''
+    });
+  }
 
   /**
    * @description Obtiene la lista de todos los clientes.
@@ -53,17 +58,27 @@ export class ClienteService {
    * @returns Un Observable con un array de clientes.
    */
   getClientes(): Observable<ICliente[]> {
-    return this.http.get<ICliente[]>(CLIENTE_API);
+    return this.http.get<ICliente[]>(CLIENTE_API, { headers: this.getAuthHeaders() });
   }
 
   /**
-   * @description Obtiene un cliente específico por su ID.
+   * @description Obtiene un cliente específico por su ID de perfil de cliente.
    * Corresponde a GET /api/cliente/:id
-   * @param id El ID del cliente.
+   * @param id El ID del cliente (del documento Cliente).
    * @returns Un Observable con los datos del cliente.
    */
   getClienteById(id: string): Observable<ICliente> {
-    return this.http.get<ICliente>(`${CLIENTE_API}/${id}`);
+    return this.http.get<ICliente>(`${CLIENTE_API}/${id}`, { headers: this.getAuthHeaders() });
+  }
+
+  /**
+   * @description Obtiene un perfil de cliente por el ID del usuario asociado.
+   * Corresponde a GET /api/cliente/by-usuario/:usuarioId
+   * @param usuarioId El ID del usuario (del documento Usuario) asociado al cliente.
+   * @returns Un Observable con los datos del cliente.
+   */
+  getClienteByUsuarioId(usuarioId: string): Observable<ICliente> {
+    return this.http.get<ICliente>(`${CLIENTE_API}/by-usuario/${usuarioId}`, { headers: this.getAuthHeaders() });
   }
 
   /**
@@ -73,7 +88,7 @@ export class ClienteService {
    * @returns Un Observable con la respuesta del backend.
    */
   createCliente(cliente: { usuarioId: string, direccion: string, fechaNacimiento?: Date, preferenciasAlimentarias?: string[], puntos?: number }): Observable<any> {
-    return this.http.post<any>(CLIENTE_API, cliente);
+    return this.http.post<any>(CLIENTE_API, cliente, { headers: this.getAuthHeaders() });
   }
 
   /**
@@ -84,7 +99,7 @@ export class ClienteService {
    * @returns Un Observable con la respuesta del backend.
    */
   updateCliente(id: string, cliente: { direccion?: string, fechaNacimiento?: Date, preferenciasAlimentarias?: string[], puntos?: number }): Observable<any> {
-    return this.http.put<any>(`${CLIENTE_API}/${id}`, cliente);
+    return this.http.put<any>(`${CLIENTE_API}/${id}`, cliente, { headers: this.getAuthHeaders() });
   }
 
   /**
@@ -94,6 +109,6 @@ export class ClienteService {
    * @returns Un Observable con la respuesta del backend.
    */
   deleteCliente(id: string): Observable<any> {
-    return this.http.delete<any>(`${CLIENTE_API}/${id}`);
+    return this.http.delete<any>(`${CLIENTE_API}/${id}`, { headers: this.getAuthHeaders() });
   }
 }
