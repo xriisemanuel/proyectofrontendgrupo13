@@ -1,0 +1,105 @@
+<div class="oferta-card" [class.inactive]="!oferta.estado">
+  <!-- Badge de estado -->
+  <div class="status-badge" [class.active]="oferta.estado" [class.inactive]="!oferta.estado">
+    {{ oferta.estado ? 'Activa' : 'Inactiva' }}
+  </div>
+
+  <!-- Badge de vigencia -->
+  <div class="vigencia-badge" [class.vigente]="isOfertaVigente()" [class.expirada]="!isOfertaVigente()">
+    {{ isOfertaVigente() ? 'Vigente' : 'Expirada' }}
+  </div>
+
+  <!-- Imagen de la oferta -->
+  <div class="card-image">
+    <img 
+      *ngIf="oferta.imagen && validarImagen(oferta.imagen)" 
+      [src]="oferta.imagen" 
+      [alt]="oferta.nombre"
+      (error)="onImageError($event)"
+      class="oferta-image">
+    <div *ngIf="!oferta.imagen || !validarImagen(oferta.imagen)" class="oferta-image-placeholder">
+      <span class="placeholder-icon">🎯</span>
+    </div>
+    
+    <!-- Overlay con descuento -->
+    <div class="discount-overlay" *ngIf="oferta.descuento > 0">
+      <span class="discount-text">-{{ oferta.descuento }}%</span>
+    </div>
+  </div>
+
+  <!-- Contenido de la card -->
+  <div class="card-content">
+    <h3 class="oferta-title">{{ oferta.nombre }}</h3>
+    
+    <p class="oferta-description" *ngIf="oferta.descripcion">
+      {{ oferta.descripcion }}
+    </p>
+
+    <!-- Fechas -->
+    <div class="dates-section">
+      <div class="date-item">
+        <span class="date-label">Inicio:</span>
+        <span class="date-value">{{ getFechaFormateada(oferta.fechaInicio) }}</span>
+      </div>
+      <div class="date-item">
+        <span class="date-label">Fin:</span>
+        <span class="date-value">{{ getFechaFormateada(oferta.fechaFin) }}</span>
+      </div>
+    </div>
+
+    <!-- Productos y categorías -->
+    <div class="aplicables-section">
+      <div class="aplicables-item">
+        <span class="aplicables-label">Productos:</span>
+        <span class="aplicables-list">{{ getProductosNombres() }}</span>
+      </div>
+      <div class="aplicables-item">
+        <span class="aplicables-label">Categorías:</span>
+        <span class="aplicables-list">{{ getCategoriasNombres() }}</span>
+      </div>
+    </div>
+
+    <!-- Tiempo restante -->
+    <div class="tiempo-restante" [class.proxima-expiracion]="isProximaAExpiracion()" [class.expirada]="isExpirada()">
+      <span class="tiempo-icon">⏰</span>
+      <span class="tiempo-text">{{ getTiempoRestante() }}</span>
+      <span *ngIf="isProximaAExpiracion()" class="warning-text">¡Próxima a expirar!</span>
+      <span *ngIf="isExpirada()" class="expired-text">Expirada</span>
+    </div>
+  </div>
+
+ <!-- Acciones (solo para administradores o supervisor_ventas con permisos específicos) -->
+  <div class="card-actions" *ngIf="showActions">
+    <!-- Botones de edición y eliminación solo para Admin -->
+    <ng-container *ngIf="authService.hasAdminPermissions()">
+      <button class="btn-action btn-edit" title="Editar oferta" (click)="onEditClick($event)">
+        <span class="btn-icon">✏️</span>
+        Editar
+      </button>
+      <button class="btn-action btn-delete" title="Eliminar oferta" (click)="onDeleteClick($event)">
+        <span class="btn-icon">🗑️</span>
+        Eliminar
+      </button>
+    </ng-container>
+
+    <!-- Botones de activar/desactivar para Admin y Supervisor de Ventas -->
+    <ng-container *ngIf="authService.hasAdminPermissions() || authService.hasAdminPermissions">
+      <button
+        *ngIf="!oferta.estado"
+        class="btn-action btn-activate"
+        title="Activar oferta"
+        (click)="onActivateClick($event)">
+        <span class="btn-icon">✅</span>
+        Activar
+      </button>
+      <button
+        *ngIf="oferta.estado"
+        class="btn-action btn-deactivate"
+        title="Desactivar oferta"
+        (click)="onDeactivateClick($event)">
+        <span class="btn-icon">⏸️</span>
+        Desactivar
+      </button>
+    </ng-container>
+  </div>
+</div>

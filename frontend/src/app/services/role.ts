@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../core/constants'; // Importa la URL base de tu API
 
+export type UserRole = 'admin' | 'cliente' | 'supervisor_cocina' | 'supervisor_ventas' | 'repartidor';
+
 // Define la interfaz para un Rol (opcional pero recomendado para tipado)
 export interface RoleInterface {
   _id?: string; // El ID es opcional al crear

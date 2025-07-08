@@ -1,0 +1,54 @@
+<!-- src/app/components/oferta-list/oferta-list.component.html -->
+<div class="oferta-list-container">
+  <h1>Gestión de Ofertas</h1>
+  <p>Administra las ofertas y descuentos de tus productos.</p>
+
+  <!-- Botón para crear nueva oferta (visible solo para admin y supervisor de ventas) -->
+  <div class="header-actions">
+    <button *ngIf="authService.hasAdminPermissions() || authService.hasSupervisorVentasPermissions()"
+            class="btn btn-primary create-offer-btn"
+            routerLink="/crear-oferta">
+      + Crear Nueva Oferta
+    </button>
+  </div>
+
+  <!-- Mensajes de estado -->
+  <div *ngIf="cargando" class="loading-message">
+    Cargando ofertas...
+  </div>
+  <div *ngIf="errorCarga" class="error-message">
+    {{ errorCarga }}
+  </div>
+
+  <!-- Controles de búsqueda -->
+  <div class="search-section">
+    <input type="text"
+           #ofertaSearchInput
+           [(ngModel)]="terminoBusqueda"
+           (input)="onSearchInputChange($event)"
+           placeholder="Buscar ofertas por nombre o descripción..."
+           class="search-input">
+    <button *ngIf="terminoBusqueda" class="clear-search-btn" (click)="limpiarBusqueda()">
+      <i class="fas fa-times-circle"></i>
+    </button>
+  </div>
+
+  <!-- Lista de Ofertas -->
+  <div *ngIf="ofertasVisibles.length === 0 && !cargando && !errorCarga" class="no-offers-message">
+    No hay ofertas disponibles con los criterios actuales.
+  </div>
+
+  <div class="oferta-cards-grid">
+    <app-oferta-card
+      *ngFor="let oferta of ofertasVisibles"
+      [oferta]="oferta"
+      [productos]="productosDisponibles"
+      [categorias]="categoriasDisponibles"
+      [showActions]="authService.hasAdminPermissions() || authService.hasSupervisorVentasPermissions()"
+      (editClick)="editarOferta($event)"
+      (deleteClick)="eliminarOferta($event)"
+      (activateClick)="activarOferta($event)"
+      (deactivateClick)="desactivarOferta($event)">
+    </app-oferta-card>
+  </div>
+</div>

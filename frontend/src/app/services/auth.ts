@@ -1,10 +1,13 @@
+// src/app/services/auth.ts (¡Este es el archivo que debes actualizar!)
 import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
 import { API_BASE_URL } from '../core/constants';
-import { IUsuario, IRol } from '../services/usuario'; 
+// Asegúrate de que estas importaciones sean correctas si tienes interfaces IUsuario o IRol
+// Si no las tienes, puedes eliminarlas o definirlas. Por ahora, las mantendremos.
+import { IUsuario, IRol } from './usuario'; 
 
 const AUTH_API = API_BASE_URL + '/auth/';
 
@@ -13,7 +16,8 @@ const AUTH_API = API_BASE_URL + '/auth/';
 })
 export class AuthService {
   private currentUserSubject: BehaviorSubject<any>;
-  public currentUser: Observable<any>;
+  public currentUser: Observable<any>; // Este es el observable al que se suscriben los componentes
+  public currentUserValue: any; // Este es el getter para obtener el valor actual directamente
   private isBrowser: boolean;
 
   constructor(
@@ -24,32 +28,23 @@ export class AuthService {
 
     let initialUser = null;
     if (this.isBrowser) {
-      console.log('AuthService constructor: Ejecutándose en el navegador.');
-      console.log('AuthService constructor: Intentando cargar usuario desde localStorage...');
       const storedUser = localStorage.getItem('user');
-      console.log('AuthService constructor: Valor RAW de "user" en localStorage:', storedUser);
-      
       try {
         initialUser = storedUser ? JSON.parse(storedUser) : null;
-        console.log('AuthService constructor: Usuario PARSEADO desde localStorage:', initialUser);
       } catch (e) {
         console.error('AuthService constructor: ERROR al parsear usuario desde localStorage:', e);
-        localStorage.removeItem('user');
+        localStorage.removeItem('user'); // Limpiar datos corruptos
         initialUser = null;
       }
-    } else {
-      console.log('AuthService constructor: Ejecutándose en el servidor (SSR). localStorage no disponible.');
     }
     
     this.currentUserSubject = new BehaviorSubject<any>(initialUser);
     this.currentUser = this.currentUserSubject.asObservable();
-    console.log('AuthService constructor: Estado inicial de currentUserSubject:', this.currentUserSubject.value);
+    // Suscribirse internamente para mantener currentUserValue actualizado
+    this.currentUser.subscribe(user => this.currentUserValue = user); 
   }
 
-  public get currentUserValue(): any {
-    return this.currentUserSubject.value;
-  }
-
+  // Método register con 13 argumentos (¡ahora sí coincidirá!)
   register(
     username: string,
     password: string,
@@ -86,23 +81,15 @@ export class AuthService {
     return this.http.post<any>(AUTH_API + 'login', { username, password })
       .pipe(
         tap(response => {
-          console.log('AuthService login (TAP): Respuesta del backend RECIBIDA:', response);
           if (this.isBrowser && response && response.token) {
-            // Antes de guardar, asegúrate de que el rol sea una cadena limpia
             if (response.usuario && response.usuario.rol) {
-                response.usuario.rol = String(response.usuario.rol).trim().toLowerCase(); // Normalizar el rol aquí
-                console.log('AuthService login (TAP): Rol normalizado ANTES de guardar:', response.usuario.rol);
+                response.usuario.rol = String(response.usuario.rol).trim().toLowerCase();
             }
             localStorage.setItem('user', JSON.stringify(response));
             this.currentUserSubject.next(response);
-            console.log('AuthService login (TAP): Usuario y token GUARDADOS en localStorage y BehaviorSubject.');
-            console.log('AuthService login (TAP): Estado ACTUAL de currentUserSubject:', this.currentUserSubject.value);
-          } else {
-            console.warn('AuthService login (TAP): No hay token en la respuesta, o no es un navegador.');
           }
         }),
         catchError((error: HttpErrorResponse) => {
-            console.error('AuthService login (CATCH ERROR): Error en la petición de login:', error);
             this.logout();
             return throwError(() => new Error(error.error?.mensaje || 'Credenciales inválidas o error de red.'));
         })
@@ -110,19 +97,12 @@ export class AuthService {
   }
 
   logout() {
-    console.log('AuthService logout: Iniciando proceso de logout.');
     if (this.isBrowser) {
       localStorage.removeItem('user');
-      console.log('AuthService logout: Usuario eliminado de localStorage.');
     }
     this.currentUserSubject.next(null);
-    console.log('AuthService logout: currentUserSubject.value establecido a null.');
   }
 
-  /**
-   * Gets the current user's JWT token.
-   * @returns The JWT token string or null if not authenticated.
-   */
   getToken(): string | null {
     if (this.isBrowser) {
       const userResponse = this.currentUserSubject.value;
@@ -131,28 +111,18 @@ export class AuthService {
     return null;
   }
 
-  /**
-   * Gets the current user's role name.
-   * @returns The role name string (e.g., 'repartidor', 'cliente', 'admin') or null if not authenticated or role not found.
-   */
   getRole(): string | null {
     if (this.isBrowser) {
       const userResponse = this.currentUserSubject.value;
       let roleName = null;
       if (userResponse && userResponse.usuario && userResponse.usuario.rol) {
-          // Normaliza el rol al extraerlo también, por si acaso no se normalizó al guardar
           roleName = String(userResponse.usuario.rol).trim().toLowerCase();
       }
-      console.log('AuthService getRole: Rol extraído y normalizado:', roleName); // Nuevo log para depuración
       return roleName;
     }
     return null;
   }
 
-  /**
-   * Obtiene el ID (_id) del usuario actualmente logueado.
-   * @returns El ID del usuario (string) o null si no hay usuario logueado o el ID no está disponible.
-   */
   getLoggedInUserId(): string | null {
     if (this.isBrowser) {
       const userResponse = this.currentUserSubject.value;
@@ -163,12 +133,34 @@ export class AuthService {
     return null;
   }
 
-  /**
-   * Checks if the user is currently authenticated.
-   * @returns True if authenticated, false otherwise.
-   */
   isAuthenticated(): boolean {
     const authenticated = !!this.getToken();
     return authenticated;
+  }
+
+  // Métodos de verificación de roles (¡ahora sí existen en este archivo!)
+  hasAdminPermissions(): boolean {
+    const role = this.getRole();
+    return role === 'admin';
+  }
+
+  hasSupervisorVentasPermissions(): boolean {
+    const role = this.getRole();
+    return role === 'supervisor_ventas' || role === 'admin';
+  }
+
+  hasSupervisorCocinaPermissions(): boolean {
+    const role = this.getRole();
+    return role === 'supervisor_cocina' || role === 'admin';
+  }
+
+  hasRepartidorPermissions(): boolean {
+    const role = this.getRole();
+    return role === 'repartidor' || role === 'admin';
+  }
+
+  isCliente(): boolean {
+    const role = this.getRole();
+    return role === 'cliente';
   }
 }

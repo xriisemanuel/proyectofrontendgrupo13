@@ -135,6 +135,7 @@ export const routes: Routes = [
     data: { roles: ['admin', 'supervisor_ventas'] }
   },
 
+// Rutas de gestión de productos y categorías (leonardo)
   { path: 'calificaciones',
     loadComponent: () => import('./components/calificaciones/calificaciones.component').then(m => m.CalificacionesComponent),
     canActivate: [authGuard, roleGuard],
@@ -145,6 +146,38 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['admin', 'supervisor_ventas'] } // Solo admin y supervisor de ventas pueden acceder
   },
+
+  // Rutas de gestión de ofertas y combos (brian)
+  { path: 'combos', 
+    loadComponent: () => import('./components/combo-list/combo-list.component').then(m => m.ComboListComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin', 'supervisor_ventas', 'cliente'] } 
+  },
+  { path: 'ofertas', 
+    loadComponent: () => import('./components/oferta-list/oferta-list.component').then(m => m.OfertaListComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin', 'supervisor_ventas', 'cliente'] } // Solo admin y supervisor de ventas pueden acceder
+  },
+  { path: 'editar-combo/:id', 
+    loadComponent: () => import('./components/combo-form/combo-form.component').then(m => m.ComboFormComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin'] } // Solo admin puede acceder
+  },
+  { path: 'editar-oferta/:id', 
+    loadComponent: () => import('./components/oferta-form/oferta-form.component').then(m => m.OfertaFormComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin'] } // Solo admin puede acceder
+  },
+  { path: 'crear-combo', 
+    loadComponent: () => import('./components/combo-form/combo-form.component').then(m => m.ComboFormComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin'] } // Solo admin puede acceder
+  },
+  { path: 'crear-oferta', 
+    loadComponent: () => import('./components/oferta-form/oferta-form.component').then(m => m.OfertaFormComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin'] } // Solo admin puede acceder
+  }, 
 
   // Ruta de wildcard: cualquier otra ruta no definida redirige al Home
   { path: '**', redirectTo: '/home' }

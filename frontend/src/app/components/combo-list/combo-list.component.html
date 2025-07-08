@@ -1,0 +1,58 @@
+<!-- src/app/components/combo-list/combo-list.component.html -->
+<div class="combo-list-container">
+  <h1>Gestión de Combos</h1>
+  <p>Administra los combos de productos disponibles en tu sistema.</p>
+
+  <!-- Sección de acciones de cabecera (Botón Crear Combo) -->
+  <div class="header-actions">
+    <!-- El botón "Crear Nuevo Combo" solo es visible para el rol 'admin' -->
+    <button *ngIf="authService.hasAdminPermissions()"
+            class="btn btn-primary create-combo-btn"
+            routerLink="/crear-combo">
+      + Crear Nuevo Combo
+    </button>
+  </div>
+
+  <!-- Mensajes de estado -->
+  <div *ngIf="cargando" class="loading-message">
+    Cargando combos...
+  </div>
+  <div *ngIf="errorCarga" class="error-message">
+    {{ errorCarga }}
+  </div>
+
+  <!-- Controles de búsqueda -->
+  <div class="search-section">
+    <input type="text"
+           #comboSearchInput
+           [(ngModel)]="terminoBusqueda"
+           (input)="onSearchInputChange($event)"
+           placeholder="Buscar combos por nombre o descripción..."
+           class="search-input">
+    <button *ngIf="terminoBusqueda" class="clear-search-btn" (click)="limpiarBusqueda()">
+      <i class="fas fa-times-circle"></i>
+    </button>
+  </div>
+
+  <!-- Lista de Combos -->
+  <div *ngIf="combosVisibles.length === 0 && !cargando && !errorCarga" class="no-combos-message">
+    No hay combos disponibles con los criterios actuales.
+  </div>
+
+  <!-- Contenedor para las tarjetas de combos (cuando tengas datos) -->
+  <div class="combo-cards-grid">
+    <!-- Aquí iría tu *ngFor para app-combo-card una vez que implementes el componente -->
+    <!--
+    <app-combo-card
+      *ngFor="let combo of combosVisibles"
+      [combo]="combo"
+      [productos]="productosDisponibles"
+      [showActions]="authService.hasAdminPermissions()"
+      (editClick)="editarCombo($event)"
+      (deleteClick)="eliminarCombo($event)"
+      (activateClick)="activarCombo($event)"
+      (deactivateClick)="desactivarCombo($event)">
+    </app-combo-card>
+    -->
+  </div>
+</div>

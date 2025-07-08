@@ -3,18 +3,18 @@
   <p>Este es tu panel de control central para gestionar la aplicación.</p>
 
   <!-- Sección Principal de Gestión de Usuarios -->
-  <div class="user-management-section">
+  <div class="user-management-section dashboard-section">
     <h3>Gestión de Usuarios</h3>
-    <div class="user-management-cards">
+    <div class="user-management-cards card-container">
       <!-- Tarjeta 1: Crear Nuevo Usuario (Formulario Adaptable) -->
-      <a routerLink="/admin/users/create" class="management-card create-user-card">
+      <a routerLink="/admin/users/create" class="management-card dashboard-card create-user-card">
         <i class="fas fa-user-plus"></i>
         <h4>Crear Nuevo Usuario</h4>
         <p>Registra un nuevo usuario y su perfil de rol asociado (adaptable).</p>
       </a>
 
       <!-- Tarjeta 2: Gestionar Usuarios Creados (Llevará a la vista de selección por rol) -->
-      <a routerLink="/admin/users/manage-by-role" class="management-card manage-users-card">
+      <a routerLink="/admin/users/manage-by-role" class="management-card dashboard-card manage-users-card">
         <i class="fas fa-users-cog"></i>
         <h4>Gestionar Usuarios Creados</h4>
         <p>Visualiza, edita y elimina usuarios existentes por rol.</p>
@@ -23,79 +23,91 @@
   </div>
 
   <!-- Sección de Resumen General (Widgets/Tarjetas) - Se mantiene para una visión rápida -->
-  <div class="summary-cards">
-    <div class="card">
-      <h3>Pedidos Pendientes</h3>
-      <p class="metric">{{ summaryData.pedidosPendientes }}</p>
-      <span class="description">En espera de preparación o envío.</span>
-    </div>
-    <div class="card">
-      <h3>Pedidos Completados Hoy</h3>
-      <p class="metric">{{ summaryData.pedidosCompletadosHoy }}</p>
-      <span class="description">Pedidos finalizados en el día.</span>
-    </div>
-    <div class="card">
-      <h3>Nuevos Usuarios (Semana)</h3>
-      <p class="metric">{{ summaryData.nuevosUsuariosSemana }}</p>
-      <span class="description">Registros de clientes recientes.</span>
-    </div>
-    <div class="card alert-card">
-      <h3>Productos Agotados</h3>
-      <p class="metric">{{ summaryData.productosAgotados }}</p>
-      <span class="description">¡Revisar inventario!</span>
-    </div>
-    <div class="card">
-      <h3>Repartidores Activos</h3>
-      <p class="metric">{{ summaryData.repartidoresActivos }}</p>
-      <span class="description">Actualmente en servicio.</span>
-    </div>
-    <div class="card">
-      <h3>Ingresos Hoy</h3>
-      <p class="metric">${{ summaryData.ingresosHoy }}</p>
-      <span class="description">Total de ventas del día.</span>
+  <div class="summary-cards dashboard-section">
+    <h3>Resumen General</h3>
+    <div class="summary-grid card-container">
+      <div class="card">
+        <h3>Pedidos Pendientes</h3>
+        <p class="metric">{{ summaryData.pedidosPendientes }}</p>
+        <span class="description">En espera de preparación o envío.</span>
+      </div>
+      <div class="card">
+        <h3>Pedidos Completados Hoy</h3>
+        <p class="metric">{{ summaryData.pedidosCompletadosHoy }}</p>
+        <span class="description">Pedidos finalizados en el día.</span>
+      </div>
+      <div class="card">
+        <h3>Nuevos Usuarios (Semana)</h3>
+        <p class="metric">{{ summaryData.nuevosUsuariosSemana }}</p>
+        <span class="description">Registros de clientes recientes.</span>
+      </div>
+      <div class="card alert-card">
+        <h3>Productos Agotados</h3>
+        <p class="metric">{{ summaryData.productosAgotados }}</p>
+        <span class="description">¡Revisar inventario!</span>
+      </div>
+      <div class="card">
+        <h3>Repartidores Activos</h3>
+        <p class="metric">{{ summaryData.repartidoresActivos }}</p>
+        <span class="description">Actualmente en servicio.</span>
+      </div>
+      <div class="card">
+        <h3>Ingresos Hoy</h3>
+        <p class="metric">${{ summaryData.ingresosHoy }}</p>
+        <span class="description">Total de ventas del día.</span>
+      </div>
     </div>
   </div>
 
-  <!-- Sección de Navegación Rápida (Otros enlaces de gestión) - Se mantiene o se adapta según necesidad -->
-  <div class="quick-links">
+  <!-- Sección de Navegación Rápida (Otras Gestiones) -->
+  <div class="quick-links-section dashboard-section">
     <h3>Otras Gestiones</h3>
-    <div class="link-group">
-      <!-- Aquí puedes mantener enlaces a otras secciones de gestión que no sean de usuario/rol directo -->
-      <a routerLink="/admin/productos" class="quick-link-btn">
+    <div class="link-group card-container">
+      <a routerLink="/admin/productos" class="quick-link-btn dashboard-card">
         <i class="fas fa-box"></i> Gestión de Productos
       </a>
-      <a routerLink="/admin/pedidos" class="quick-link-btn">
+      <a routerLink="/pedido/dashboard" class="quick-link-btn dashboard-card">
         <i class="fas fa-clipboard-list"></i> Gestión de Pedidos
       </a>
-      <a routerLink="/admin/clientes" class="quick-link-btn">
+      <a routerLink="cliente/dashboard" class="quick-link-btn dashboard-card">
         <i class="fas fa-user-friends"></i> Gestión de Clientes
       </a>
-      <a routerLink="/admin/reportes" class="quick-link-btn">
+      <a routerLink="/admin/reportes" class="quick-link-btn dashboard-card">
         <i class="fas fa-chart-line"></i> Reportes
       </a>
-      <a routerLink="/admin/configuracion" class="quick-link-btn">
+      <a routerLink="/admin/configuracion" class="quick-link-btn dashboard-card">
         <i class="fas fa-cogs"></i> Configuración
       </a>
-      <a routerLink="/admin/roles/manage" class="quick-link-btn">
+      <a routerLink="/admin/roles/manage" class="quick-link-btn dashboard-card">
         <i class="fas fa-users-cog"></i> Gestión de Roles
       </a>
-      <a routerLink="/admin/repartidores/manage" class="quick-link-btn">
+      <a routerLink="/admin/repartidores/manage" class="quick-link-btn dashboard-card">
         <i class="fas fa-motorcycle"></i> Gestión de Repartidores
+      </a>
+      
+      <!-- MOVIDO AQUÍ: Tarjeta para Gestionar Ofertas -->
+      <a  routerLink="/ofertas"  class="quick-link-btn dashboard-card">
+        <i class="fas fa-tags"></i> Gestión de Ofertas
+      </a>
+
+      <!-- MOVIDO AQUÍ: Tarjeta para Gestionar Combos -->
+      <a routerLink="/combos" class="quick-link-btn dashboard-card">
+        <i class="fas fa-boxes"></i> Gestión de Combos
       </a>
     </div>
   </div>
 
   <!-- Sección de Actividad Reciente o Tablas Clave - Se mantiene -->
-  <div class="recent-activity">
+  <div class="recent-activity-section dashboard-section">
     <h3>Últimos Pedidos</h3>
-    <div class="table-placeholder">
+    <div class="table-placeholder card-container">
       <p>Tabla de últimos pedidos pendientes o en curso...</p>
       <ul>
         <li>Pedido #1001 - Cliente: Juan Pérez - Estado: En preparación</li>
         <li>Pedido #1002 - Cliente: María García - Estado: En camino</li>
         <li>Pedido #1003 - Cliente: Pedro López - Estado: Pendiente</li>
       </ul>
-      <a routerLink="/admin/pedidos" class="view-all-link">Ver todos los pedidos</a>
+      <a routerLink="/pedido/dashboard" class="view-all-link">Ver todos los pedidos</a>
     </div>
   </div>
 </div>
