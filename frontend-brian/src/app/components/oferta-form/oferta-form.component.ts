@@ -1,3 +1,13 @@
+/**
+ * Componente de Formulario de Ofertas
+ * 
+ * Permite crear y editar ofertas del sistema:
+ * - Formulario reactivo con validaciones
+ * - Selección de productos y categorías aplicables
+ * - Gestión de fechas de inicio y fin
+ * - Validación de fechas automática
+ * - Integración con servicios de backend
+ */
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
@@ -15,16 +25,37 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrl: './oferta-form.component.css'
 })
 export class OfertaFormComponent implements OnInit {
+  /** Formulario reactivo para la oferta */
   ofertaForm: FormGroup;
+  
+  /** Lista de productos disponibles */
   productos: Producto[] = [];
+  
+  /** Lista de categorías disponibles */
   categorias: Categoria[] = [];
+  
+  /** IDs de productos seleccionados */
   productosSeleccionados: string[] = [];
+  
+  /** IDs de categorías seleccionadas */
   categoriasSeleccionadas: string[] = [];
+  
+  /** Indica si es modo edición */
   esEdicion: boolean = false;
+  
+  /** ID de la oferta en edición */
   ofertaId: string | null = null;
+  
+  /** Estado de carga de datos */
   cargando: boolean = false;
+  
+  /** Estado de guardado */
   guardando: boolean = false;
+  
+  /** Mensaje de respuesta */
   mensaje: string = '';
+  
+  /** Mensaje de error de carga */
   errorCarga: string = '';
 
   constructor(
@@ -52,7 +83,10 @@ export class OfertaFormComponent implements OnInit {
     }, { validators: this.fechasValidator });
   }
 
-  // Validador personalizado para fecha de fin
+  /**
+   * Validador personalizado para fecha de fin
+   * Verifica que la fecha de fin sea posterior a la fecha de inicio
+   */
   fechaFinValidator(control: AbstractControl): ValidationErrors | null {
     if (!control.value) return null;
     
@@ -66,7 +100,10 @@ export class OfertaFormComponent implements OnInit {
     return null;
   }
 
-  // Validador para ambas fechas
+  /**
+   * Validador para ambas fechas
+   * Verifica la coherencia entre fecha de inicio y fin
+   */
   fechasValidator(group: AbstractControl): ValidationErrors | null {
     const fechaInicio = group.get('fechaInicio')?.value;
     const fechaFin = group.get('fechaFin')?.value;
@@ -79,7 +116,7 @@ export class OfertaFormComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Verificar permisos
+    // Verificar permisos de administrador
     if (!this.authService.hasAdminPermissions()) {
       this.router.navigate(['/']);
       return;
@@ -88,13 +125,6 @@ export class OfertaFormComponent implements OnInit {
     // Obtener parámetros de la ruta
     this.ofertaId = this.route.snapshot.paramMap.get('id');
     this.esEdicion = !!this.ofertaId;
-
-    console.log('OfertaFormComponent inicializado');
-    console.log('Es edición:', this.esEdicion);
-    console.log('ID de oferta:', this.ofertaId);
-    console.log('Usuario autenticado:', this.authService.isLoggedIn());
-    console.log('Rol actual:', this.authService.getCurrentRole());
-    console.log('Token disponible:', !!localStorage.getItem('token'));
 
     // Cargar productos y categorías
     this.cargarProductos();
@@ -106,6 +136,9 @@ export class OfertaFormComponent implements OnInit {
     }
   }
 
+  /**
+   * Carga la lista de productos disponibles
+   */
   cargarProductos() {
     this.productoService.getProductos().subscribe({
       next: (data) => {
@@ -118,6 +151,9 @@ export class OfertaFormComponent implements OnInit {
     });
   }
 
+  /**
+   * Carga la lista de categorías disponibles
+   */
   cargarCategorias() {
     this.categoriaService.getCategorias().subscribe({
       next: (data) => {
@@ -130,38 +166,29 @@ export class OfertaFormComponent implements OnInit {
     });
   }
 
+  /**
+   * Carga los datos de una oferta existente para edición
+   */
   cargarOferta() {
     if (!this.ofertaId) return;
 
     this.cargando = true;
     this.errorCarga = '';
 
-    console.log('Intentando cargar oferta con ID:', this.ofertaId);
-
     this.ofertaService.getOfertaById(this.ofertaId).subscribe({
       next: (response: any) => {
-        console.log('Respuesta del backend:', response);
-        console.log('Tipo de respuesta:', typeof response);
-        console.log('¿Es array?', Array.isArray(response));
-        
         // Verificar si la respuesta es válida
         if (!response) {
-          console.error('Respuesta vacía del backend');
           this.errorCarga = 'Error: Respuesta vacía del servidor';
           this.cargando = false;
           return;
         }
         
-        // El backend devuelve la oferta directamente, no dentro de un objeto 'oferta'
+        // El backend devuelve la oferta directamente
         const oferta = response;
-        
-        console.log('Oferta extraída:', oferta);
-        console.log('Productos aplicables:', oferta.productosAplicables);
-        console.log('Categorías aplicables:', oferta.categoriasAplicables);
         
         // Verificar que la oferta tenga los campos necesarios
         if (!oferta.nombre) {
-          console.error('Oferta sin nombre:', oferta);
           this.errorCarga = 'Error: Datos de oferta incompletos';
           this.cargando = false;
           return;
@@ -171,14 +198,9 @@ export class OfertaFormComponent implements OnInit {
         this.productosSeleccionados = oferta.productosAplicables?.map((p: any) => p._id || p) || [];
         this.categoriasSeleccionadas = oferta.categoriasAplicables?.map((c: any) => c._id || c) || [];
         
-        console.log('Productos seleccionados:', this.productosSeleccionados);
-        console.log('Categorías seleccionadas:', this.categoriasSeleccionadas);
-        
         // Convertir fechas a formato de input date
         const fechaInicio = oferta.fechaInicio ? new Date(oferta.fechaInicio).toISOString().split('T')[0] : '';
         const fechaFin = oferta.fechaFin ? new Date(oferta.fechaFin).toISOString().split('T')[0] : '';
-        
-        console.log('Fechas convertidas:', { fechaInicio, fechaFin });
         
         // Actualizar formulario
         this.ofertaForm.patchValue({
@@ -191,33 +213,23 @@ export class OfertaFormComponent implements OnInit {
           estado: oferta.estado !== undefined ? oferta.estado : true
         });
         
-        console.log('Formulario actualizado:', this.ofertaForm.value);
-        
         this.cargando = false;
       },
       error: (error: any) => {
-        console.error('Error al cargar oferta:', error);
-        console.error('Status:', error.status);
-        console.error('StatusText:', error.statusText);
-        console.error('Error completo:', error);
-        
         this.cargando = false;
-        
-        if (error.status === 401) {
-          this.errorCarga = 'Error de autenticación. Por favor, inicia sesión nuevamente.';
-        } else if (error.status === 403) {
-          this.errorCarga = 'No tienes permisos para acceder a esta oferta.';
-        } else if (error.status === 404) {
-          this.errorCarga = 'Oferta no encontrada.';
-        } else if (error.status === 500) {
-          this.errorCarga = 'Error interno del servidor.';
+        if (error.status === 404) {
+          this.errorCarga = 'Oferta no encontrada';
         } else {
-          this.errorCarga = `Error al cargar la oferta: ${error.message || 'Error desconocido'}`;
+          this.errorCarga = 'Error al cargar la oferta';
         }
       }
     });
   }
 
+  /**
+   * Alterna la selección de un producto
+   * @param productoId - ID del producto a alternar
+   */
   toggleProducto(productoId: string) {
     const index = this.productosSeleccionados.indexOf(productoId);
     if (index > -1) {
@@ -227,6 +239,10 @@ export class OfertaFormComponent implements OnInit {
     }
   }
 
+  /**
+   * Alterna la selección de una categoría
+   * @param categoriaId - ID de la categoría a alternar
+   */
   toggleCategoria(categoriaId: string) {
     const index = this.categoriasSeleccionadas.indexOf(categoriaId);
     if (index > -1) {
@@ -236,15 +252,16 @@ export class OfertaFormComponent implements OnInit {
     }
   }
 
+  /**
+   * Guarda la oferta (crear o actualizar)
+   */
   guardarOferta() {
-    if (this.ofertaForm.valid) {
+    if (this.ofertaForm.valid && this.productosSeleccionados.length > 0 && this.categoriasSeleccionadas.length > 0) {
       this.guardando = true;
       this.mensaje = '';
 
-      const ofertaData = {
+      const ofertaData: Oferta = {
         ...this.ofertaForm.value,
-        fechaInicio: new Date(this.ofertaForm.value.fechaInicio).toISOString(),
-        fechaFin: new Date(this.ofertaForm.value.fechaFin).toISOString(),
         productosAplicables: this.productosSeleccionados,
         categoriasAplicables: this.categoriasSeleccionadas
       };
@@ -252,49 +269,49 @@ export class OfertaFormComponent implements OnInit {
       if (this.esEdicion && this.ofertaId) {
         // Actualizar oferta existente
         this.ofertaService.editarOferta(this.ofertaId, ofertaData).subscribe({
-          next: (response: any) => {
-            this.mensaje = response.mensaje || 'Oferta actualizada correctamente';
+          next: (response) => {
+            this.mensaje = 'Oferta actualizada exitosamente';
             this.guardando = false;
             setTimeout(() => {
               this.router.navigate(['/ofertas']);
             }, 1500);
           },
           error: (error) => {
-            this.mensaje = error.error?.mensaje || 'Error al actualizar la oferta';
+            this.mensaje = 'Error al actualizar la oferta';
             this.guardando = false;
           }
         });
       } else {
         // Crear nueva oferta
         this.ofertaService.crearOferta(ofertaData).subscribe({
-          next: (response: any) => {
-            this.mensaje = response.mensaje || 'Oferta creada correctamente';
+          next: (response) => {
+            this.mensaje = 'Oferta creada exitosamente';
             this.guardando = false;
             setTimeout(() => {
               this.router.navigate(['/ofertas']);
             }, 1500);
           },
-          error: (error: any) => {
-            this.mensaje = error.error?.mensaje || 'Error al crear la oferta';
+          error: (error) => {
+            this.mensaje = 'Error al crear la oferta';
             this.guardando = false;
           }
         });
       }
-    } else {
-      console.log('Formulario inválido:', this.ofertaForm.errors);
-      console.log('Errores por campo:', {
-        nombre: this.ofertaForm.get('nombre')?.errors,
-        descuento: this.ofertaForm.get('descuento')?.errors,
-        fechaInicio: this.ofertaForm.get('fechaInicio')?.errors,
-        fechaFin: this.ofertaForm.get('fechaFin')?.errors
-      });
     }
   }
 
+  /**
+   * Navega de vuelta a la lista de ofertas
+   */
   volverAtras() {
     this.router.navigate(['/ofertas']);
   }
 
+  /**
+   * Valida si una URL es válida
+   * @param url - URL a validar
+   * @returns true si la URL es válida
+   */
   esUrlValida(url: string): boolean {
     if (!url) return true;
     try {

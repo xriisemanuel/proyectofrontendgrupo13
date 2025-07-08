@@ -1,6 +1,11 @@
 <div class="home-container">
+  <!-- Mensaje temporal -->
+  <div *ngIf="mensaje" class="mensaje-temp">
+    {{ mensaje }}
+  </div>
+
   <div class="home-header">
-    <h2>Bienvenido a Nuestro Catálogo</h2>
+    <h2>¡Combos y Ofertas de Subte!</h2>
     <p>Descubre nuestros combos especiales y ofertas increíbles</p>
   </div>
 
@@ -47,6 +52,7 @@
               (deleteClick)="eliminarCombo($event)"
               (activateClick)="activarCombo($event)"
               (deactivateClick)="desactivarCombo($event)"
+              (addToCartClick)="addComboToCart($event)"
               class="carousel-item">
             </app-combo-card>
           </div>
@@ -114,6 +120,7 @@
               (deleteClick)="eliminarOferta($event)"
               (activateClick)="activarOferta($event)"
               (deactivateClick)="desactivarOferta($event)"
+              (addToCartClick)="addToCart($event)"
               class="carousel-item">
             </app-oferta-card>
           </div>

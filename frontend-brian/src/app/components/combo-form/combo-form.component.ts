@@ -260,9 +260,4 @@ export class ComboFormComponent implements OnInit {
     const producto = this.getProductoSeleccionado(productoId);
     return producto ? producto.unidades : 1;
   }
-
-  getSubtotalProducto(producto: Producto): number {
-    const unidades = this.getUnidadesProducto(producto._id);
-    return producto.precio * unidades;
-  }
 }

@@ -1,39 +1,4 @@
-<!-- Debug: Formulario de ofertas cargado -->
-<div style="background: yellow; padding: 10px; margin: 10px; border: 2px solid red;">
-  DEBUG: Formulario de ofertas visible - VERSIÓN SIMPLIFICADA
-  <br>
-  Estado del formulario: {{ ofertaForm.valid ? 'Válido' : 'Inválido' }}
-  <br>
-  Errores del formulario: {{ ofertaForm.errors | json }}
-  <br>
-  <strong>Errores por campo:</strong>
-  <br>
-  Nombre: {{ ofertaForm.get('nombre')?.errors | json }}
-  <br>
-  Descuento: {{ ofertaForm.get('descuento')?.errors | json }}
-  <br>
-  Fecha Inicio: {{ ofertaForm.get('fechaInicio')?.errors | json }}
-  <br>
-  Fecha Fin: {{ ofertaForm.get('fechaFin')?.errors | json }}
-  <br>
-  <strong>Valores actuales:</strong>
-  <br>
-  Nombre: "{{ ofertaForm.get('nombre')?.value }}"
-  <br>
-  Descuento: {{ ofertaForm.get('descuento')?.value }}
-  <br>
-  Fecha Inicio: "{{ ofertaForm.get('fechaInicio')?.value }}"
-  <br>
-  Fecha Fin: "{{ ofertaForm.get('fechaFin')?.value }}"
-  <br>
-  <strong>Validaciones de fechas:</strong>
-  <br>
-  Fecha Fin Inválida: {{ ofertaForm.get('fechaFin')?.errors?.['fechaFinInvalida'] | json }}
-  <br>
-  Fechas Inválidas (grupo): {{ ofertaForm.errors?.['fechasInvalidas'] | json }}
-</div>
-
-<div class="oferta-form-container">
+<div class="form-container">
   <div class="form-header">
     <h2>{{ esEdicion ? 'Editar Oferta' : 'Crear Nueva Oferta' }}</h2>
     <button type="button" (click)="volverAtras()" class="btn btn-outline">
@@ -162,18 +127,21 @@
         <label>Seleccionar Productos</label>
         <div class="productos-selector">
           <div *ngFor="let producto of productos" class="producto-item">
-            <input 
-              type="checkbox" 
-              [id]="'producto-' + producto._id"
-              [value]="producto._id"
-              (change)="toggleProducto(producto._id)"
-              [checked]="productosSeleccionados.includes(producto._id)"
-            />
-            <label [for]="'producto-' + producto._id" class="producto-label">
+            <div class="producto-row">
+              <input 
+                type="checkbox" 
+                [id]="'producto-' + producto._id"
+                [value]="producto._id"
+                (change)="toggleProducto(producto._id)"
+                [checked]="productosSeleccionados.includes(producto._id)"
+              />
               <span class="producto-nombre">{{ producto.nombre }}</span>
               <span class="producto-precio">${{ producto.precio }}</span>
-            </label>
+            </div>
           </div>
+        </div>
+        <div *ngIf="productosSeleccionados.length === 0" class="error-message">
+          Debes seleccionar al menos un producto
         </div>
       </div>
     </div>
@@ -197,11 +165,14 @@
             </label>
           </div>
         </div>
+        <div *ngIf="categoriasSeleccionadas.length === 0" class="error-message">
+          Debes seleccionar al menos una categoría
+        </div>
       </div>
     </div>
 
     <div class="form-section">
-      <h3>Imagen</h3>
+      <h3>Imagen de la Oferta</h3>
       
       <div class="form-group">
         <label for="imagen">URL de la Imagen</label>
@@ -211,9 +182,10 @@
           formControlName="imagen" 
           class="form-control"
           placeholder="https://ejemplo.com/imagen.jpg"
+          [class.invalid]="ofertaForm.get('imagen')?.invalid && ofertaForm.get('imagen')?.touched"
         />
-        <div *ngIf="ofertaForm.get('imagen')?.value && !esUrlValida(ofertaForm.get('imagen')?.value)" class="error-message">
-          URL de imagen inválida
+        <div *ngIf="ofertaForm.get('imagen')?.invalid && ofertaForm.get('imagen')?.touched" class="error-message">
+          <span *ngIf="ofertaForm.get('imagen')?.errors?.['pattern']">Ingresa una URL válida</span>
         </div>
       </div>
     </div>
@@ -226,9 +198,9 @@
       <button type="button" (click)="volverAtras()" class="btn btn-outline">
         Cancelar
       </button>
-      <button type="submit" [disabled]="!ofertaForm.valid || guardando" class="btn btn-primary">
+      <button type="submit" [disabled]="ofertaForm.invalid || guardando" class="btn btn-primary">
         <span *ngIf="guardando">Guardando...</span>
-        <span *ngIf="!guardando">{{ esEdicion ? 'Actualizar Oferta' : 'Crear Oferta' }}</span>
+        <span *ngIf="!guardando">{{ esEdicion ? 'Actualizar' : 'Crear' }} Oferta</span>
       </button>
     </div>
   </form>

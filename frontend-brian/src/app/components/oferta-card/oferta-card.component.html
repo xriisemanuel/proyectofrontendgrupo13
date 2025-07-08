@@ -31,31 +31,48 @@
   <div class="card-content">
     <h3 class="oferta-title">{{ oferta.nombre }}</h3>
     
-    <p class="oferta-description" *ngIf="oferta.descripcion">
-      {{ oferta.descripcion }}
-    </p>
+    <!-- Precio y descripción en línea -->
+    <div class="main-info">
+      <div *ngIf="getProductoUnicoConDescuento() as infoPrecio" class="price-section">
+        <div class="price-container">
+          <span class="price-label">Precio:</span>
+          <div class="price-info">
+            <span class="original-price">${{ infoPrecio.precioOriginal.toFixed(2) }}</span>
+            <span class="final-price">${{ infoPrecio.precioFinal.toFixed(2) }}</span>
+            <span class="discount-badge">-{{ oferta.descuento }}%</span>
+          </div>
+        </div>
+      </div>
 
-    <!-- Fechas -->
-    <div class="dates-section">
-      <div class="date-item">
-        <span class="date-label">Inicio:</span>
-        <span class="date-value">{{ getFechaFormateada(oferta.fechaInicio) }}</span>
-      </div>
-      <div class="date-item">
-        <span class="date-label">Fin:</span>
-        <span class="date-value">{{ getFechaFormateada(oferta.fechaFin) }}</span>
-      </div>
+      <p class="oferta-description" *ngIf="oferta.descripcion">
+        {{ oferta.descripcion }}
+      </p>
     </div>
 
-    <!-- Productos y categorías -->
-    <div class="aplicables-section">
-      <div class="aplicables-item">
-        <span class="aplicables-label">Productos:</span>
-        <span class="aplicables-list">{{ getProductosNombres() }}</span>
+    <!-- Información compacta -->
+    <div class="info-grid">
+      <!-- Fechas -->
+      <div class="dates-section">
+        <div class="date-item">
+          <span class="date-label">Inicio:</span>
+          <span class="date-value">{{ getFechaFormateada(oferta.fechaInicio) }}</span>
+        </div>
+        <div class="date-item">
+          <span class="date-label">Fin:</span>
+          <span class="date-value">{{ getFechaFormateada(oferta.fechaFin) }}</span>
+        </div>
       </div>
-      <div class="aplicables-item">
-        <span class="aplicables-label">Categorías:</span>
-        <span class="aplicables-list">{{ getCategoriasNombres() }}</span>
+
+      <!-- Productos y categorías -->
+      <div class="aplicables-section">
+        <div class="aplicables-item">
+          <span class="aplicables-label">Productos:</span>
+          <span class="aplicables-list">{{ getProductosNombres() }}</span>
+        </div>
+        <div class="aplicables-item">
+          <span class="aplicables-label">Categorías:</span>
+          <span class="aplicables-list">{{ getCategoriasNombres() }}</span>
+        </div>
       </div>
     </div>
 
@@ -65,6 +82,14 @@
       <span class="tiempo-text">{{ getTiempoRestante() }}</span>
       <span *ngIf="isProximaAExpiracion()" class="warning-text">¡Próxima a expirar!</span>
       <span *ngIf="isExpirada()" class="expired-text">Expirada</span>
+    </div>
+
+    <!-- Botón Añadir al Carrito (para todos los usuarios, ofertas activas y vigentes) -->
+    <div class="cart-action" *ngIf="oferta.estado && isOfertaVigente()">
+      <button class="btn-add-cart" title="Añadir al carrito" (click)="onAddToCartClick($event)">
+        <span class="btn-icon">🛒</span>
+        Añadir al Carrito
+      </button>
     </div>
   </div>
 

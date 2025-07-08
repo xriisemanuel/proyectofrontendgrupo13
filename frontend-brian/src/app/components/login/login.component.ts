@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { RoleService, Role } from '../../services/role.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -19,7 +20,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private fb: FormBuilder, 
     private authService: AuthService,
-    private roleService: RoleService
+    private roleService: RoleService,
+    private router: Router
   ) {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
@@ -59,8 +61,9 @@ export class LoginComponent implements OnInit {
 
       this.authService.login(credentials).subscribe({
         next: (response) => {
-          console.log('Login exitoso:', response);
-          window.location.reload();
+          // Login exitoso
+          this.roleService.setRole(response.usuario.rol);
+          this.router.navigate(['/']);
         },
         error: (error) => {
           console.error('Error en login:', error);

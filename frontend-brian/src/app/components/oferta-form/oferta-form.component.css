@@ -1,195 +1,16 @@
-/* Formulario de Ofertas - Estilos Específicos */
+/* ===== ESTILOS ESPECÍFICOS DEL FORMULARIO DE OFERTAS ===== */
 
+/* Contenedor específico para ofertas */
 .oferta-form-container {
-  max-width: 800px;
-  margin: 0 auto;
-  background: white;
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
-  overflow: hidden;
-  border: 1px solid var(--gray-200);
-  animation: fadeInUp 0.6s ease-out;
+  /* Hereda estilos de .form-container */
 }
 
-.form-header {
-  background: var(--secondary-color);
-  color: white;
-  padding: var(--spacing-xl);
-  text-align: center;
-  position: relative;
-}
-
-.form-header h2 {
-  margin: 0 0 var(--spacing-md) 0;
-  font-size: var(--text-2xl);
-  font-weight: var(--font-bold);
-  font-family: var(--font-serif);
-  color: white;
-}
-
-.form-header .btn-outline {
-  position: absolute;
-  top: var(--spacing-lg);
-  left: var(--spacing-lg);
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-md);
-  font-weight: var(--font-medium);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  font-size: var(--text-sm);
-}
-
-.form-header .btn-outline:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.5);
-  transform: translateY(-1px);
-}
-
+/* Formulario de ofertas */
 .oferta-form {
   padding: var(--spacing-xl);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xl);
-}
-
-.form-section {
-  background: var(--gray-50);
-  padding: var(--spacing-xl);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--gray-200);
-  animation: slideInUp 0.6s ease-out;
-  animation-fill-mode: both;
-}
-
-.form-section h3 {
-  margin: 0 0 var(--spacing-lg) 0;
-  color: var(--gray-800);
-  font-size: var(--text-xl);
-  font-weight: var(--font-semibold);
-  font-family: var(--font-alt);
-  position: relative;
-  padding-bottom: var(--spacing-sm);
-}
-
-.form-section h3::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 60px;
-  height: 3px;
-  background: var(--secondary-color);
-  border-radius: 2px;
-}
-
-/* Selectores de productos y categorías */
-.productos-selector, .categorias-selector {
-  max-height: 300px;
-  overflow-y: auto;
-  border: 2px solid var(--gray-200);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-md);
-  background: white;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.producto-item, .categoria-item {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  transition: all 0.2s ease;
-  cursor: pointer;
-  margin-bottom: var(--spacing-sm);
-  border: 1px solid var(--gray-200);
-  background: white;
-}
-
-.producto-item:hover, .categoria-item:hover {
-  background: var(--gray-50);
-  border-color: var(--secondary-color);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
-}
-
-.producto-item:last-child, .categoria-item:last-child {
-  margin-bottom: 0;
-}
-
-.producto-item input[type="checkbox"], .categoria-item input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--secondary-color);
-  cursor: pointer;
-}
-
-.producto-label, .categoria-label {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-  cursor: pointer;
-  flex: 1;
-}
-
-.producto-nombre, .categoria-nombre {
-  font-weight: var(--font-semibold);
-  color: var(--gray-800);
-  font-size: var(--text-sm);
-}
-
-.producto-item:hover .producto-nombre, .categoria-item:hover .categoria-nombre {
-  color: var(--secondary-color);
-}
-
-.producto-precio {
-  font-weight: var(--font-medium);
-  color: var(--secondary-color);
-  font-size: var(--text-sm);
-}
-
-/* Estados de carga y error */
-.loading-state, .error-state {
-  text-align: center;
-  padding: var(--spacing-2xl);
-  font-size: var(--text-lg);
-  background: white;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--gray-200);
-  margin: var(--spacing-xl);
-}
-
-.loading-state {
-  color: var(--gray-600);
-  font-family: var(--font-elegant);
-  font-style: italic;
-}
-
-.error-state {
-  color: var(--danger-color);
-  background: #fef2f2;
-  border: 2px solid var(--danger-color);
-  font-family: var(--font-sans);
-  font-weight: var(--font-medium);
-  position: relative;
-  overflow: hidden;
-}
-
-.error-state::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background: var(--danger-color);
 }
 
 /* Alertas */
@@ -215,7 +36,7 @@
   border-color: #fecaca;
 }
 
-/* Scrollbar personalizado */
+/* Scrollbar personalizado para selectores */
 .productos-selector::-webkit-scrollbar,
 .categorias-selector::-webkit-scrollbar {
   width: 8px;
@@ -238,7 +59,7 @@
   background: var(--gray-400);
 }
 
-/* Animaciones */
+/* Animaciones específicas */
 @keyframes slideInUp {
   from {
     opacity: 0;
@@ -261,61 +82,23 @@
   }
 }
 
-/* Delays de animación */
+/* Delays de animación para secciones */
 .form-section:nth-child(1) { animation-delay: 0.1s; }
 .form-section:nth-child(2) { animation-delay: 0.2s; }
 .form-section:nth-child(3) { animation-delay: 0.3s; }
 .form-section:nth-child(4) { animation-delay: 0.4s; }
 
-/* Responsive */
+/* Responsive específico para ofertas */
 @media (max-width: 768px) {
-  .oferta-form-container {
-    margin: var(--spacing-md);
-    border-radius: var(--radius-lg);
-  }
-  
-  .form-header {
+  .oferta-form {
     padding: var(--spacing-lg);
-  }
-  
-  .form-header h2 {
-    font-size: var(--text-xl);
-  }
-  
-  .form-section {
-    padding: var(--spacing-lg);
-  }
-  
-  .form-section h3 {
-    font-size: var(--text-lg);
-  }
-  
-  .productos-selector,
-  .categorias-selector {
-    max-height: 250px;
+    gap: var(--spacing-lg);
   }
 }
 
 @media (max-width: 480px) {
-  .oferta-form-container {
-    margin: var(--spacing-sm);
-  }
-  
-  .form-header h2 {
-    font-size: var(--text-lg);
-  }
-  
-  .form-header .btn-outline {
-    position: static;
-    margin-top: var(--spacing-sm);
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .producto-item,
-  .categoria-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-sm);
+  .oferta-form {
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
   }
 } 

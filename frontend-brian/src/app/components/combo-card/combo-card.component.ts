@@ -19,6 +19,7 @@ export class ComboCardComponent {
   @Output() deleteClick = new EventEmitter<string>();
   @Output() activateClick = new EventEmitter<string>();
   @Output() deactivateClick = new EventEmitter<string>();
+  @Output() addToCartClick = new EventEmitter<Combo>();
 
   getProductosNombres(): string {
     if (!this.combo.productos || this.combo.productos.length === 0) {
@@ -61,6 +62,11 @@ export class ComboCardComponent {
     if (this.combo._id) {
       this.deactivateClick.emit(this.combo._id);
     }
+  }
+
+  onAddToCartClick(event: Event): void {
+    event.stopPropagation();
+    this.addToCartClick.emit(this.combo);
   }
 
   getPrecioConDescuento(): number {

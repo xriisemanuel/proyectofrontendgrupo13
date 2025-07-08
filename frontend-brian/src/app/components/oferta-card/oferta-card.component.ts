@@ -21,6 +21,7 @@ export class OfertaCardComponent {
   @Output() deleteClick = new EventEmitter<string>();
   @Output() activateClick = new EventEmitter<string>();
   @Output() deactivateClick = new EventEmitter<string>();
+  @Output() addToCartClick = new EventEmitter<Oferta>();
 
   getProductosNombres(): string {
     if (!this.oferta.productosAplicables || this.oferta.productosAplicables.length === 0) {
@@ -63,14 +64,6 @@ export class OfertaCardComponent {
     const fin = new Date(this.oferta.fechaFin);
     
     return ahora >= inicio && ahora <= fin;
-  }
-
-  getDiasRestantes(): number {
-    const ahora = new Date();
-    const fin = new Date(this.oferta.fechaFin);
-    const diffTime = fin.getTime() - ahora.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return Math.max(0, diffDays);
   }
 
   getTiempoRestante(): string {
@@ -161,5 +154,30 @@ export class OfertaCardComponent {
     if (this.oferta._id) {
       this.deactivateClick.emit(this.oferta._id);
     }
+  }
+
+  onAddToCartClick(event: Event): void {
+    event.stopPropagation();
+    this.addToCartClick.emit(this.oferta);
+  }
+
+  // Devuelve el producto único si la oferta aplica solo a un producto y una categoría
+  getProductoUnicoConDescuento(): {precioOriginal: number, precioFinal: number, nombre: string} | null {
+    if (
+      this.oferta.productosAplicables &&
+      this.oferta.productosAplicables.length === 1 &&
+      this.oferta.categoriasAplicables &&
+      this.oferta.categoriasAplicables.length === 1
+    ) {
+      const productoId = this.oferta.productosAplicables[0]._id || this.oferta.productosAplicables[0];
+      const producto = this.productos.find(p => p._id === productoId);
+      if (producto) {
+        const precioOriginal = producto.precio;
+        const descuento = this.oferta.descuento || 0;
+        const precioFinal = +(precioOriginal * (1 - descuento / 100)).toFixed(2);
+        return { precioOriginal, precioFinal, nombre: producto.nombre };
+      }
+    }
+    return null;
   }
 } 

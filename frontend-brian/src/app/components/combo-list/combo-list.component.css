@@ -6,6 +6,32 @@
   margin: 0 auto;
 }
 
+/* Mensaje temporal */
+.mensaje-temp {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--primary-color);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  z-index: 1000;
+  box-shadow: var(--shadow-lg);
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 .combo-list-header {
   display: flex;
   justify-content: space-between;
@@ -93,14 +119,15 @@
 /* Grid de cards */
 .combo-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: var(--spacing-lg);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-md);
   margin-bottom: var(--spacing-xl);
 }
 
 .combo-card-item {
   cursor: pointer;
   transition: transform 0.2s ease;
+  justify-self: center;
 }
 
 .combo-card-item:hover {
@@ -307,17 +334,16 @@
   
   .combo-list-header {
     flex-direction: column;
-    align-items: stretch;
+    align-items: flex-start;
     gap: var(--spacing-sm);
   }
   
   .combo-list-title {
     font-size: 1.5rem;
-    text-align: center;
   }
   
   .search-container {
-    justify-content: center;
+    width: 100%;
   }
   
   .search-input {
@@ -325,17 +351,16 @@
   }
   
   .combo-cards-grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: var(--spacing-md);
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--spacing-sm);
   }
   
   .modal-content {
     width: 95%;
-    margin: var(--spacing-sm);
   }
   
   .form-row {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
   
   .modal-footer {
@@ -359,7 +384,6 @@
   
   .search-input {
     min-width: 150px;
-    font-size: 0.875rem;
   }
   
   .modal-header h3 {
@@ -368,6 +392,6 @@
   
   .modal-body,
   .modal-footer {
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm);
   }
 }

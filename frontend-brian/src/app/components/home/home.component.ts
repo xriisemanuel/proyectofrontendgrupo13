@@ -49,6 +49,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   productos: Producto[] = [];
   productosDisponibles: Producto[] = [];
   categoriasDisponibles: Categoria[] = [];
+  
+  // Mensajes
+  mensaje: string = '';
 
   constructor(
     private comboService: ComboService,
@@ -368,5 +371,29 @@ export class HomeComponent implements OnInit, OnDestroy {
       sessionStorage.setItem('focusOfertaSearch', '1');
     }
     this.router.navigate(['/ofertas']);
+  }
+
+  /**
+   * Añade una oferta al carrito (simulado)
+   * @param oferta - Oferta a añadir
+   */
+  addToCart(oferta: any) {
+    // TODO: Implementar lógica real del carrito
+    this.mensaje = `Oferta "${oferta.nombre}" añadida al carrito`;
+    setTimeout(() => {
+      this.mensaje = '';
+    }, 2000);
+  }
+
+  /**
+   * Añade un combo al carrito (simulado)
+   * @param combo - Combo a añadir
+   */
+  addComboToCart(combo: any) {
+    // TODO: Implementar lógica real del carrito
+    this.mensaje = `Combo "${combo.nombre}" añadido al carrito`;
+    setTimeout(() => {
+      this.mensaje = '';
+    }, 2000);
   }
 } 

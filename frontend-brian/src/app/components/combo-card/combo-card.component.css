@@ -2,7 +2,7 @@
 
 .combo-card {
   background: white;
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
   transition: all 0.3s ease;
@@ -11,6 +11,8 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  max-width: 320px;
+  min-height: 400px;
 }
 
 .combo-card:hover {
@@ -31,7 +33,7 @@
   right: var(--spacing-sm);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-sm);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -50,10 +52,10 @@
   border: 1px solid #fecaca;
 }
 
-/* Imagen */
+/* Imagen - Más grande */
 .card-image {
   position: relative;
-  height: 200px;
+  height: 180px;
   overflow: hidden;
   background: var(--gray-50);
 }
@@ -79,33 +81,40 @@
 }
 
 .placeholder-icon {
-  font-size: 3rem;
+  font-size: 2.5rem;
   opacity: 0.5;
   color: var(--gray-400);
 }
 
 /* Contenido */
 .card-content {
-  padding: var(--spacing-lg);
+  padding: var(--spacing-sm);
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-xs);
 }
 
+/* Título más vistoso */
 .combo-title {
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: 1.2rem;
+  font-weight: 700;
   color: var(--gray-900);
-  margin: 0;
+  margin: 0 0 var(--spacing-xs) 0;
   line-height: 1.3;
   font-family: var(--font-alt);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  background: linear-gradient(135deg, var(--gray-900) 0%, var(--primary-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.02em;
 }
 
 .combo-description {
   color: var(--gray-600);
-  font-size: 0.875rem;
-  line-height: 1.5;
+  font-size: 0.75rem;
+  line-height: 1.3;
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -122,14 +131,14 @@
 .products-label {
   font-weight: 600;
   color: var(--gray-700);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .products-list {
   color: var(--gray-600);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -137,9 +146,14 @@
   overflow: hidden;
 }
 
-/* Sección de precios */
+/* Sección de precios - Más destacado */
 .price-section {
   margin-top: auto;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
 }
 
 .price-container {
@@ -150,10 +164,11 @@
 
 .price-label {
   font-weight: 600;
-  color: var(--gray-700);
-  font-size: 0.875rem;
+  color: white;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 .price-info {
@@ -164,15 +179,18 @@
 }
 
 .original-price {
-  color: var(--gray-500);
+  color: rgba(255,255,255,0.8);
   text-decoration: line-through;
-  font-size: 0.875rem;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .final-price {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--primary-color);
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  letter-spacing: 0.5px;
 }
 
 .discount-badge {
@@ -180,15 +198,17 @@
   color: white;
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-sm);
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.7rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 /* Acciones */
 .card-actions {
-  padding: var(--spacing-lg);
+  padding: var(--spacing-sm);
   border-top: 1px solid var(--gray-200);
   background-color: var(--gray-50);
   display: flex;
@@ -198,12 +218,12 @@
 
 .btn-action {
   flex: 1;
-  min-width: 80px;
-  padding: var(--spacing-sm) var(--spacing-md);
+  min-width: 70px;
+  padding: var(--spacing-xs) var(--spacing-sm);
   border: none;
   border-radius: var(--radius-md);
   font-weight: 500;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   cursor: pointer;
   transition: all 0.2s ease;
   text-transform: uppercase;
@@ -234,12 +254,12 @@
 }
 
 .btn-activate {
-  background-color: var(--primary-color);
+  background-color: var(--secondary-color);
   color: white;
 }
 
 .btn-activate:hover {
-  background-color: var(--primary-dark);
+  background-color: var(--secondary-dark);
 }
 
 .btn-deactivate {
@@ -257,14 +277,63 @@
   gap: var(--spacing-xs);
 }
 
+/* Botón Añadir al Carrito */
+.cart-action {
+  padding: var(--spacing-sm);
+  border-top: 1px solid var(--gray-200);
+  background-color: var(--gray-50);
+  display: flex;
+  justify-content: center;
+}
+
+.btn-add-cart {
+  width: 100%;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-add-cart:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-add-cart:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
+  .combo-card {
+    max-width: 280px;
+    min-height: 360px;
+  }
+  
+  .card-image {
+    height: 160px;
+  }
+  
   .card-content {
-    padding: var(--spacing-md);
+    padding: var(--spacing-xs);
   }
   
   .card-actions {
-    padding: var(--spacing-md);
+    padding: var(--spacing-xs);
     flex-direction: column;
   }
   
@@ -272,27 +341,50 @@
     width: 100%;
   }
   
+  .cart-action {
+    padding: var(--spacing-xs);
+  }
+  
+  .btn-add-cart {
+    padding: var(--spacing-xs);
+    font-size: 0.7rem;
+  }
+  
   .combo-title {
-    font-size: 1.125rem;
+    font-size: 1.1rem;
   }
   
   .final-price {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
   }
 }
 
 @media (max-width: 480px) {
+  .combo-card {
+    max-width: 260px;
+    min-height: 340px;
+  }
+  
   .card-image {
-    height: 150px;
+    height: 140px;
   }
   
   .card-content {
-    padding: var(--spacing-sm);
-    gap: var(--spacing-sm);
+    padding: var(--spacing-xs);
+    gap: var(--spacing-xs);
   }
   
   .card-actions {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-xs);
+  }
+  
+  .cart-action {
+    padding: var(--spacing-xs);
+  }
+  
+  .btn-add-cart {
+    padding: var(--spacing-xs);
+    font-size: 0.65rem;
   }
   
   .combo-title {
@@ -300,6 +392,6 @@
   }
   
   .final-price {
-    font-size: 1.125rem;
+    font-size: 1.1rem;
   }
 } 

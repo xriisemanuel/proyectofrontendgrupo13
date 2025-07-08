@@ -47,6 +47,14 @@
         </div>
       </div>
     </div>
+
+    <!-- Botón Añadir al Carrito (para todos los usuarios, combos activos) -->
+    <div class="cart-action" *ngIf="combo.estado">
+      <button class="btn-add-cart" title="Añadir al carrito" (click)="onAddToCartClick($event)">
+        <span class="btn-icon">🛒</span>
+        Añadir al Carrito
+      </button>
+    </div>
   </div>
 
   <!-- Acciones (solo para administradores) -->

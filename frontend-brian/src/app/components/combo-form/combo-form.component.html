@@ -1,4 +1,4 @@
-<div class="combo-form-container">
+<div class="form-container">
   <div class="form-header">
     <h2>{{ esEdicion ? 'Editar Combo' : 'Crear Nuevo Combo' }}</h2>
     <button type="button" (click)="volverAtras()" class="btn btn-outline">
@@ -55,52 +55,32 @@
       <h3>Productos del Combo</h3>
       
       <div class="form-group">
-        <label for="productos">Seleccionar Productos *</label>
+        <label>Seleccionar Productos *</label>
         <div class="productos-selector">
           <div *ngFor="let producto of productos" class="producto-item">
-            <input 
-              type="checkbox" 
-              [id]="'producto-' + producto._id"
-              [value]="producto._id"
-              (change)="toggleProducto(producto._id)"
-              [checked]="isProductoSeleccionado(producto._id)"
-            />
-            <label [for]="'producto-' + producto._id" class="producto-label">
+            <div class="producto-row">
+              <input 
+                type="checkbox" 
+                [id]="'producto-' + producto._id"
+                [value]="producto._id"
+                (change)="toggleProducto(producto._id)"
+                [checked]="isProductoSeleccionado(producto._id)"
+              />
               <span class="producto-nombre">{{ producto.nombre }}</span>
               <span class="producto-precio">${{ producto.precio }}</span>
-            </label>
-            
-            <!-- Controles de unidades (solo mostrar si está seleccionado) -->
-            <div *ngIf="isProductoSeleccionado(producto._id)" class="unidades-control">
-              <label for="unidades-{{ producto._id }}">Unidades:</label>
-              <div class="unidades-input">
-                <button 
-                  type="button" 
-                  class="btn-unidad" 
-                  (click)="cambiarUnidades(producto._id, getUnidadesProducto(producto._id) - 1)"
-                  [disabled]="getUnidadesProducto(producto._id) <= 1"
-                >
-                  -
-                </button>
+              
+              <!-- Campo de unidades inline -->
+              <div *ngIf="isProductoSeleccionado(producto._id)" class="unidades-inline">
                 <input 
                   type="number" 
                   [id]="'unidades-' + producto._id"
                   [value]="getUnidadesProducto(producto._id)"
                   min="1"
                   (change)="onUnidadesChange($event, producto._id)"
-                  class="unidades-number"
+                  class="unidades-input"
+                  placeholder="1"
                 />
-                <button 
-                  type="button" 
-                  class="btn-unidad" 
-                  (click)="cambiarUnidades(producto._id, getUnidadesProducto(producto._id) + 1)"
-                >
-                  +
-                </button>
               </div>
-              <span class="subtotal-producto">
-                Subtotal: ${{ getSubtotalProducto(producto).toFixed(2) }}
-              </span>
             </div>
           </div>
         </div>

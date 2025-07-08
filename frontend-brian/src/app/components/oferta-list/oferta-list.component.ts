@@ -6,7 +6,7 @@ import { OfertaService, Oferta } from '../../services/oferta.service';
 import { ProductoService, Producto } from '../../services/producto.service';
 import { CategoriaService, Categoria } from '../../services/categoria.service';
 import { AuthService } from '../../services/auth.service';
-import { Subject, debounceTime, distinctUntilChanged, switchMap, interval, Subscription, timer } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { OfertaCardComponent } from '../oferta-card/oferta-card.component';
 import { Router } from '@angular/router';
 
@@ -22,14 +22,13 @@ export class OfertaListComponent implements OnInit, OnDestroy {
   ofertasFiltradas: Oferta[] = [];
   terminoBusqueda: string = '';
   private searchSubject = new Subject<string>();
-  private verificacionSubscription?: Subscription;
   
   productosDisponibles: Producto[] = [];
   categoriasDisponibles: Categoria[] = [];
   
   errorCarga: string = '';
   cargando: boolean = false;
-  ultimaVerificacion: Date = new Date();
+  mensaje: string = '';
 
   @ViewChild('ofertaSearchInput') ofertaSearchInput!: ElementRef<HTMLInputElement>;
 
@@ -55,7 +54,6 @@ export class OfertaListComponent implements OnInit, OnDestroy {
       next: (ofertas) => {
         this.ofertas = ofertas;
         this.filtrarOfertasPorRol();
-        this.verificarOfertasExpiradas();
       },
       error: (error) => {
         console.error('Error al buscar ofertas:', error);
@@ -66,14 +64,10 @@ export class OfertaListComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Cargar ofertas (ahora es público)
     this.cargarOfertas();
-    // Solo cargar productos y categorías si es administrador (para mostrar en las cards)
-    if (this.authService.hasAdminPermissions()) {
-      this.cargarProductos();
-      this.cargarCategorias();
-    }
+    // Cargar productos y categorías para mostrar en las cards (tanto para clientes como administradores)
+    this.cargarProductos();
+    this.cargarCategorias();
     
-    // Iniciar verificación automática cada minuto
-    this.iniciarVerificacionAutomatica();
     // Enfocar búsqueda si viene de Home
     setTimeout(() => {
       if (isPlatformBrowser(this.platformId) && sessionStorage.getItem('focusOfertaSearch') === '1') {
@@ -85,51 +79,6 @@ export class OfertaListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     // Limpiar suscripción al destruir el componente
-    if (this.verificacionSubscription) {
-      this.verificacionSubscription.unsubscribe();
-    }
-  }
-
-  iniciarVerificacionAutomatica(): void {
-    // Verificar inmediatamente al cargar
-    this.verificarOfertasExpiradas();
-    
-    // Luego verificar cada minuto
-    this.verificacionSubscription = interval(60000).subscribe(() => {
-      this.verificarOfertasExpiradas();
-    });
-  }
-
-  verificarOfertasExpiradas(): void {
-    // Verificar ofertas expiradas en el frontend
-    const ofertasParaDesactivar = this.ofertaService.getOfertasParaDesactivar(this.ofertas);
-    
-    if (ofertasParaDesactivar.length > 0) {
-      console.log(`Se encontraron ${ofertasParaDesactivar.length} ofertas expiradas`);
-      
-      // Desactivar ofertas expiradas
-      ofertasParaDesactivar.forEach(oferta => {
-        if (oferta._id) {
-          this.ofertaService.desactivarOferta(oferta._id).subscribe({
-            next: () => {
-              console.log(`Oferta "${oferta.nombre}" desactivada automáticamente por expiración`);
-              // Actualizar el estado local
-              const index = this.ofertas.findIndex(o => o._id === oferta._id);
-              if (index !== -1) {
-                this.ofertas[index].estado = false;
-              }
-            },
-            error: (error) => {
-              console.error(`Error al desactivar oferta expirada "${oferta.nombre}":`, error);
-            }
-          });
-        }
-      });
-      
-      // Actualizar la lista filtrada
-      this.filtrarOfertasPorRol();
-      this.ultimaVerificacion = new Date();
-    }
   }
 
   cargarOfertas(): void {
@@ -140,7 +89,6 @@ export class OfertaListComponent implements OnInit, OnDestroy {
       next: (ofertas) => {
         this.ofertas = ofertas;
         this.filtrarOfertasPorRol();
-        this.verificarOfertasExpiradas(); // Verificar inmediatamente al cargar
         this.cargando = false;
       },
       error: (error) => {
@@ -303,5 +251,19 @@ export class OfertaListComponent implements OnInit, OnDestroy {
     const horasRestantes = diferencia / (1000 * 60 * 60);
     
     return horasRestantes > 0 && horasRestantes <= 24;
+  }
+
+  /**
+   * Añade una oferta al carrito (simulado)
+   * @param oferta - Oferta a añadir
+   */
+  addToCart(oferta: any) {
+    // Mostrar mensaje temporal
+    this.mensaje = `"${oferta.nombre}" añadido al carrito`;
+    
+    // Limpiar mensaje después de 3 segundos
+    setTimeout(() => {
+      this.mensaje = '';
+    }, 3000);
   }
 } 

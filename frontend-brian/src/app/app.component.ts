@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterOutlet, RouterModule } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ComboFormComponent } from './components/combo-form/combo-form.component';
@@ -9,6 +9,7 @@ import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { AuthService } from './services/auth.service';
+import { RoleService, UserRole } from './services/role.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -30,13 +31,35 @@ import { CommonModule } from '@angular/common';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'frontend-brian';
   
-  constructor(public authService: AuthService) {
-    console.log('AppComponent inicializado');
+  /** Estado de autenticación del usuario */
+  isLoggedIn: boolean = false;
+  
+  /** Rol actual del usuario */
+  currentRole: UserRole = 'cliente';
+  
+  constructor(
+    public authService: AuthService,
+    private roleService: RoleService
+  ) {}
+  
+  ngOnInit() {
+    // Verificar si el usuario está autenticado al cargar la aplicación
+    this.isLoggedIn = this.authService.isLoggedIn();
+    this.currentRole = this.authService.getCurrentRole();
+    
+    // Suscribirse a cambios en el estado de autenticación
+    this.roleService.currentRole$.subscribe((role: UserRole) => {
+      this.currentRole = role;
+      this.isLoggedIn = this.authService.isLoggedIn();
+    });
   }
   
+  /**
+   * Cierra la sesión del usuario
+   */
   logout() {
     this.authService.logout();
     window.location.reload();

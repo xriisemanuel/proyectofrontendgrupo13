@@ -22,6 +22,7 @@ export class ComboListComponent implements OnInit {
   combosFiltrados: Combo[] = [];
   errorCarga: string = '';
   cargando: boolean = false;
+  mensaje: string = '';
   @ViewChild('comboSearchInput') comboSearchInput!: ElementRef<HTMLInputElement>;
 
   constructor(
@@ -35,10 +36,8 @@ export class ComboListComponent implements OnInit {
   ngOnInit() {
     // Cargar combos (ahora es público)
     this.cargarCombos();
-    // Solo cargar productos si es administrador (para mostrar en las cards)
-    if (this.authService.hasAdminPermissions()) {
-      this.cargarProductos();
-    }
+    // Cargar productos para mostrar en las cards (tanto para clientes como administradores)
+    this.cargarProductos();
     // Enfocar búsqueda si viene de Home
     setTimeout(() => {
       if (isPlatformBrowser(this.platformId) && sessionStorage.getItem('focusComboSearch') === '1') {
@@ -204,5 +203,17 @@ export class ComboListComponent implements OnInit {
       this.comboSearchInput.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       setTimeout(() => this.comboSearchInput.nativeElement.focus(), 400);
     }
+  }
+
+  /**
+   * Añade un combo al carrito (simulado)
+   * @param combo - Combo a añadir
+   */
+  addComboToCart(combo: any) {
+    // TODO: Implementar lógica real del carrito
+    this.mensaje = `Combo "${combo.nombre}" añadido al carrito`;
+    setTimeout(() => {
+      this.mensaje = '';
+    }, 2000);
   }
 }

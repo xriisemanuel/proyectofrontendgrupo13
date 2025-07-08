@@ -1,4 +1,9 @@
 <div class="combo-list-container">
+  <!-- Mensaje temporal -->
+  <div *ngIf="mensaje" class="mensaje-temp">
+    {{ mensaje }}
+  </div>
+
   <div class="combo-list-header">
     <h2 class="combo-list-title">Lista de Combos</h2>
     
@@ -46,6 +51,7 @@
       (deleteClick)="eliminarCombo($event)"
       (activateClick)="activarCombo($event)"
       (deactivateClick)="desactivarCombo($event)"
+      (addToCartClick)="addComboToCart($event)"
       class="combo-card-item">
     </app-combo-card>
   </div>

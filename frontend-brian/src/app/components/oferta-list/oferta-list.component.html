@@ -1,4 +1,9 @@
 <div class="oferta-list-container">
+  <!-- Mensaje temporal -->
+  <div *ngIf="mensaje" class="mensaje-temp">
+    {{ mensaje }}
+  </div>
+
   <div class="oferta-list-header">
     <h2 class="oferta-list-title">Lista de Ofertas</h2>
     
@@ -20,18 +25,6 @@
               class="btn-create">
         + Crear Oferta
       </button>
-    </div>
-  </div>
-
-  <!-- Información de verificación automática (solo para administradores) -->
-  <div *ngIf="authService.hasAdminPermissions() && !cargando" class="verificacion-info">
-    <div class="verificacion-status">
-      <span class="status-indicator active"></span>
-      <span class="status-text">Verificación automática activa</span>
-      <span class="ultima-verificacion">Última verificación: {{ ultimaVerificacion | date:'HH:mm:ss' }}</span>
-    </div>
-    <div class="verificacion-description">
-      Las ofertas se desactivan automáticamente cuando expiran
     </div>
   </div>
 
@@ -57,6 +50,7 @@
       (deleteClick)="eliminarOferta($event)"
       (activateClick)="activarOferta($event)"
       (deactivateClick)="desactivarOferta($event)"
+      (addToCartClick)="addToCart($event)"
       class="oferta-card-item">
     </app-oferta-card>
   </div>
@@ -65,5 +59,4 @@
   <div *ngIf="!errorCarga && !cargando && ofertasFiltradas.length === 0" class="empty-state">
     No hay ofertas para mostrar.
   </div>
-</div>
-
+</div> 
