@@ -1,0 +1,55 @@
+<!-- src/app/features/cliente/components/mis-pedidos/mis-pedidos.component.html -->
+
+<div class="mis-pedidos-container">
+  <div class="dashboard-header">
+    <h2><i class="fas fa-clipboard-list"></i> Mis Pedidos</h2>
+  </div>
+  <p class="intro-text">Aquí puedes ver el estado actual de tus pedidos y tu historial de compras.</p>
+
+  <div *ngIf="isLoading" class="loading-indicator">
+    <i class="fas fa-spinner fa-spin"></i> Cargando tus pedidos...
+  </div>
+
+  <div *ngIf="errorMessage" class="message-panel error-message">
+    <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!isLoading && pedidos.length === 0" class="no-data-message">
+    <p><i class="fas fa-box-open"></i> No tienes pedidos registrados aún.</p>
+    <p>¡Explora nuestros productos y haz tu primer pedido!</p>
+  </div>
+
+  <div *ngIf="!isLoading && pedidos.length > 0" class="pedidos-list">
+    <div *ngFor="let pedido of pedidos" class="pedido-card interactive-card">
+      <div class="pedido-header">
+        <h3>Pedido #{{ pedido._id | slice:0:8 }}</h3> <!-- Muestra solo una parte del ID para brevedad -->
+        <span class="pedido-estado status-{{ pedido.estado | lowercase }}">
+          {{ pedido.estado | titlecase }}
+        </span>
+      </div>
+      <div class="pedido-details">
+        <p><strong>Fecha:</strong> {{ pedido.fechaPedido | date:'medium' }}</p>
+        <p><strong>Total:</strong> ${{ pedido.total }}</p>
+        <p><strong>Método de Pago:</strong> {{ pedido.metodoPago }}</p>
+        <p><strong>Dirección:</strong> {{ pedido.direccionEntrega }}</p>
+        <div class="detalle-productos">
+          <h4>Productos:</h4>
+          <ul>
+            <li *ngFor="let item of pedido.detalleProductos">
+              {{ item.cantidad }}x {{ item.nombreProducto }} - ${{ formatPrice(item.precioUnitario) }} c/u
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="pedido-actions">
+        <!-- Puedes añadir acciones aquí, como "Ver Detalles", "Calificar" (si el estado es "entregado") -->
+        <button *ngIf="pedido.estado === 'entregado'" class="btn-calificar">
+          <i class="fas fa-star"></i> Calificar
+        </button>
+        <button class="btn-ver-detalles">
+          <i class="fas fa-info-circle"></i> Ver Detalles
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

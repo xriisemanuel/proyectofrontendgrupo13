@@ -1,0 +1,130 @@
+<!-- src/app/features/cliente/components/realizar-pedido/realizar-pedido.component.html -->
+
+<div class="pedido-container">
+    <div class="dashboard-header">
+        <h2><i class="fas fa-shopping-cart"></i> Realizar Nuevo Pedido</h2>
+    </div>
+    <p class="intro-text">Explora nuestros productos y crea tu pedido. Una vez que hayas añadido todo a tu carrito,
+        completa los detalles de entrega y pago.</p>
+
+    <!-- Sección de Mensajes (Error/Éxito) -->
+    <div *ngIf="errorMessage" class="message-panel error-message interactive-card">
+        <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+    </div>
+    <div *ngIf="successMessage" class="message-panel success-message interactive-card">
+        <i class="fas fa-check-circle"></i> {{ successMessage }}
+    </div>
+
+    <!-- Sección de Selección de Productos -->
+    <div class="product-selection-panel dashboard-panel interactive-card">
+        <h3><i class="fas fa-box-open"></i> Productos Disponibles</h3>
+        <div *ngIf="isLoading" class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i> Cargando productos...
+        </div>
+        <div *ngIf="!isLoading && productosDisponibles.length === 0" class="no-products">
+            <p>No hay productos disponibles en este momento.</p>
+        </div>
+
+        <div class="products-grid">
+            <div *ngFor="let producto of productosDisponibles" class="product-card interactive-card">
+                <div class="product-image-container">
+                    <!-- Placeholder de imagen si no hay URL, o si la URL falla -->
+                    <img [src]="producto.imageUrl || 'https://placehold.co/150x150/172A45/CCD6F6?text=Producto'"
+                        alt="{{ producto.nombre }}"
+                        onerror="this.onerror=null;this.src='https://placehold.co/150x150/172A45/CCD6F6?text=Producto';"
+                        class="product-image">
+                </div>
+                <div class="product-info">
+                    <h4>{{ producto.nombre }}</h4>
+                    <p class="product-description">{{ producto.descripcion }}</p>
+                    <p class="product-price">${{ formatPrice(producto.precio) }}</p>
+                    <button (click)="agregarAlCarrito(producto)" class="add-to-cart-btn">
+                        <i class="fas fa-plus-circle"></i> Añadir al Carrito
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de Carrito de Compras -->
+    <div class="cart-panel dashboard-panel interactive-card">
+        <h3><i class="fas fa-shopping-basket"></i> Tu Carrito ({{ carrito.length }} ítems)</h3>
+        <div *ngIf="carrito.length === 0" class="empty-cart">
+            <p>Tu carrito está vacío. ¡Añade algunos productos!</p>
+        </div>
+
+        <div *ngIf="carrito.length > 0" class="cart-items-list">
+            <div *ngFor="let item of carrito" class="cart-item interactive-card">
+                <div class="item-details">
+                    <span class="item-name">{{ item.nombreProducto }}</span>
+                    <span class="item-price">${{ formatPrice(item.precioUnitario) }} c/u</span>
+                </div>
+                <div class="item-quantity-controls">
+                    <button (click)="quitarDelCarrito(item.productoId)" class="quantity-btn minus-btn">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <span class="item-quantity">{{ item.cantidad }}</span>
+                    <!-- CORRECCIÓN APLICADA AQUÍ: Se usa incrementarCantidadEnCarrito con item.productoId -->
+                    <button (click)="incrementarCantidadEnCarrito(item.productoId)"
+                        class="quantity-btn plus-btn">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <span class="item-subtotal">${{ formatPrice(item.cantidad * item.precioUnitario) }}</span>
+            </div>
+        </div>
+
+        <div *ngIf="carrito.length > 0" class="cart-summary">
+            <div class="summary-line">
+                <span>Subtotal Productos:</span>
+                <span>${{ formatPrice(subtotalPedido) }}</span>
+            </div>
+            <div class="summary-line">
+                <span>Descuentos:</span>
+                <span>-${{ formatPrice(descuentos) }}</span>
+            </div>
+            <div class="summary-line">
+                <span>Costo de Envío:</span>
+                <span>+${{ formatPrice(costoEnvio) }}</span>
+            </div>
+            <div class="summary-line total-line">
+                <span>Total a Pagar:</span>
+                <span>${{ formatPrice(totalPedido) }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de Detalles del Pedido (Dirección y Pago) -->
+    <div class="order-details-panel dashboard-panel interactive-card">
+        <h3><i class="fas fa-info-circle"></i> Detalles del Pedido</h3>
+        <form (ngSubmit)="realizarPedido()">
+            <div class="form-group">
+                <label for="direccionEntrega"><i class="fas fa-map-marker-alt"></i> Dirección de Entrega:</label>
+                <input type="text" id="direccionEntrega" [(ngModel)]="direccionEntrega" name="direccionEntrega" required
+                    placeholder="Ej. Calle Falsa 123, Springfield">
+            </div>
+
+            <div class="form-group">
+                <label for="metodoPago"><i class="fas fa-wallet"></i> Método de Pago:</label>
+                <select id="metodoPago" [(ngModel)]="metodoPago" name="metodoPago" required>
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
+                    <option value="Tarjeta de Débito">Tarjeta de Débito</option>
+                    <option value="Transferencia">Transferencia</option>
+                    <option value="Mercado Pago">Mercado Pago</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="observaciones"><i class="fas fa-comment-dots"></i> Observaciones (opcional):</label>
+                <textarea id="observaciones" [(ngModel)]="observaciones" name="observaciones" rows="3"
+                    placeholder="Ej. Tocar timbre 2 veces, dejar en la puerta del vecino."></textarea>
+            </div>
+
+            <button type="submit" class="submit-order-btn" [disabled]="isLoading || carrito.length === 0">
+                <i class="fas fa-paper-plane"></i> {{ isLoading ? 'Procesando...' : 'Confirmar Pedido' }}
+            </button>
+        </form>
+    </div>
+</div>

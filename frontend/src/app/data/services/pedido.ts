@@ -4,8 +4,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../../core/constants/constants'; // Asegúrate de que esta ruta sea correcta
-import { IPedido } from '../../shared/interfaces';
-
+import { IPedidoPayload } from '../../shared/pedido.interface'; // Importa IPedido y IPedidoPayload
+import { IPedido } from '../../shared/interfaces'; // Asegúrate de que esta ruta sea correcta
 const PEDIDO_API = `${API_BASE_URL}/pedido`; // Ruta base de la API para pedidos (ajusta si es diferente)
 
 @Injectable({
@@ -22,11 +22,7 @@ export class PedidoService {
    * @param estados Opcional. Array de estados por los que filtrar (ej. ['pendiente', 'en_preparacion']).
    * @returns Un Observable con un array de pedidos.
    */
-  // **AJUSTADO: Eliminando la lógica de 'url = ${PEDIDO_API}/filtrados?estado=' aquí**
-  // Ya que ahora 'getPedidos' y 'getPedidosByRepartidorId' (que es el que se usa en el dashboard)
-  // pueden usar el mismo endpoint raíz '/pedido' con query parameters.
-  // Tu `listarPedidos` en el backend ya maneja `estado` y `repartidorId` como query params.
-   getPedidos(
+  getPedidos(
     estados?: string[],
     repartidorId?: string,
     clienteId?: string,
@@ -82,10 +78,11 @@ export class PedidoService {
 
   /**
    * @description Crea un nuevo pedido. (Principalmente para el cliente)
+   * Acepta directamente el IPedidoPayload que se construye en el frontend.
    * @param pedidoData Los datos del pedido a crear.
    * @returns Un Observable con la respuesta del backend.
    */
-  createPedido(pedidoData: Omit<IPedido, '_id' | 'fechaPedido' | 'subtotal' | 'total' | 'estado' | 'createdAt' | 'updatedAt'>): Observable<any> {
+  createPedido(pedidoData: IPedidoPayload): Observable<any> { // CORRECCIÓN APLICADA AQUÍ
     return this.http.post(PEDIDO_API, pedidoData);
   }
 
@@ -107,37 +104,6 @@ export class PedidoService {
    */
   deletePedido(id: string): Observable<any> {
     return this.http.delete(`${PEDIDO_API}/${id}`);
-  }
-
-  /**
-   * @description Obtiene pedidos filtrados por estado (endpoint específico).
-   * **RECOMENDACIÓN:** Este método `getPedidosByEstado` se vuelve redundante.
-   * Ahora `getPedidos(estados)` hace lo mismo llamando al endpoint principal.
-   * Puedes eliminarlo si ya no lo usas explícitamente en otros lugares.
-   */
-  // getPedidosByEstado(estado: IPedido['estado']): Observable<IPedido[]> {
-  //   return this.http.get<IPedido[]>(`${PEDIDO_API}/estado/${estado}`);
-  // }
-
-  /**
-   * @description Asigna un repartidor a un pedido. (Solo para admin/supervisor_ventas)
-   * @param pedidoId El ID del pedido.
-   * @param repartidorId El ID del repartidor.
-   * @param fechaEstimadaEntrega La fecha estimada de entrega.
-   * @returns Un Observable con la respuesta del backend.
-   */
-  asignarRepartidor(pedidoId: string, repartidorId: string, fechaEstimadaEntrega?: Date): Observable<any> {
-    return this.http.patch(`${PEDIDO_API}/${pedidoId}/asignar-repartidor`, { repartidorId, fechaEstimadaEntrega });
-  }
-
-  /**
-   * @description Aplica descuentos a un pedido. (Solo para admin/supervisor_ventas)
-   * @param pedidoId El ID del pedido.
-   * @param montoDescuento El monto del descuento.
-   * @returns Un Observable con la respuesta del backend.
-   */
-  aplicarDescuentos(pedidoId: string, montoDescuento: number): Observable<any> {
-    return this.http.patch(`${PEDIDO_API}/${pedidoId}/aplicar-descuentos`, { montoDescuento });
   }
 
   /**

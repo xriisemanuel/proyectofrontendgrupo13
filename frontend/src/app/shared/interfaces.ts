@@ -135,3 +135,26 @@ export interface ICliente {
   puntos?: number;
 }
 // -
+// src/app/shared/interfaces/calificacion.interface.ts
+
+// Interfaz para la calificación de productos específicos dentro de un pedido
+export interface ICalificacionProducto {
+  _id?: string; // Mongoose podría añadir un _id a los subdocumentos si no se especifica _id: false
+  productoId: string;
+  nombreProducto: string;
+  puntuacion: number; // 1-5 estrellas
+  comentario?: string | null; // Opcional, puede ser null
+}
+
+// Interfaz para la calificación general de un pedido
+export interface ICalificacion {
+  _id?: string; // ID generado por MongoDB
+  pedidoId: string;
+  clienteId: string;
+  puntuacionComida: number; // 1-5 estrellas
+  puntuacionServicio: number; // 1-5 estrellas
+  puntuacionEntrega: number; // 1-5 estrellas
+  comentario?: string | null; // Opcional, puede ser null, max 500 caracteres
+  fechaCalificacion?: Date | string; // Fecha de calificación, por defecto Date.now
+  calificacionProductos?: ICalificacionProducto[]; // Array de calificaciones de productos
+}

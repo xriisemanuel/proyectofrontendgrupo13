@@ -199,5 +199,24 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['cliente'] } // Solo los clientes pueden acceder a este dashboard
   },
+  // Rutas específicas del Cliente
+  {
+    path: 'cliente/realizar-pedido',
+    loadComponent: () => import('./features/cliente/realizar-pedido/realizar-pedido').then(m => m.RealizarPedidoComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['cliente'] }
+  },
+  {
+    path: 'mis-pedidos',
+    loadComponent: () => import('./features/cliente/mis-pedidos/mis-pedidos').then(m => m.MisPedidosComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['cliente'] } // Solo los clientes pueden ver sus pedidos
+  },
+  {
+    path: 'calificaciones',
+    loadComponent: () => import('./features/cliente/calificaciones/calificaciones').then(m => m.CalificacionesComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['cliente'] } // Solo los clientes pueden ver sus pedidos
+  },
   { path: '**', redirectTo: 'home' }
 ];

@@ -1,0 +1,109 @@
+<!-- src/app/features/cliente/components/calificaciones/calificaciones.component.html -->
+
+<div class="calificaciones-container">
+    <div class="dashboard-header">
+        <h2><i class="fas fa-star"></i> Calificar Pedidos</h2>
+    </div>
+    <p class="intro-text">Comparte tu experiencia y califica los pedidos que has recibido.</p>
+
+    <div *ngIf="isLoading" class="loading-indicator">
+        <i class="fas fa-spinner fa-spin"></i> Cargando...
+    </div>
+
+    <div *ngIf="errorMessage" class="message-panel error-message">
+        <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+    </div>
+    <div *ngIf="successMessage" class="message-panel success-message">
+        <i class="fas fa-check-circle"></i> {{ successMessage }}
+    </div>
+
+    <!-- Sección para Calificar un Nuevo Pedido -->
+    <div class="calificar-form-section interactive-card">
+        <h3><i class="fas fa-edit"></i> Enviar Nueva Calificación</h3>
+        <form (ngSubmit)="submitCalificacion()">
+            <div class="form-group">
+                <label for="pedidoSelect">Selecciona un Pedido para Calificar:</label>
+                <select id="pedidoSelect" [(ngModel)]="selectedPedidoId" name="selectedPedido" required>
+                    <option [ngValue]="null" disabled>-- Selecciona un pedido --</option>
+                    <option *ngFor="let pedido of pedidosCompletados" [ngValue]="pedido._id">
+                        Pedido #{{ pedido._id | slice:0:8 }} - Total: ${{ pedido.total | number:'1.2-2' }} ({{
+                        pedido.fechaPedido | date:'shortDate' }})
+                    </option>
+                </select>
+                <p *ngIf="pedidosCompletados.length === 0 && !isLoading" class="no-data-message-small">
+                    No hay pedidos completados disponibles para calificar.
+                </p>
+            </div>
+
+            <!-- Puntuación de Comida -->
+            <div class="form-group rating-stars">
+                <label>Puntuación de Comida:</label>
+                <div class="stars">
+                    <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star" [class.active]="star <= puntuacionComida"
+                        (click)="setRating(star, 'comida')"></i>
+                </div>
+            </div>
+
+            <!-- Puntuación de Servicio -->
+            <div class="form-group rating-stars">
+                <label>Puntuación de Servicio:</label>
+                <div class="stars">
+                    <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star" [class.active]="star <= puntuacionServicio"
+                        (click)="setRating(star, 'servicio')"></i>
+                </div>
+            </div>
+
+            <!-- Puntuación de Entrega -->
+            <div class="form-group rating-stars">
+                <label>Puntuación de Entrega:</label>
+                <div class="stars">
+                    <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star" [class.active]="star <= puntuacionEntrega"
+                        (click)="setRating(star, 'entrega')"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="comentario">Comentario (opcional):</label>
+                <textarea id="comentario" [(ngModel)]="comentario" name="comentario" rows="4"
+                    placeholder="¿Qué te pareció el pedido o el servicio?"></textarea>
+            </div>
+
+            <button type="submit"
+                [disabled]="!selectedPedidoId || puntuacionComida === 0 || puntuacionServicio === 0 || puntuacionEntrega === 0">
+                <i class="fas fa-paper-plane"></i> Enviar Calificación
+            </button>
+        </form>
+    </div>
+
+    <!-- Sección de Calificaciones Anteriores -->
+    <div class="calificaciones-list-section interactive-card">
+        <h3><i class="fas fa-history"></i> Tus Calificaciones Anteriores</h3>
+        <div *ngIf="calificaciones.length === 0 && !isLoading" class="no-data-message">
+            <p><i class="fas fa-comment-dots"></i> Aún no has enviado ninguna calificación.</p>
+        </div>
+
+        <div *ngIf="calificaciones.length > 0" class="calificaciones-grid">
+            <div *ngFor="let calificacion of calificaciones" class="calificacion-card">
+                <div class="card-header">
+                    <h4>Pedido #{{ calificacion.pedidoId | slice:0:8 }}</h4>
+                    <div class="rating-summary">
+                        <p>Comida:
+                            <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star"
+                                [class.active]="star <= calificacion.puntuacionComida"></i>
+                        </p>
+                        <p>Servicio:
+                            <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star"
+                                [class.active]="star <= calificacion.puntuacionServicio"></i>
+                        </p>
+                        <p>Entrega:
+                            <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star"
+                                [class.active]="star <= calificacion.puntuacionEntrega"></i>
+                        </p>
+                    </div>
+                </div>
+                <p class="card-comment">{{ calificacion.comentario || 'Sin comentario.' }}</p>
+                <span class="card-date">{{ calificacion.fechaCalificacion | date:'shortDate' }}</span>
+            </div>
+        </div>
+    </div>
+</div>

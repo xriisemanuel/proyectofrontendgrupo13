@@ -1,0 +1,320 @@
+/* src/app/features/cliente/components/mis-pedidos/mis-pedidos.component.css */
+
+.mis-pedidos-container {
+    padding: 30px;
+    max-width: 1000px;
+    margin: 40px auto;
+    background-color: #0A192F;
+    /* Fondo oscuro principal */
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+    color: #CCD6F6;
+    /* Texto claro */
+    font-family: 'Inter', sans-serif;
+}
+
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid rgba(100, 255, 218, 0.15);
+}
+
+.dashboard-header h2 {
+    font-size: 2.8em;
+    color: #64FFDA;
+    /* Color de acento */
+    font-weight: 800;
+    margin: 0;
+    text-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    letter-spacing: -0.05em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.dashboard-header h2 i {
+    font-size: 1.2em;
+}
+
+.intro-text {
+    text-align: center;
+    font-size: 1.1em;
+    color: #8892B0;
+    margin-bottom: 40px;
+}
+
+.loading-indicator,
+.message-panel,
+.no-data-message {
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    text-align: center;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.loading-indicator {
+    background-color: rgba(100, 255, 218, 0.1);
+    color: #64FFDA;
+    border: 1px solid #64FFDA;
+}
+
+.loading-indicator i {
+    animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.error-message {
+    background-color: rgba(239, 71, 111, 0.2);
+    color: #EF476F;
+    border: 1px solid #EF476F;
+}
+
+.no-data-message {
+    background-color: rgba(136, 146, 176, 0.1);
+    color: #8892B0;
+    border: 1px solid #8892B0;
+}
+
+.no-data-message i {
+    font-size: 1.5em;
+}
+
+.pedidos-list {
+    display: grid;
+    gap: 30px;
+}
+
+.pedido-card {
+    background: #172A45;
+    /* Fondo de tarjeta oscuro */
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pedido-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.6);
+}
+
+.pedido-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(136, 146, 176, 0.2);
+}
+
+.pedido-header h3 {
+    font-size: 1.8em;
+    color: #CCD6F6;
+    margin: 0;
+    font-weight: 700;
+}
+
+.pedido-estado {
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Estilos para los diferentes estados de pedido */
+.status-recibido,
+.status-confirmado,
+.status-en_preparacion {
+    background-color: rgba(255, 181, 107, 0.2);
+    color: #FFB56B;
+    border: 1px solid #FFB56B;
+}
+
+.status-listo_para_entrega,
+.status-en_delivery {
+    background-color: rgba(100, 255, 218, 0.2);
+    color: #64FFDA;
+    border: 1px solid #64FFDA;
+}
+
+.status-entregado {
+    background-color: rgba(80, 250, 123, 0.2);
+    color: #50FA7B;
+    border: 1px solid #50FA7B;
+}
+
+.status-cancelado,
+.status-fallido {
+    background-color: rgba(239, 71, 111, 0.2);
+    color: #EF476F;
+    border: 1px solid #EF476F;
+}
+
+.pedido-details p {
+    font-size: 1em;
+    margin-bottom: 8px;
+    color: #CCD6F6;
+}
+
+.pedido-details strong {
+    color: #64FFDA;
+    font-weight: 600;
+}
+
+.detalle-productos {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(136, 146, 176, 0.1);
+}
+
+.detalle-productos h4 {
+    font-size: 1.2em;
+    color: #64FFDA;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.detalle-productos ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.detalle-productos ul li {
+    background-color: rgba(136, 146, 176, 0.08);
+    padding: 8px 12px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    font-size: 0.95em;
+    color: #E6E6E6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pedido-actions {
+    margin-top: 25px;
+    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+.pedido-actions button {
+    background: linear-gradient(45deg, #FFB56B 0%, #E08A22 100%);
+    /* Naranja para acciones */
+    color: #0A192F;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease-out;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pedido-actions button:hover {
+    background: linear-gradient(45deg, #E08A22 0%, #FFB56B 100%);
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 8px 20px rgba(255, 181, 107, 0.4);
+}
+
+.pedido-actions .btn-calificar {
+    background: linear-gradient(45deg, #50FA7B 0%, #34B399 100%);
+    /* Verde para calificar */
+    color: #0A192F;
+}
+
+.pedido-actions .btn-calificar:hover {
+    background: linear-gradient(45deg, #34B399 0%, #50FA7B 100%);
+}
+
+
+/* Media Queries para Responsividad */
+@media (max-width: 768px) {
+    .mis-pedidos-container {
+        padding: 20px;
+        margin: 20px auto;
+    }
+
+    .dashboard-header h2 {
+        font-size: 2.2em;
+        gap: 10px;
+    }
+
+    .intro-text {
+        font-size: 1em;
+        margin-bottom: 30px;
+    }
+
+    .pedido-card {
+        padding: 20px;
+    }
+
+    .pedido-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .pedido-header h3 {
+        font-size: 1.6em;
+    }
+
+    .pedido-estado {
+        font-size: 0.8em;
+    }
+
+    .pedido-actions {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .pedido-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .mis-pedidos-container {
+        padding: 15px;
+    }
+
+    .dashboard-header h2 {
+        font-size: 1.8em;
+    }
+
+    .pedido-header h3 {
+        font-size: 1.4em;
+    }
+
+    .pedido-details p,
+    .detalle-productos ul li {
+        font-size: 0.9em;
+    }
+}

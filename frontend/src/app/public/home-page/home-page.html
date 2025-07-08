@@ -1,61 +1,70 @@
+<!-- src/app/public/home-page/home-page.html -->
+
 <div class="home-page-container">
-    <header class="hero-section">
-        <h1>Bienvenido a Nuestra Tienda Premium</h1>
-        <p>Descubre lo último y lo mejor en productos y colecciones exclusivas.</p>
-        <div class="auth-call-to-action">
-            <p>¿Listo para explorar o iniciar sesión?</p>
-            <button class="btn btn-primary" [routerLink]="['/login']">Iniciar Sesión</button>
-            <button class="btn btn-secondary" [routerLink]="['/register']">Registrarse</button>
+    <header class="main-header">
+        <div class="logo-area">
+            <h1>Tu Tienda Premium</h1>
+        </div>
+        <div class="auth-area">
+            <button class="btn-login" [routerLink]="['/login']">
+                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+            </button>
         </div>
     </header>
 
-    <div *ngIf="isLoading" class="loading-indicator text-center mt-5">
-        <div class="spinner-border text-primary" role="status">
-            <span class="sr-only">Cargando contenido premium...</span>
+    <div *ngIf="isLoading" class="loading-indicator">
+        <i class="fas fa-spinner fa-spin"></i> Cargando contenido premium...
+    </div>
+
+    <div *ngIf="errorMessage" class="message-panel error-message">
+        <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+    </div>
+
+    <!-- Sección de Categorías (Ahora en la parte superior) -->
+    <section class="content-section categories-section" *ngIf="!isLoading && categories.length > 0">
+        <div class="section-header">
+            <h2>Explorar Categorías</h2>
+            <p>Encuentra tus favoritos con nuestras colecciones exclusivas.</p>
         </div>
-        <p>Cargando lo mejor para ti...</p>
-    </div>
+        <div class="categories-grid">
+            <div class="category-card interactive-card" *ngFor="let category of categories">
+                <h3 class="category-card-title">{{ category.nombre }}</h3>
+                <p class="category-card-description">{{ category.descripcion | slice:0:100 }}...</p>
+                <!-- Puedes añadir un routerLink aquí si tienes una página para ver productos por categoría -->
+                <button class="btn-view-category">Ver Categoría</button>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <!-- Asumiendo que esta ruta te lleva a una página de todas las categorías -->
+            <button class="btn-outline-primary-custom" [routerLink]="['/admin/categories']">Ver Todas las
+                Categorías</button>
+        </div>
+    </section>
 
-    <div *ngIf="errorMessage" class="alert alert-danger mt-5" role="alert">
-        {{ errorMessage }}
-    </div>
-
-    <section class="content-section" *ngIf="!isLoading && products.length > 0">
+    <!-- Sección de Productos Destacados -->
+    <section class="content-section products-section" *ngIf="!isLoading && products.length > 0">
         <div class="section-header">
             <h2>Productos Destacados</h2>
             <p>Nuestras selecciones más populares y recién llegadas.</p>
         </div>
         <div class="products-grid">
-            <div class="product-card" *ngFor="let product of products">
+            <div class="product-card interactive-card" *ngFor="let product of products">
                 <img [src]="getProductImageUrl(product)" alt="{{ product.nombre }}" class="product-card-image">
                 <div class="product-card-body">
                     <h3 class="product-card-title">{{ product.nombre }}</h3>
                     <p class="product-card-description">{{ product.descripcion | slice:0:70 }}...</p>
                     <div class="product-card-price">{{ product.precio | currency:'USD':'symbol':'1.2-2' }}</div>
-                    <button class="btn btn-primary-card">Ver Detalles</button>
+                    <!-- Botón "Comprar" que llama a un método en el componente TS -->
+                    <button class="btn-buy" (click)="comprarProducto(product)">
+                        <i class="fas fa-shopping-cart"></i> Comprar
+                    </button>
                 </div>
             </div>
         </div>
         <div class="text-center mt-4">
-            <button class="btn btn-outline-primary" [routerLink]="['/admin/products']">Ver Todos los Productos</button>
-        </div>
-    </section>
-
-    <section class="content-section" *ngIf="!isLoading && categories.length > 0">
-        <div class="section-header">
-            <h2>Explorar Categorías</h2>
-            <p>Encuentra tus favoritos con nuestras colecciones.</p>
-        </div>
-        <div class="categories-grid">
-            <div class="category-card" *ngFor="let category of categories">
-                <h3 class="category-card-title">{{ category.nombre }}</h3>
-                <p class="category-card-description">{{ category.descripcion | slice:0:100 }}...</p>
-                <button class="btn btn-outline-secondary-card">Ver Categoría</button>
-            </div>
-        </div>
-        <div class="text-center mt-4">
-            <button class="btn btn-outline-primary" [routerLink]="['/admin/categories']">Ver Todas las
-                Categorías</button>
+            <!-- Asumiendo que esta ruta te lleva a una página de todos los productos -->
+            <button class="btn-outline-primary-custom" [routerLink]="['/admin/products']">Ver Todos los
+                Productos</button>
         </div>
     </section>
 

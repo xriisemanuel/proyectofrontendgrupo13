@@ -42,15 +42,6 @@ export class ClienteService {
     return this.http.get<ICliente>(`${CLIENTE_API}/${id}`, { headers: this.getAuthHeaders() });
   }
 
-  /**
-   * @description Obtiene un perfil de cliente por el ID del usuario asociado.
-   * Corresponde a GET /api/cliente/by-usuario/:usuarioId
-   * @param usuarioId El ID del usuario (del documento Usuario) asociado al cliente.
-   * @returns Un Observable con los datos del cliente.
-   */
-  getClienteByUsuarioId(usuarioId: string): Observable<ICliente> {
-    return this.http.get<ICliente>(`${CLIENTE_API}/by-usuario/${usuarioId}`, { headers: this.getAuthHeaders() });
-  }
 
   /**
    * @description Crea un nuevo cliente.
@@ -81,5 +72,15 @@ export class ClienteService {
    */
   deleteCliente(id: string): Observable<any> {
     return this.http.delete<any>(`${CLIENTE_API}/${id}`, { headers: this.getAuthHeaders() });
+  }
+
+  /**
+   * @description Obtiene un perfil de cliente por el ID del usuario asociado.
+   * Corresponde a GET /api/cliente/by-usuario/:usuarioId
+   * @param usuarioId El ID del usuario (del documento Usuario) asociado al cliente.
+   * @returns Un Observable con los datos del cliente.
+   */
+  getClienteByUsuarioId(usuarioId: string): Observable<ICliente> {
+    return this.http.get<ICliente>(`${CLIENTE_API}/by-usuario/${usuarioId}`, { headers: this.getAuthHeaders() });
   }
 }
