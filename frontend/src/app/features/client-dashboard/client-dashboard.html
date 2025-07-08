@@ -43,7 +43,7 @@
           <strong>Puntos de Lealtad:</strong> <span class="points-value">{{ cliente.puntos || 0 }}</span>
         </div>
       </div>
-      <button class="btn btn-primary edit-profile-btn" (click)="goToEditProfile()">
+      <button class="btn btn-primary edit-profile-btn" [routerLink]="['/client/profile/edit']">
         <i class="fas fa-user-edit"></i> Editar Perfil
       </button>
     </div>
