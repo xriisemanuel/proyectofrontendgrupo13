@@ -1,0 +1,68 @@
+<!-- src/app/features/admin/manage-repartidores/manage-repartidores.html -->
+
+<div class="manage-repartidores-container">
+    <h2>Gestión de Repartidores</h2>
+    <p>Visualiza y administra los perfiles de los repartidores registrados en el sistema.</p>
+
+    <div class="top-actions">
+        <!-- Podrías añadir un botón para crear un nuevo repartidor directamente aquí,
+         o redirigir al formulario de creación de usuario y asegurarte de que
+         el rol "repartidor" esté preseleccionado. Por ahora, redirigimos a la creación general. -->
+        <button routerLink="/admin/users/create" class="btn btn-primary create-repartidor-btn">
+            <i class="fas fa-user-plus"></i> Registrar Nuevo Repartidor
+        </button>
+    </div>
+
+    <!-- Mensajes de Carga y Vacío -->
+    <div *ngIf="isLoading" class="loading-message">
+        <i class="fas fa-spinner fa-spin"></i> Cargando repartidores...
+    </div>
+
+    <div *ngIf="!isLoading && repartidores.length === 0" class="no-data-message">
+        <i class="fas fa-info-circle"></i> No hay repartidores registrados en el sistema.
+    </div>
+
+    <!-- Tabla de Repartidores -->
+    <div *ngIf="!isLoading && repartidores.length > 0" class="repartidores-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Nombre Completo</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Vehículo</th>
+                    <th>Licencia</th>
+                    <th>Calificación</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let repartidor of repartidores">
+                    <td>{{ repartidor.username }}</td>
+                    <td>{{ repartidor.nombre }} {{ repartidor.apellido }}</td>
+                    <td>{{ repartidor.email }}</td>
+                    <td>{{ repartidor.telefono || 'N/A' }}</td>
+                    <td>{{ repartidor.repartidorId?.vehiculo || 'N/A' }}</td>
+                    <td>{{ repartidor.repartidorId?.numeroLicencia || 'N/A' }}</td>
+                    <td>{{ repartidor.repartidorId?.calificacionPromedio || 'N/A' }}</td>
+                    <td>{{ repartidor.repartidorId?.estado || 'N/A' }}</td>
+                    <td class="actions-column">
+                        <button (click)="editRepartidor(repartidor._id)" class="btn btn-edit" title="Editar Repartidor">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button (click)="deleteRepartidor(repartidor._id, repartidor.username)" class="btn btn-delete"
+                            title="Eliminar Repartidor">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="back-link">
+        <a routerLink="/admin/dashboard"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+    </div>
+</div>

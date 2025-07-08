@@ -1,12 +1,13 @@
-// src/app/features/categories/services/categoria.service.ts
+// src/app/data/services/categoria.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'; // Importa HttpParams
 import { Observable } from 'rxjs';
-import { ICategoria } from '../categories/models/categoria.model'; // Asegúrate de que esta ruta sea correcta
-import { API_BASE_URL } from '../../core/constants/constants'; // Tu constante de URL base
-import { AuthService } from '../../core/auth/auth'; // Tu servicio de autenticación
+import { API_BASE_URL } from '../../core/constants/constants';
+import { AuthService } from '../../core/auth/auth';
 
-const CATEGORIA_API = API_BASE_URL + '/categorias'; // Endpoint para categorías
+import { ICategoria, IProducto } from '../../shared/interfaces'; // Importa ICategoria y IProducto
+
+const CATEGORIA_API = API_BASE_URL + '/categorias'; // Asegúrate de que este endpoint coincida con tu backend (puede ser '/categorias')
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ export class CategoriaService {
 
   constructor(
     private http: HttpClient,
-    private authService: AuthService // Inyectamos el AuthService
+    private authService: AuthService
   ) { }
 
   /**
@@ -24,14 +25,13 @@ export class CategoriaService {
    */
   private getAuthHeaders(): HttpHeaders {
     const token = this.authService.getToken(); // Obtiene el token del AuthService
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
     if (token) {
-      return new HttpHeaders({
-        'Content-Type': 'application/json',
-        'x-access-token': token // O 'Authorization': `Bearer ${token}` dependiendo de tu backend
-      });
+      headers = headers.set('Authorization', `Bearer ${token}`); // Usa 'Bearer' para el token JWT
     }
-    // Si no hay token, devuelve headers básicos o un error (aunque esto debería manejarse con guards)
-    return new HttpHeaders({ 'Content-Type': 'application/json' });
+    return headers;
   }
 
   /**
@@ -41,7 +41,7 @@ export class CategoriaService {
    */
   getCategorias(estado?: boolean): Observable<ICategoria[]> {
     let params = new HttpParams();
-    if (estado !== undefined) {
+    if (estado !== undefined && estado !== null) { // Asegúrate de que el estado sea un booleano definido
       params = params.append('estado', estado.toString());
     }
     return this.http.get<ICategoria[]>(CATEGORIA_API, { headers: this.getAuthHeaders(), params });
@@ -59,10 +59,9 @@ export class CategoriaService {
   /**
    * Crea una nueva categoría.
    * @param categoria Los datos de la nueva categoría.
-   * @returns Observable de la respuesta del backend (que incluye la categoría creada).
+   * @returns Observable de la respuesta del backend.
    */
-  createCategoria(categoria: { nombre: string, descripcion?: string, imagen?: string, estado?: boolean }): Observable<any> {
-    // El backend espera un objeto con los campos directamente
+  createCategoria(categoria: Partial<ICategoria>): Observable<any> { // Usamos Partial<ICategoria> para campos opcionales
     return this.http.post<any>(CATEGORIA_API, categoria, { headers: this.getAuthHeaders() });
   }
 
@@ -70,9 +69,9 @@ export class CategoriaService {
    * Actualiza una categoría existente.
    * @param id El ID de la categoría a actualizar.
    * @param categoria Los datos actualizados de la categoría.
-   * @returns Observable de la respuesta del backend (que incluye la categoría actualizada).
+   * @returns Observable de la respuesta del backend.
    */
-  updateCategoria(id: string, categoria: { nombre?: string, descripcion?: string, imagen?: string, estado?: boolean }): Observable<any> {
+  updateCategoria(id: string, categoria: Partial<ICategoria>): Observable<any> { // Usamos Partial<ICategoria>
     return this.http.put<any>(`${CATEGORIA_API}/${id}`, categoria, { headers: this.getAuthHeaders() });
   }
 
@@ -86,29 +85,31 @@ export class CategoriaService {
   }
 
   /**
-   * Activa una categoría.
+   * Activa una categoría (cambia su estado a true).
    * @param id El ID de la categoría a activar.
    * @returns Observable de la respuesta del backend.
    */
   activarCategoria(id: string): Observable<any> {
+    // Asumiendo que tu backend tiene un endpoint PATCH para activar/desactivar o que PUT/PATCH con {estado: true} es suficiente
     return this.http.patch<any>(`${CATEGORIA_API}/${id}/activar`, {}, { headers: this.getAuthHeaders() });
   }
 
   /**
-   * Desactiva una categoría.
+   * Desactiva una categoría (cambia su estado a false).
    * @param id El ID de la categoría a desactivar.
    * @returns Observable de la respuesta del backend.
    */
   desactivarCategoria(id: string): Observable<any> {
+    // Asumiendo que tu backend tiene un endpoint PATCH para activar/desactivar
     return this.http.patch<any>(`${CATEGORIA_API}/${id}/desactivar`, {}, { headers: this.getAuthHeaders() });
   }
 
   /**
    * Obtiene los productos asociados a una categoría específica.
    * @param categoriaId El ID de la categoría.
-   * @returns Observable de un array de productos. (Necesitarás definir la interfaz de IProducto)
+   * @returns Observable de un array de productos.
    */
-  getProductosByCategoria(categoriaId: string): Observable<any[]> { // Considera tipar 'any[]' con 'IProducto[]' cuando la tengas
-    return this.http.get<any[]>(`${CATEGORIA_API}/${categoriaId}/productos`, { headers: this.getAuthHeaders() });
+  getProductosByCategoria(categoriaId: string): Observable<IProducto[]> { // Tipado con IProducto[]
+    return this.http.get<IProducto[]>(`${CATEGORIA_API}/${categoriaId}/productos`, { headers: this.getAuthHeaders() });
   }
 }

@@ -1,0 +1,67 @@
+<!-- src/app/features/admin/manage-clientes/manage-clientes.html -->
+
+<div class="manage-clientes-container">
+    <h2>Gestión de Clientes</h2>
+    <p>Visualiza y administra los perfiles de los clientes registrados en el sistema.</p>
+
+    <div class="top-actions">
+        <!-- Redirigimos al formulario de creación de usuario general.
+         Puedes considerar que al llegar aquí, el rol 'cliente' esté preseleccionado. -->
+        <button routerLink="/admin/users/create" class="btn btn-primary create-cliente-btn">
+            <i class="fas fa-user-plus"></i> Registrar Nuevo Cliente
+        </button>
+    </div>
+
+    <!-- Mensajes de Carga y Vacío -->
+    <div *ngIf="isLoading" class="loading-message">
+        <i class="fas fa-spinner fa-spin"></i> Cargando clientes...
+    </div>
+
+    <div *ngIf="!isLoading && clientes.length === 0" class="no-data-message">
+        <i class="fas fa-info-circle"></i> No hay clientes registrados en el sistema.
+    </div>
+
+    <!-- Tabla de Clientes -->
+    <div *ngIf="!isLoading && clientes.length > 0" class="clientes-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Nombre Completo</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Dirección</th>
+                    <th>Fecha Nac.</th>
+                    <th>Preferencias</th>
+                    <th>Puntos</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let cliente of clientes">
+                    <td>{{ cliente.username }}</td>
+                    <td>{{ cliente.nombre }} {{ cliente.apellido }}</td>
+                    <td>{{ cliente.email }}</td>
+                    <td>{{ cliente.telefono || 'N/A' }}</td>
+                    <td>{{ cliente.clienteId?.direccion || 'N/A' }}</td>
+                    <td>{{ cliente.clienteId?.fechaNacimiento || 'N/A' }}</td>
+                    <td>{{ getPreferenciasAlimentarias(cliente.clienteId) }}</td>
+                    <td>{{ cliente.clienteId?.puntos || 0 }}</td>
+                    <td class="actions-column">
+                        <button (click)="editCliente(cliente._id)" class="btn btn-edit" title="Editar Cliente">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button (click)="deleteCliente(cliente._id, cliente.username)" class="btn btn-delete"
+                            title="Eliminar Cliente">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="back-link">
+        <a routerLink="/admin/dashboard"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+    </div>
+</div>

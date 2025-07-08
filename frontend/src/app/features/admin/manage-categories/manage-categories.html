@@ -1,0 +1,65 @@
+<!-- src/app/features/admin/manage-categories/manage-categories.html -->
+
+<div class="manage-categories-container">
+    <h2>Gestión de Categorías</h2>
+    <p>Visualiza, edita y elimina categorías existentes en el sistema.</p>
+
+    <div class="top-actions">
+        <button routerLink="/admin/categories/create" class="btn btn-primary create-category-btn">
+            <i class="fas fa-plus-circle"></i> Crear Nueva Categoría
+        </button>
+    </div>
+
+    <!-- Mensajes de Carga y Vacío -->
+    <div *ngIf="isLoading" class="loading-message">
+        <i class="fas fa-spinner fa-spin"></i> Cargando categorías...
+    </div>
+
+    <div *ngIf="!isLoading && categorias.length === 0" class="no-data-message">
+        <i class="fas fa-info-circle"></i> No hay categorías registradas en el sistema.
+    </div>
+
+    <!-- Tabla de Categorías -->
+    <div *ngIf="!isLoading && categorias.length > 0" class="categories-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let categoria of categorias">
+                    <td>{{ categoria.nombre }}</td>
+                    <td>{{ categoria.descripcion || 'N/A' }}</td>
+                    <td>
+                        <span [ngClass]="{'status-active': categoria.estado, 'status-inactive': !categoria.estado}">
+                            {{ categoria.estado ? 'Activa' : 'Inactiva' }}
+                        </span>
+                    </td>
+                    <td class="actions-column">
+                        <button (click)="editCategory(categoria._id)" class="btn btn-edit" title="Editar Categoría">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button (click)="toggleCategoryStatus(categoria)"
+                            [ngClass]="{'btn-toggle-active': !categoria.estado, 'btn-toggle-inactive': categoria.estado}"
+                            [title]="categoria.estado ? 'Desactivar Categoría' : 'Activar Categoría'">
+                            <i
+                                [ngClass]="{'fas fa-toggle-on': categoria.estado, 'fas fa-toggle-off': !categoria.estado}"></i>
+                        </button>
+                        <button (click)="deleteCategory(categoria._id, categoria.nombre)" class="btn btn-delete"
+                            title="Eliminar Categoría">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="back-link">
+        <a routerLink="/admin/dashboard"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+    </div>
+</div>

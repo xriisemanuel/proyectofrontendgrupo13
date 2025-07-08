@@ -1,0 +1,93 @@
+<!-- src/app/features/admin/create-product/create-product.html -->
+
+<div class="create-product-container">
+    <h2>Crear Nuevo Producto</h2>
+    <p>Registra un nuevo producto en el catálogo de la aplicación.</p>
+
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label for="nombre">Nombre del Producto:</label>
+            <input id="nombre" type="text" formControlName="nombre" placeholder="Ej: Pizza Pepperoni">
+            <div *ngIf="f['nombre'].invalid && (f['nombre'].dirty || f['nombre'].touched)" class="validation-error">
+                <div *ngIf="f['nombre'].errors?.['required']">El nombre del producto es requerido.</div>
+                <div *ngIf="f['nombre'].errors?.['minlength']">El nombre debe tener al menos 3 caracteres.</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="descripcion">Descripción:</label>
+            <textarea id="descripcion" formControlName="descripcion" rows="3"
+                placeholder="Una breve descripción del producto..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="precio">Precio:</label>
+            <input id="precio" type="number" formControlName="precio" placeholder="Ej: 12.99" step="0.01">
+            <div *ngIf="f['precio'].invalid && (f['precio'].dirty || f['precio'].touched)" class="validation-error">
+                <div *ngIf="f['precio'].errors?.['required']">El precio es requerido.</div>
+                <div *ngIf="f['precio'].errors?.['min']">El precio debe ser mayor que 0.</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="categoriaId">Categoría:</label>
+            <select id="categoriaId" formControlName="categoriaId">
+                <option [ngValue]="''" disabled>-- Selecciona una categoría --</option>
+                <option *ngIf="isLoadingCategories" disabled>Cargando categorías...</option>
+                <option *ngIf="!isLoadingCategories && categorias.length === 0" disabled>No hay categorías disponibles
+                </option>
+                <option *ngFor="let categoria of categorias" [ngValue]="categoria._id">
+                    {{ categoria.nombre }}
+                </option>
+            </select>
+            <div *ngIf="f['categoriaId'].invalid && (f['categoriaId'].dirty || f['categoriaId'].touched)"
+                class="validation-error">
+                <div *ngIf="f['categoriaId'].errors?.['required']">La categoría es requerida.</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="stock">Stock:</label>
+            <input id="stock" type="number" formControlName="stock" placeholder="Ej: 100">
+            <div *ngIf="f['stock'].invalid && (f['stock'].dirty || f['stock'].touched)" class="validation-error">
+                <div *ngIf="f['stock'].errors?.['required']">El stock es requerido.</div>
+                <div *ngIf="f['stock'].errors?.['min']">El stock no puede ser negativo.</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="imagenUrl">URL de la Imagen:</label>
+            <input id="imagenUrl" type="url" formControlName="imagenUrl"
+                placeholder="Ej: https://ejemplo.com/imagen.png">
+            <div *ngIf="f['imagenUrl'].invalid && (f['imagenUrl'].dirty || f['imagenUrl'].touched)"
+                class="validation-error">
+                <div *ngIf="f['imagenUrl'].errors?.['pattern']">Por favor, introduce una URL de imagen válida (ej.
+                    .png).</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="estado">Estado:</label>
+            <select id="estado" formControlName="estado">
+                <option [ngValue]="true">Activo</option>
+                <option [ngValue]="false">Inactivo</option>
+            </select>
+            <div *ngIf="f['estado'].invalid && (f['estado'].dirty || f['estado'].touched)" class="validation-error">
+                <div *ngIf="f['estado'].errors?.['required']">El estado es requerido.</div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" [disabled]="productForm.invalid || isSaving" class="btn btn-primary">
+                <i class="fas fa-plus-circle"></i> {{ isSaving ? 'Creando...' : 'Crear Producto' }}
+            </button>
+            <a routerLink="/admin/dashboard" class="btn btn-secondary">
+                <i class="fas fa-times-circle"></i> Cancelar
+            </a>
+        </div>
+    </form>
+
+    <div class="back-link">
+        <a routerLink="/admin/dashboard"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+    </div>
+</div>

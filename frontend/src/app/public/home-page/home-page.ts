@@ -8,11 +8,9 @@ import { take, tap, catchError } from 'rxjs/operators'; // Para observables
 import { of } from 'rxjs'; // Para manejar errores en forkJoin
 
 // Importa tus modelos y servicios
-import { ProductService } from '../../features/products/producto'; // Tu servicio de productos
-import { Producto } from '../../features/products/models/producto.model'; // Tu modelo de producto
-
-import { CategoriaService } from '../../features/categories/categoria'; // Tu servicio de categorías
-import { ICategoria } from '../../features/categories/models/categoria.model'; // Tu modelo de categoría
+import { ProductoService } from '../../data/services/producto'; // Tu servicio de productos
+import { IProducto, ICategoria } from '../../shared/interfaces'; // Tu modelo de producto
+import { CategoriaService } from '../../data/services/categoria'; // Tu servicio de categorías
 
 @Component({
   selector: 'app-home-page',
@@ -26,13 +24,13 @@ import { ICategoria } from '../../features/categories/models/categoria.model'; /
 })
 export class HomePageComponent implements OnInit {
 
-  products: Producto[] = [];
+  products: IProducto[] = [];
   categories: ICategoria[] = [];
   isLoading: boolean = true;
   errorMessage: string | null = null;
 
   constructor(
-    private productService: ProductService,
+    private productService: ProductoService,
     private categoriaService: CategoriaService // Asegúrate de que este servicio exista y funcione
   ) { }
 
@@ -76,9 +74,9 @@ export class HomePageComponent implements OnInit {
     });
   }
 
-  getProductImageUrl(product: Producto): string {
-    if (product.imagenes && product.imagenes.length > 0) {
-      return product.imagenes[0];
+  getProductImageUrl(product: IProducto): string {
+    if (product.imagenUrl && product.imagenUrl.length > 0) {
+      return product.imagenUrl[0];
     }
     return 'assets/images/default-product.png'; // Asegúrate de tener una imagen por defecto
   }

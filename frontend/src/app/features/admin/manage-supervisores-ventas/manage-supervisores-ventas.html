@@ -1,0 +1,60 @@
+<!-- src/app/features/admin/manage-supervisores-ventas/manage-supervisores-ventas.html -->
+
+<div class="manage-supervisores-ventas-container">
+    <h2>Gestión de Supervisores de Ventas</h2>
+    <p>Visualiza y administra los perfiles de los supervisores de ventas registrados en el sistema.</p>
+
+    <div class="top-actions">
+        <button routerLink="/admin/users/create" class="btn btn-primary create-supervisor-btn">
+            <i class="fas fa-user-plus"></i> Registrar Nuevo Supervisor
+        </button>
+    </div>
+
+    <!-- Mensajes de Carga y Vacío -->
+    <div *ngIf="isLoading" class="loading-message">
+        <i class="fas fa-spinner fa-spin"></i> Cargando supervisores de ventas...
+    </div>
+
+    <div *ngIf="!isLoading && supervisoresVentas.length === 0" class="no-data-message">
+        <i class="fas fa-info-circle"></i> No hay supervisores de ventas registrados en el sistema.
+    </div>
+
+    <!-- Tabla de Supervisores de Ventas -->
+    <div *ngIf="!isLoading && supervisoresVentas.length > 0" class="supervisores-ventas-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Nombre Completo</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Rol</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let supervisor of supervisoresVentas">
+                    <td>{{ supervisor.username }}</td>
+                    <td>{{ supervisor.nombre }} {{ supervisor.apellido }}</td>
+                    <td>{{ supervisor.email }}</td>
+                    <td>{{ supervisor.telefono || 'N/A' }}</td>
+                    <td>{{ getRoleName(supervisor) }}</td>
+                    <td class="actions-column">
+                        <button (click)="editSupervisorVentas(supervisor._id)" class="btn btn-edit"
+                            title="Editar Supervisor">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button (click)="deleteSupervisorVentas(supervisor._id, supervisor.username)"
+                            class="btn btn-delete" title="Eliminar Supervisor">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="back-link">
+        <a routerLink="/admin/dashboard"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+    </div>
+</div>

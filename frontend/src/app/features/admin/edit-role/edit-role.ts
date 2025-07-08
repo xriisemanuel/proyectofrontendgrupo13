@@ -1,23 +1,21 @@
 // src/app/features/admin/components/admin/edit-role/edit-role.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms'; // ReactiveFormsModule
+import { ActivatedRoute, Router, RouterLink } from '@angular/router'; // RouterLink
 import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 
-// --- ¡IMPORTACIÓN CORRECTA Y ÚNICA DE INTERFACES! ---
-import { UsuarioService } from './../../../data/services/usuario';
+import { UsuarioService } from '../../../data/services/usuario';
 import { IRol } from '../../../shared/interfaces';
-// --- FIN DE IMPORTACIÓN ---
 
 @Component({
   selector: 'app-edit-role',
   templateUrl: './edit-role.html',
   styleUrls: ['./edit-role.css'],
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterLink]
+  imports: [ReactiveFormsModule, CommonModule, RouterLink] // <--- ¡AÑADIDO ReactiveFormsModule y RouterLink!
 })
 export class EditRoleComponent implements OnInit, OnDestroy {
   roleForm: FormGroup;
@@ -28,9 +26,9 @@ export class EditRoleComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(
-    private fb: FormBuilder,
+    private fb: FormBuilder, // Inyección de FormBuilder
     private route: ActivatedRoute,
-    private router: Router,
+    private router: Router, // Inyección de Router
     private usuarioService: UsuarioService,
     private toastr: ToastrService
   ) {

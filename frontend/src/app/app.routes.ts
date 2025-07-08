@@ -84,7 +84,61 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['admin'] } // Solo admins pueden editar usuarios
   },
-  // Gestión de Supervisores de Ventas (para Admin)
-  // NO EXISTEN MÁS COMPONENTES; DEBEMOS CREARLOS (esto se abordará en un paso posterior si es necesario)
+  // --- ¡NUEVA RUTA PARA GESTIÓN DE REPARTIDORES! ---
+  {
+    path: 'admin/repartidores/manage',
+    loadComponent: () => import('./features/admin/manage-repartidores/manage-repartidores').then(m => m.ManageRepartidores),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin'] } // Solo admins pueden gestionar repartidores
+  },
+  // --- ¡NUEVA RUTA PARA GESTIÓN DE CLIENTES! ---
+  {
+    path: 'admin/clientes/manage',
+    loadComponent: () => import('./features/admin/manage-clientes/manage-clientes').then(m => m.ManageClientes),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin'] } // Solo admins pueden gestionar clientes
+  },
+  // --- ¡NUEVA RUTA PARA GESTIÓN DE SUPERVISORES DE COCINA! ---
+  {
+    path: 'admin/supervisores-cocina/manage',
+    loadComponent: () => import('./features/admin/manage-supervisores-cocina/manage-supervisores-cocina').then(m => m.ManageSupervisoresCocina),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin'] } // Solo admins pueden gestionar supervisores de cocina
+  },
+   // --- ¡NUEVA RUTA PARA GESTIÓN DE SUPERVISORES DE VENTAS! ---
+  {
+    path: 'admin/supervisores-ventas/manage',
+    loadComponent: () => import('./features/admin/manage-supervisores-ventas/manage-supervisores-ventas').then(m => m.ManageSupervisoresVentas),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin'] } // Solo admins pueden gestionar supervisores de ventas
+  },
+  // --- ¡NUEVA RUTA PARA CREAR CATEGORÍA! ---
+  {
+    path: 'admin/categories/create',
+    loadComponent: () => import('./features/admin/create-category/create-category').then(m => m.CreateCategory),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin'] } // Solo admins pueden crear categorías
+  },
+  // --- ¡NUEVA RUTA PARA CREAR PRODUCTO! ---
+  {
+    path: 'admin/products/create',
+    loadComponent: () => import('./features/admin/create-product/create-product').then(m => m.CreateProduct),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin'] } // Solo admins pueden crear productos
+  },
+  // --- ¡NUEVA RUTA PARA GESTIONAR CATEGORÍAS! ---
+  {
+    path: 'admin/categories', // Ruta para la lista de categorías
+    loadComponent: () => import('./features/admin/manage-categories/manage-categories').then(m => m.ManageCategories),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin'] } // Solo admins pueden gestionar categorías
+  },
+  // --- ¡NUEVA RUTA PARA GESTIONAR PRODUCTOS! ---
+  {
+    path: 'admin/products', // Ruta para la lista de productos
+    loadComponent: () => import('./features/admin/manage-products/manage-products').then(m => m.ManageProducts),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin'] } // Solo admins pueden gestionar productos
+  },
   { path: '**', redirectTo: 'home' }
 ];

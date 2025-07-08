@@ -43,3 +43,27 @@ export interface IUsuario {
     createdAt?: Date;
     updatedAt?: Date;
 }
+
+// --- NUEVAS INTERFACES PARA PRODUCTOS Y CATEGORÍAS ---
+
+export interface ICategoria {
+  _id: string;
+  nombre: string;
+  descripcion?: string;
+  estado: boolean; // true para activo, false para inactivo
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface IProducto {
+  _id: string;
+  nombre: string;
+  descripcion?: string;
+  precio: number;
+  categoriaId: ICategoria | string; // Puede ser el objeto completo o solo el ID
+  stock: number;
+  imagenUrl?: string; // URL de la imagen del producto
+  estado: boolean; // true para activo, false para inactivo
+  createdAt?: Date;
+  updatedAt?: Date;
+}

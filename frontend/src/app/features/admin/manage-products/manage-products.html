@@ -1,0 +1,78 @@
+<!-- src/app/features/admin/manage-products/manage-products.html -->
+
+<div class="manage-products-container">
+    <h2>Gestión de Productos</h2>
+    <p>Visualiza, edita y elimina productos existentes en el catálogo.</p>
+
+    <div class="top-actions">
+        <button routerLink="/admin/products/create" class="btn btn-primary create-product-btn">
+            <i class="fas fa-plus-circle"></i> Crear Nuevo Producto
+        </button>
+    </div>
+
+    <!-- Mensajes de Carga y Vacío -->
+    <div *ngIf="isLoading" class="loading-message">
+        <i class="fas fa-spinner fa-spin"></i> Cargando productos...
+    </div>
+
+    <div *ngIf="!isLoading && productos.length === 0" class="no-data-message">
+        <i class="fas fa-info-circle"></i> No hay productos registrados en el sistema.
+    </div>
+
+    <!-- Tabla de Productos -->
+    <div *ngIf="!isLoading && productos.length > 0" class="products-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Imagen</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                    <th>Categoría</th>
+                    <th>Stock</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let producto of productos">
+                    <td class="product-image-cell">
+                        <img [src]="producto.imagenUrl || 'https://placehold.co/50x50/cccccc/333333?text=No+Img'"
+                            alt="{{ producto.nombre }}" class="product-thumbnail"
+                            onerror="this.onerror=null;this.src='https://placehold.co/50x50/cccccc/333333?text=No+Img';"
+                            title="Imagen de {{ producto.nombre }}">
+                    </td>
+                    <td>{{ producto.nombre }}</td>
+                    <td>{{ producto.descripcion || 'N/A' }}</td>
+                    <td>${{ producto.precio | number:'1.2-2' }}</td>
+                    <td>{{ getCategoryName(producto.categoriaId) }}</td>
+                    <td>{{ producto.stock }}</td>
+                    <td>
+                        <span [ngClass]="{'status-active': producto.estado, 'status-inactive': !producto.estado}">
+                            {{ producto.estado ? 'Activo' : 'Inactivo' }}
+                        </span>
+                    </td>
+                    <td class="actions-column">
+                        <button (click)="editProduct(producto._id)" class="btn btn-edit" title="Editar Producto">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button (click)="toggleProductStatus(producto)"
+                            [ngClass]="{'btn-toggle-active': !producto.estado, 'btn-toggle-inactive': producto.estado}"
+                            [title]="producto.estado ? 'Desactivar Producto' : 'Activar Producto'">
+                            <i
+                                [ngClass]="{'fas fa-toggle-on': producto.estado, 'fas fa-toggle-off': !producto.estado}"></i>
+                        </button>
+                        <button (click)="deleteProduct(producto._id, producto.nombre)" class="btn btn-delete"
+                            title="Eliminar Producto">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="back-link">
+        <a routerLink="/admin/dashboard"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+    </div>
+</div>

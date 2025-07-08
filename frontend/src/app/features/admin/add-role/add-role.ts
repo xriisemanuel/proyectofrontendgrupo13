@@ -2,20 +2,18 @@
 
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms'; // Importa ReactiveFormsModule
+import { Router, RouterLink } from '@angular/router'; // Importa RouterLink
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 
-// Importa la interfaz IRol desde el archivo centralizado
 import { IRol } from '../../../shared/interfaces';
-// Importa el servicio de roles
 import { RolService } from '../../../data/services/role';
 
 @Component({
   selector: 'app-add-role',
-  imports: [ReactiveFormsModule, CommonModule, RouterLink],
+  imports: [ReactiveFormsModule, CommonModule, RouterLink], // <--- ¡Asegurado aquí!
   templateUrl: './add-role.html',
   styleUrl: './add-role.css',
   standalone: true
@@ -23,15 +21,13 @@ import { RolService } from '../../../data/services/role';
 
 export class AddRole implements OnInit, OnDestroy {
   roleForm: FormGroup;
-  // ELIMINADO: errorMessage: string = '';
-  // ELIMINADO: successMessage: string = '';
   isSaving: boolean = false;
 
   private destroy$ = new Subject<void>();
 
   constructor(
-    private fb: FormBuilder,
-    private router: Router,
+    private fb: FormBuilder, // Inyección de FormBuilder
+    private router: Router, // Inyección de Router
     private rolService: RolService,
     private toastr: ToastrService
   ) {
@@ -41,9 +37,7 @@ export class AddRole implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit(): void {
-    // No hay lógica compleja de inicialización por ahora
-  }
+  ngOnInit(): void { }
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -51,9 +45,6 @@ export class AddRole implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    // ELIMINADO: this.errorMessage = '';
-    // ELIMINADO: this.successMessage = '';
-
     if (this.roleForm.valid) {
       this.isSaving = true;
       const newRoleData: Partial<IRol> = this.roleForm.value;
