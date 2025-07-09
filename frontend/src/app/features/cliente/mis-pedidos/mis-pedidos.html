@@ -1,8 +1,12 @@
 <!-- src/app/features/cliente/components/mis-pedidos/mis-pedidos.component.html -->
-
 <div class="mis-pedidos-container">
     <div class="dashboard-header">
-        <h2><i class="fas fa-clipboard-list"></i> Mis Pedidos</h2>
+        <div class="header-content">
+            <h2><i class="fas fa-clipboard-list"></i> Mis Pedidos</h2>
+             <button class="btn-volver" routerLink="/client/dashboard">
+                <i class="fas fa-arrow-left"></i> Volver al Dashboard
+            </button>
+        </div>
     </div>
     <p class="intro-text">Aquí puedes ver el estado actual de tus pedidos y tu historial de compras.</p>
 
@@ -25,7 +29,7 @@
     <div *ngIf="!isLoading && pedidos.length > 0" class="pedidos-list">
         <div *ngFor="let pedido of pedidos" class="pedido-card app-interactive-card">
             <div class="pedido-header">
-                <h3>Pedido #{{ pedido._id | slice:0:8 }}</h3> <!-- Muestra solo una parte del ID para brevedad -->
+                <h3>Pedido #{{ pedido._id | slice:0:8 }}</h3>
                 <span class="pedido-estado status-{{ pedido.estado | lowercase }}">
                     {{ pedido.estado | titlecase }}
                 </span>
