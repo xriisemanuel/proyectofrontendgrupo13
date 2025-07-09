@@ -1,77 +1,36 @@
-<!-- src/app/components/client-dashboard/client-dashboard.component.html -->
-<div class="client-dashboard-container">
-  <div class="dashboard-header">
+<!-- src/app/components/client-dashboard/client-dashboard.html -->
+<div class="client-dashboard-wrapper">
+  <!-- Encabezado del Dashboard -->
+  <header class="dashboard-header">
     <h1>Bienvenido, {{ usuario?.nombre || 'Cliente' }}!</h1>
     <button (click)="onLogout()" class="btn-logout">
       <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
     </button>
-  </div>
-  <p class="dashboard-intro">Aquí puedes gestionar tu cuenta y tus pedidos.</p>
+  </header>
 
+  <p class="dashboard-intro">Aquí puedes gestionar tu cuenta, explorar productos y realizar tus pedidos fácilmente.</p>
+
+  <!-- Mensajes de Carga y Error -->
   <div *ngIf="isLoading" class="loading-message">
     <i class="fas fa-spinner fa-spin"></i> Cargando tu información...
   </div>
 
-  <div *ngIf="errorMessage" class="message-panel error-message">
-    <i class="fas fa-exclamation-triangle"></i> {{ errorMessage }}
+  <div *ngIf="errorMessage && !isLoading" class="error-panel">
+    <i class="fas fa-exclamation-triangle"></i>
+    <p>{{ errorMessage }}</p>
+    <p>Por favor, asegúrate de haber iniciado sesión con una cuenta de cliente.</p>
+    <a [routerLink]="['/login']" class="btn-go-to-login">
+      <i class="fas fa-sign-in-alt"></i> Ir a Iniciar Sesión
+    </a>
   </div>
 
-  <div *ngIf="!isLoading && !errorMessage && cliente && usuario" class="dashboard-content">
-    <!-- Sección de Categorías -->
-    <section class="content-section categories-section" *ngIf="categories.length > 0">
-      <div class="section-header">
-        <h2>Explorar Categorías</h2>
-        <p>Encuentra tus favoritos con nuestras colecciones exclusivas.</p>
-      </div>
-      <div class="categories-grid">
-        <div class="category-card app-interactive-card" *ngFor="let category of categories">
-          <div class="card-image-container">
-            <img [src]="getCategoryImageUrl(category)" alt="{{ category.nombre }}" class="category-card-image">
-          </div>
-          <div class="card-content">
-            <h3 class="category-card-title">{{ category.nombre }}</h3>
-            <p class="category-card-description">{{ category.descripcion | slice:0:100 }}...</p>
-            <button class="btn-view-category" [routerLink]="['/client/categories', category._id]">Ver Categoría</button>
-          </div>
-        </div>
-      </div>
-      <div class="text-center mt-4">
-        <button class="btn-outline-primary-custom app-interactive-card" [routerLink]="['/client/categories']">Ver Todas
-          las Categorías</button>
-      </div>
-    </section>
+  <!-- Contenido Principal del Dashboard (Solo si no hay carga ni error y hay datos) -->
+  <div *ngIf="!isLoading && !errorMessage && cliente && usuario" class="dashboard-content-grid">
 
-    <!-- Sección de Productos Destacados -->
-    <section class="content-section products-section" *ngIf="products.length > 0">
-      <div class="section-header">
-        <h2>Productos Destacados</h2>
-        <p>Nuestras selecciones más populares y recién llegadas.</p>
-      </div>
-      <div class="products-grid">
-        <div class="product-card app-interactive-card" *ngFor="let product of products">
-          <div class="card-image-container">
-            <img [src]="getProductImageUrl(product)" alt="{{ product.nombre }}" class="product-card-image">
-          </div>
-          <div class="product-card-body">
-            <h3 class="product-card-title">{{ product.nombre }}</h3>
-            <p class="product-card-description">{{ product.descripcion | slice:0:70 }}...</p>
-            <div class="product-card-price">{{ product.precio | currency:'USD':'symbol':'1.2-2' }}</div>
-            <button class="btn-buy" (click)="comprarProducto(product)">
-              <i class="fas fa-shopping-cart"></i> Comprar
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="text-center mt-4">
-        <button class="btn-outline-primary-custom app-interactive-card" [routerLink]="['/client/products']">Ver Todos
-          los Productos</button>
-      </div>
-    </section>
-
-    <!-- Sección de Resumen Personal -->
-    <div class="dashboard-section personal-info-card app-interactive-card">
-      <h3>Tu Perfil</h3>
-      <div class="info-grid">
+    <!-- Sección de Tu Perfil -->
+    <section class="profile-section">
+      <h2 class="section-title">Tu Perfil</h2>
+      <div class="profile-info-grid">
         <div class="info-item">
           <strong>Usuario:</strong> <span>{{ usuario.username }}</span>
         </div>
@@ -88,55 +47,98 @@
           <strong>Dirección Principal:</strong> <span>{{ cliente.direccion || 'No especificada' }}</span>
         </div>
         <div class="info-item">
-          <strong>Fecha Nacimiento:</strong> <span>{{ cliente.fechaNacimiento ? (cliente.fechaNacimiento |
-            date:'dd/MM/yyyy') : 'No especificada' }}</span>
+          <strong>Fecha Nacimiento:</strong> <span>{{ cliente.fechaNacimiento ? (cliente.fechaNacimiento | date:'dd/MM/yyyy') : 'No especificada' }}</span>
         </div>
         <div class="info-item">
-          <strong>Preferencias Alimentarias:</strong>
-          <span>{{ cliente.preferenciasAlimentarias?.length ? cliente.preferenciasAlimentarias?.join(', ') : 'Ninguna'
-            }}</span>
+          <strong>Preferencias Alimentarias:</strong> <span>{{ cliente.preferenciasAlimentarias?.length ? cliente.preferenciasAlimentarias?.join(', ') : 'Ninguna' }}</span>
         </div>
         <div class="info-item">
           <strong>Puntos de Lealtad:</strong> <span class="points-value">{{ cliente.puntos || 0 }}</span>
         </div>
       </div>
-      <button class="btn-edit-profile app-interactive-card" (click)="goToEditProfile()">
+      <button class="btn-edit-profile" (click)="goToEditProfile()">
         <i class="fas fa-user-edit"></i> Editar Perfil
       </button>
-    </div>
+    </section>
 
     <!-- Sección de Acciones Rápidas -->
-    <div class="dashboard-section quick-actions-grid">
-      <h3>Acciones Rápidas</h3>
-      <div class="action-cards">
-        <a (click)="goToMisPedidos()" class="action-card app-interactive-card">
+    <section class="quick-actions-section">
+      <h2 class="section-title">Acciones Rápidas</h2>
+      <div class="action-cards-grid">
+        <a (click)="goToMisPedidos()" class="action-card">
           <i class="fas fa-clipboard-list"></i>
           <h4>Mis Pedidos</h4>
-          <p>Revisa el estado de tus pedidos y tu historial.</p>
+          <p>Revisa el estado y el historial de tus pedidos.</p>
         </a>
-        <a (click)="goToCalificaciones()" class="action-card app-interactive-card">
+        <a (click)="goToCalificaciones()" class="action-card">
           <i class="fas fa-star"></i>
           <h4>Calificar Pedidos</h4>
           <p>Comparte tu experiencia y califica tus pedidos.</p>
         </a>
-        <a routerLink="/client/ofertas" class="action-card app-interactive-card">
+        <a routerLink="/client/ofertas" class="action-card">
           <i class="fas fa-tags"></i>
           <h4>Ver Ofertas</h4>
           <p>Descubre las últimas promociones y descuentos.</p>
         </a>
-        <a routerLink="/client/combos" class="action-card app-interactive-card">
+        <a routerLink="/client/combos" class="action-card">
           <i class="fas fa-box-open"></i>
           <h4>Explorar Combos</h4>
           <p>Encuentra combinaciones especiales a mejor precio.</p>
         </a>
+        <a routerLink="/client/products" class="action-card">
+          <i class="fas fa-utensils"></i>
+          <h4>Ver Productos</h4>
+          <p>Explora todo nuestro catálogo de productos.</p>
+        </a>
+        <a routerLink="/client/categories" class="action-card">
+          <i class="fas fa-folder-open"></i>
+          <h4>Explorar Categorías</h4>
+          <p>Navega por nuestras categorías de productos.</p>
+        </a>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <!-- Mensaje si no se pudo cargar el cliente o no es cliente -->
-  <div *ngIf="!isLoading && errorMessage" class="unauthorized-message">
-    <p>{{ errorMessage }}</p>
-    <p>Por favor, asegúrate de haber iniciado sesión con una cuenta de cliente.</p>
-    <button class="btn-go-to-login" [routerLink]="['/login']">Ir a Iniciar Sesión</button>
+    <!-- Sección de Productos Destacados (si existen) -->
+    <section *ngIf="products && products.length > 0" class="products-section">
+      <h2 class="section-title">Productos Destacados</h2>
+      <div class="products-grid">
+        <div *ngFor="let product of products.slice(0, 4)" class="product-card">
+          <img [src]="getProductImageUrl(product)" alt="{{ product.nombre }}" class="product-image">
+          <div class="product-details">
+            <h3 class="product-title">{{ product.nombre }}</h3>
+            <p class="product-description">{{ product.descripcion | slice:0:70 }}...</p>
+            <div class="product-price">{{ product.precio | currency:'USD':'symbol':'1.2-2' }}</div>
+            <button class="btn-buy" (click)="comprarProducto(product)">
+              <i class="fas fa-shopping-cart"></i> Comprar
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="section-footer">
+        <a routerLink="/client/products" class="btn-view-all">
+          Ver Todos los Productos <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </section>
+
+    <!-- Sección de Categorías (si existen) -->
+    <section *ngIf="categories && categories.length > 0" class="categories-section">
+      <h2 class="section-title">Explorar Categorías</h2>
+      <div class="categories-grid">
+        <a *ngFor="let category of categories.slice(0, 4)" [routerLink]="['/client/categories', category._id]" class="category-card">
+          <img [src]="getCategoryImageUrl(category)" alt="{{ category.nombre }}" class="category-image">
+          <div class="category-details">
+            <h3 class="category-title">{{ category.nombre }}</h3>
+            <p class="category-description">{{ category.descripcion | slice:0:50 }}...</p>
+          </div>
+        </a>
+      </div>
+      <div class="section-footer">
+        <a routerLink="/client/categories" class="btn-view-all">
+          Ver Todas las Categorías <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </section>
+
   </div>
 </div>

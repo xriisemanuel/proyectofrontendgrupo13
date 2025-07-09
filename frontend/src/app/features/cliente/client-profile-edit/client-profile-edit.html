@@ -3,6 +3,9 @@
   <div class="header-section">
     <h1>Editar Perfil</h1>
     <p>Actualiza tu información personal y de contacto.</p>
+     <button class="btn-volver" (click)="goBackToDashboard()">
+        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+     </button>
   </div>
 
   <div *ngIf="loading" class="loading-indicator">
@@ -101,7 +104,7 @@
     </div>
 
     <div class="form-actions">
-      <button type="submit" class="btn-save-changes" [disabled]="profileForm.invalid">
+      <button type="submit" class="btn-save-changes" [disabled]="profileForm.invalid" (click)="goBackToDashboard()" >
         <i class="fas fa-save"></i> Guardar Cambios
       </button>
       <button type="button" class="btn-cancel" (click)="goBackToDashboard()">
