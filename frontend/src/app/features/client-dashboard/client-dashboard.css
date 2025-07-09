@@ -170,7 +170,7 @@ body {
 }
 
 .info-item {
-    background: rgba(10, 25, 47, 0.5);
+    background: rgba(105, 134, 179, 0.5);
     padding: 20px;
     border-radius: 12px;
     border: 1px solid rgba(100, 255, 218, 0.1);
@@ -183,7 +183,7 @@ body {
 }
 
 .info-item strong {
-    color: rgba(100, 255, 218, 0.9);
+    color: rgba(255, 255, 255, 0.9);
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
