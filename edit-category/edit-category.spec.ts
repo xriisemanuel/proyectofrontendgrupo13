@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ManageUsersByRol } from './manage-users-by-rol';
+import { EditCategory } from './edit-category';
 
-describe('ManageUsersByRol', () => {
-  let component: ManageUsersByRol;
-  let fixture: ComponentFixture<ManageUsersByRol>;
+describe('EditCategory', () => {
+  let component: EditCategory;
+  let fixture: ComponentFixture<EditCategory>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ManageUsersByRol]
+      imports: [EditCategory]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ManageUsersByRol);
+    fixture = TestBed.createComponent(EditCategory);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

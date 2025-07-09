@@ -39,7 +39,6 @@ export class ClientProfileEditComponent implements OnInit {
       fechaNacimiento: ['', Validators.required], // Usaremos tipo 'date' en HTML
       preferenciasAlimentarias: ['', Validators.required],
       // No incluimos 'puntos' aquí ya que no debería ser editable por el cliente
-      fotoPerfil: [''] // Campo opcional para la URL de la foto de perfil
     });
   }
 
@@ -112,7 +111,6 @@ export class ClientProfileEditComponent implements OnInit {
       telefono: formData.telefono,
       nombre: formData.nombre,
       apellido: formData.apellido,
-      fotoPerfil: formData.fotoPerfil
     };
 
     this.clientService.updateCliente(this.clientId, updateData).pipe(

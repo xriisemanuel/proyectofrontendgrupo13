@@ -189,6 +189,32 @@ body {
   box-shadow: 0 15px 30px rgba(110, 231, 183, 0.6);
 }
 
+/* Estilo para el botón de "Entrar" */
+.btn-salir {
+  background: linear-gradient(45deg, #ca321e 0%, #410404 100%);
+  /* Degradado de acento */
+  color: #0F172A;
+  /* Texto muy oscuro para contraste */
+  border: none;
+  border-radius: 12px;
+  padding: 18px 35px;
+  font-size: 1.3em;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  width: 100%;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-top: 20px;
+}
+
+.btn-salir:hover {
+  background: linear-gradient(45deg, #ac010c 0%, #552c32 100%);
+  /* Invierte el degradado al hover */
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 15px 30px rgba(63, 4, 13, 0.6);
+}
 /* Mensaje de error */
 .error-message {
   color: #EF4444;
@@ -266,7 +292,10 @@ body {
     padding: 16px 30px;
     font-size: 1.2em;
   }
-
+.btn-salir {
+    padding: 10px 20px;
+    font-size: 1em;
+  }
   .error-message {
     padding: 12px;
     font-size: 1em;
@@ -290,10 +319,5 @@ body {
 
   .form-group input {
     padding: 10px 12px;
-  }
-
-  .btn-primary {
-    padding: 14px 25px;
-    font-size: 1.1em;
   }
 }

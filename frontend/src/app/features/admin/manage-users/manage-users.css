@@ -1,163 +1,240 @@
+/* --- Estilos Generales del Contenedor --- */
 .manage-by-role-container {
-    max-width: 900px;
-    margin: 50px auto;
-    padding: 35px;
-    border-radius: 15px;
-    background-color: #ffffff;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    font-family: 'Arial', sans-serif;
-    color: #333;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 30px;
+    max-width: 1200px;
+    margin: 40px auto;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     text-align: center;
+    animation: fadeIn 0.8s ease-out;
 }
 
-h2 {
-    color: #2c3e50;
-    margin-bottom: 20px;
-    font-size: 2.2em;
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.manage-by-role-container h2 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 2.5em;
     font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
-p {
-    color: #555;
-    margin-bottom: 40px;
+.manage-by-role-container p {
+    color: #666;
     font-size: 1.1em;
+    margin-bottom: 40px;
+    line-height: 1.6;
 }
 
+/* --- Estilos de las Tarjetas de Selección de Rol --- */
 .role-selection-cards {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 30px;
-    /* Espacio entre las tarjetas */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
     margin-bottom: 50px;
+    justify-content: center;
 }
 
 .role-card {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #333;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 280px;
-    /* Ancho fijo para las tarjetas */
-    height: 200px;
-    /* Altura fija */
-    background-color: #f8f9fa;
-    /* Fondo claro para las tarjetas */
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-    padding: 20px;
     text-align: center;
-    text-decoration: none;
-    color: #2c3e50;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-    border: 2px solid #e9ecef;
-    /* Borde sutil */
+    min-height: 200px;
+    /* Altura mínima para todas las tarjetas */
 }
 
 .role-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    border-color: #007bff;
-    /* Borde azul al pasar el ratón */
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
 }
 
 .role-card i {
-    font-size: 4em;
-    /* Íconos grandes */
-    margin-bottom: 15px;
+    font-size: 3.5em;
+    margin-bottom: 20px;
     color: #007bff;
-    /* Color azul por defecto para los íconos */
+    /* Color predeterminado de los iconos */
+    transition: color 0.3s ease;
 }
 
 .role-card h4 {
-    font-size: 1.6em;
+    font-size: 1.5em;
     margin-bottom: 10px;
-    color: #2c3e50;
+    color: #444;
 }
 
 .role-card p {
-    font-size: 1em;
-    color: #666;
+    font-size: 0.95em;
+    color: #777;
+    line-height: 1.5;
     margin-bottom: 0;
+    /* Elimina el margen inferior predeterminado */
 }
 
-/* Colores específicos para los íconos de las tarjetas */
+/* --- Colores específicos para cada tipo de tarjeta (personalización visual) --- */
 .roles-card i {
-    color: #6f42c1;
-    /* Púrpura para roles */
+    color: #28a745;
+    /* Verde */
 }
 
 .repartidores-card i {
-    color: #fd7e14;
-    /* Naranja para repartidores */
+    color: #ffc107;
+    /* Amarillo */
 }
 
-/* Puedes añadir más estilos para otras tarjetas de rol aquí */
 .clientes-card i {
-    color: #20c997;
-    /* Verde azulado para clientes */
+    color: #17a2b8;
+    /* Azul claro */
 }
 
 .cocina-card i {
     color: #dc3545;
-    /* Rojo para cocina */
+    /* Rojo */
 }
 
 .ventas-card i {
-    color: #17a2b8;
-    /* Cyan para ventas */
+    color: #6f42c1;
+    /* Púrpura */
 }
 
-
+/* --- Estilos del Enlace de Volver --- */
 .back-link {
-    text-align: center;
-    margin-top: 30px;
+    margin-top: 40px;
 }
 
 .back-link a {
-    color: #007bff;
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 25px;
+    background-color: #6c757d;
+    /* Gris oscuro */
+    color: #fff;
     text-decoration: none;
-    font-weight: bold;
-    transition: color 0.3s ease;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-size: 1.05em;
 }
 
 .back-link a:hover {
-    color: #0056b3;
-    text-decoration: underline;
+    background-color: #5a6268;
+    transform: translateY(-2px);
 }
 
-.back-link a i {
-    margin-right: 5px;
+.back-link i {
+    margin-right: 10px;
+    font-size: 1.1em;
 }
 
-/* Media Queries para Responsividad */
+/* --- Media Queries para Responsividad --- */
+@media (max-width: 992px) {
+    .manage-by-role-container {
+        padding: 25px;
+        margin: 30px auto;
+    }
+
+    .manage-by-role-container h2 {
+        font-size: 2em;
+    }
+
+    .manage-by-role-container p {
+        font-size: 1em;
+        margin-bottom: 30px;
+    }
+
+    .role-card {
+        padding: 25px;
+        min-height: 180px;
+    }
+
+    .role-card i {
+        font-size: 3em;
+        margin-bottom: 15px;
+    }
+
+    .role-card h4 {
+        font-size: 1.3em;
+    }
+}
+
 @media (max-width: 768px) {
+    .role-selection-cards {
+        grid-template-columns: 1fr;
+        /* Una columna en pantallas pequeñas */
+    }
+
     .manage-by-role-container {
         padding: 20px;
         margin: 20px auto;
     }
 
-    .role-selection-cards {
-        flex-direction: column;
-        align-items: center;
+    .manage-by-role-container h2 {
+        font-size: 1.8em;
+    }
+
+    .manage-by-role-container p {
+        font-size: 0.95em;
+        margin-bottom: 25px;
     }
 
     .role-card {
-        width: 90%;
-        /* Ocupa más ancho en pantallas pequeñas */
-        height: auto;
-        padding: 15px;
+        padding: 20px;
+        min-height: 160px;
     }
 
     .role-card i {
-        font-size: 3em;
+        font-size: 2.8em;
+        margin-bottom: 12px;
     }
 
     .role-card h4 {
-        font-size: 1.4em;
+        font-size: 1.2em;
     }
 
-    .role-card p {
+    .back-link a {
+        padding: 10px 20px;
+        font-size: 0.95em;
+    }
+}
+
+@media (max-width: 480px) {
+    .manage-by-role-container {
+        padding: 15px;
+    }
+
+    .manage-by-role-container h2 {
+        font-size: 1.6em;
+    }
+
+    .manage-by-role-container p {
         font-size: 0.9em;
+        margin-bottom: 20px;
+    }
+
+    .role-card i {
+        font-size: 2.5em;
+    }
+
+    .role-card h4 {
+        font-size: 1.1em;
     }
 }

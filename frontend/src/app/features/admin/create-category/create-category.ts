@@ -11,7 +11,7 @@ import { ToastrService } from 'ngx-toastr';
 // Importa la interfaz y el servicio
 import { ICategoria } from '../../../shared/interfaces';
 import { CategoriaService } from '../../../data/services/categoria';
-import { UnplashService } from '../../../data/services/unplash';
+import { OpenaiApiService } from '../../../core/services/openai-api'; // Importa tu nuevo servicio de OpenAI
 
 @Component({
     selector: 'app-create-category',
@@ -31,7 +31,8 @@ export class CreateCategory implements OnInit, OnDestroy {
     successMessage: string | null = null;
     errorMessage: string | null = null;
 
-    private unplashService = inject(UnplashService);
+    // Cambiado de UnplashService a OpenaiApiService
+    private openaiApiService = inject(OpenaiApiService);
 
     constructor(
         private fb: FormBuilder,
@@ -42,7 +43,6 @@ export class CreateCategory implements OnInit, OnDestroy {
         this.categoryForm = this.fb.group({
             nombre: ['', [Validators.required, Validators.minLength(3)]],
             descripcion: [''],
-            // Cambiado de imagenUrl a imagen
             imagen: ['', Validators.pattern('(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?.(png|jpg|jpeg|gif)')],
             estado: [true, Validators.required],
             imagenPrompt: ['']
@@ -66,33 +66,33 @@ export class CreateCategory implements OnInit, OnDestroy {
         if (prompt) {
             this.isSearchingImage = true;
             this.generatedImageUrl = null;
-            this.unplashService.buscarImagen(prompt).pipe(takeUntil(this.destroy$)).subscribe({
-                next: (data) => {
+            // Llama a tu OpenaiApiService
+            this.openaiApiService.generateImage(prompt).pipe(takeUntil(this.destroy$)).subscribe({
+                next: (response) => {
                     this.isSearchingImage = false;
-                    if (data.results && data.results.length > 0) {
-                        this.generatedImageUrl = data.results[0]?.urls?.regular;
+                    if (response && response.imageUrl) {
+                        this.generatedImageUrl = response.imageUrl;
                         this.successMessage = 'Imagen generada con éxito. Puedes usarla o buscar otra.';
                     } else {
-                        this.errorMessage = 'No se encontraron imágenes para el prompt proporcionado.';
-                        this.toastr.info('No se encontraron imágenes para el prompt proporcionado.', 'Sin Resultados');
+                        this.errorMessage = 'No se pudo generar una imagen para el prompt proporcionado.';
+                        this.toastr.info('No se pudo generar una imagen para el prompt proporcionado.', 'Sin Resultados');
                     }
                 },
                 error: (err) => {
                     this.isSearchingImage = false;
-                    console.error('Error al buscar imagen:', err);
-                    this.errorMessage = 'Error al buscar la imagen. Por favor, intenta de nuevo.';
-                    this.toastr.error(this.errorMessage, 'Error de Búsqueda');
+                    console.error('Error al generar imagen con OpenAI:', err);
+                    this.errorMessage = 'Error al generar la imagen. Por favor, intenta de nuevo.';
+                    this.toastr.error(this.errorMessage, 'Error de Generación');
                 }
             });
         } else {
-            this.errorMessage = 'Por favor, introduce una descripción para buscar una imagen.';
+            this.errorMessage = 'Por favor, introduce una descripción para generar una imagen.';
             this.toastr.warning(this.errorMessage, 'Descripción Requerida');
         }
     }
 
     usarImagenGenerada(): void {
         if (this.generatedImageUrl) {
-            // Cambiado de imagenUrl a imagen
             this.categoryForm.get('imagen')?.setValue(this.generatedImageUrl);
             this.toastr.success('URL de la imagen generada copiada al campo "URL de la Imagen".', 'Imagen Agregada');
             this.generatedImageUrl = null;
@@ -119,7 +119,7 @@ export class CreateCategory implements OnInit, OnDestroy {
         this.categoriaService.createCategoria(newCategoryData).pipe(takeUntil(this.destroy$)).subscribe({
             next: (response) => {
                 this.successMessage = response.mensaje || 'Categoría creada exitosamente.';
-                this.toastr.success('¡Éxito!');
+                this.toastr.success(this.successMessage || 'Categoría creada exitosamente.', '¡Éxito!');
                 this.categoryForm.reset({ estado: true });
                 this.generatedImageUrl = null;
                 this.isSaving = false;

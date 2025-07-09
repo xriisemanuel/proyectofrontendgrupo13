@@ -145,7 +145,7 @@ export class ClientDashboard implements OnInit, OnDestroy {
 
   comprarProducto(product: IProducto): void {
     console.log('Comprar producto:', product.nombre);
-    this.router.navigate(['/client/realizar-pedido'], { queryParams: { productId: product._id, quantity: 1 } });
+    this.router.navigate(['cliente/realizar-pedido'], { queryParams: { productId: product._id, quantity: 1 } });
   }
 
   // Métodos de navegación a otras partes del dashboard

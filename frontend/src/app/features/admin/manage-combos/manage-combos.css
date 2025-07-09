@@ -262,3 +262,17 @@ tbody tr:hover {
         margin: 0 3px;
     }
 }
+.btn-salir {
+    background: linear-gradient(45deg, #ca321e 0%, #410404 100%);
+    display: block;
+    width: 100%;
+    max-width: 200px;
+    margin: 20px auto;
+    padding: 12px;
+    color: #512702;
+    text-align: center;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}   

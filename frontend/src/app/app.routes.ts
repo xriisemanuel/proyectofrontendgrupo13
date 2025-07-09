@@ -109,6 +109,7 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['admin'] } // Solo admins pueden gestionar supervisores de cocina
   },
+  ///admin/categories/edit
   // --- ¡NUEVA RUTA PARA GESTIÓN DE SUPERVISORES DE VENTAS! ---
   {
     path: 'admin/supervisores-ventas/manage',
@@ -158,6 +159,15 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['admin'] } // Solo admins pueden editar combos
   },
+  // Gestión de Categorías (para Admin) - AÑADIDA LA RUTA DE EDICIÓN
+  {
+    path: 'admin/categories/edit/:id', // Ruta para editar una categoría específica
+    loadComponent: () => import('./features/admin/edit-category/edit-category').then(m => m.EditCategoryComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin'] } // Solo admins pueden editar categorías
+  }
+  ,
+
   // --- NUEVA RUTA: GESTIONAR COMBOS ---
   {
     path: 'admin/combos', // Ruta principal para gestionar combos

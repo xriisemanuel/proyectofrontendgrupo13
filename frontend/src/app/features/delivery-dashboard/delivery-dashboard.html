@@ -1,8 +1,12 @@
-<!-- src/app/features/delivery-dashboard/delivery-dashboard.html -->
 <div class="delivery-dashboard-container">
   <h1>Dashboard del Repartidor</h1>
 
-  <!-- Mensajes de estado (carga, error, éxito) -->
+  <div class="dashboard-header-actions">
+    <button (click)="logout()" class="logout-button">
+      <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+    </button>
+  </div>
+
   <div *ngIf="loadingRepartidor || loadingPedidos || loadingMap" class="loading-message">
     <i class="fas fa-spinner fa-spin"></i> Cargando datos...
   </div>
@@ -15,7 +19,6 @@
     <i class="fas fa-check-circle"></i> {{ successMessage }}
   </div>
 
-  <!-- Información del Perfil del Repartidor -->
   <div *ngIf="repartidor && !loadingRepartidor" class="repartidor-info-card">
     <h2>Mi Perfil de Repartidor</h2>
     <p><strong>Nombre:</strong> {{ repartidor!.usuarioId!.nombre }} {{ repartidor!.usuarioId!.apellido }}</p>
@@ -33,10 +36,12 @@
         {{ repartidor.estado | titlecase }}
       </span>
     </p>
-    <p><strong>Calificación Promedio:</strong> {{ repartidor.calificacionPromedio ? (repartidor.calificacionPromedio | number:'1.1-1') : 'Sin calificaciones' }}</p>
+    <p><strong>Calificación Promedio:</strong> {{ repartidor.calificacionPromedio ? (repartidor.calificacionPromedio |
+      number:'1.1-1') : 'Sin calificaciones' }}</p>
     <p><strong>Ubicación:</strong>
       <span *ngIf="repartidor.ubicacionActual?.lat !== null && repartidor.ubicacionActual?.lon !== null">
-        Lat: {{ repartidor.ubicacionActual?.lat| number:'1.4-4' }}, Lon: {{ repartidor.ubicacionActual?.lon| number:'1.4-4' }}
+        Lat: {{ repartidor.ubicacionActual?.lat| number:'1.4-4' }}, Lon: {{ repartidor.ubicacionActual?.lon|
+        number:'1.4-4' }}
       </span>
       <span *ngIf="repartidor.ubicacionActual?.lat === null || repartidor.ubicacionActual?.lon === null">
         No disponible
@@ -48,11 +53,10 @@
       <button (click)="changeRepartidorStatus('disponible')" [disabled]="repartidor.estado === 'disponible'">
         <i class="fas fa-check-circle"></i> Poner Disponible
       </button>
-      <button (click)="changeRepartidorStatus('fuera_de_servicio')" [disabled]="repartidor.estado === 'fuera_de_servicio'">
+      <button (click)="changeRepartidorStatus('fuera_de_servicio')"
+        [disabled]="repartidor.estado === 'fuera_de_servicio'">
         <i class="fas fa-times-circle"></i> Poner Fuera de Servicio
       </button>
-      <!-- El botón de actualizar ubicación manual se reemplaza por el seguimiento automático -->
-      <!-- <button (click)="updateLocation()">Actualizar Ubicación</button> -->
     </div>
 
     <h3>Historial de Entregas (últimas 5):</h3>
@@ -61,7 +65,8 @@
         {{ getHistorialEntregaDisplay(entrega) }}
       </li>
     </ul>
-    <p *ngIf="!repartidor.historialEntregas || repartidor.historialEntregas.length === 0">No hay entregas registradas aún.</p>
+    <p *ngIf="!repartidor.historialEntregas || repartidor.historialEntregas.length === 0">No hay entregas registradas
+      aún.</p>
   </div>
 
   <div *ngIf="!repartidor && !loadingRepartidor" class="no-data-message">
@@ -70,7 +75,6 @@
 
   <hr>
 
-  <!-- Sección del Mapa de Ubicación -->
   <div class="location-map-section">
     <h2>Mi Ubicación Actual</h2>
     <div class="map-controls">
@@ -82,7 +86,6 @@
       </button>
     </div>
     <div id="map" class="map-container">
-      <!-- El mapa de Google Maps se cargará aquí -->
       <div *ngIf="!isMapLoaded" class="map-placeholder">
         Cargando mapa...
       </div>
@@ -97,7 +100,6 @@
 
   <hr>
 
-  <!-- Sección de Pedidos Asignados -->
   <div class="assigned-orders-section" *ngIf="repartidor && !loadingPedidos">
     <h2>Pedidos Asignados</h2>
     <div *ngIf="pedidosAsignados.length > 0; else noPedidos">
@@ -108,17 +110,20 @@
         <p><strong>Estado:</strong> {{ pedido.estado | titlecase }}</p>
         <p><strong>Total:</strong> ${{ pedido.total | number:'1.2-2' }}</p>
         <p><strong>Fecha Pedido:</strong> {{ pedido.fechaPedido | date:'short' }}</p>
-        <p *ngIf="pedido.fechaEstimadaEntrega"><strong>Fecha Estimada Entrega:</strong> {{ pedido.fechaEstimadaEntrega | date:'short' }}</p>
+        <p *ngIf="pedido.fechaEstimadaEntrega"><strong>Fecha Estimada Entrega:</strong> {{ pedido.fechaEstimadaEntrega |
+          date:'short' }}</p>
 
         <h4>Detalle de Productos:</h4>
         <ul>
           <li *ngFor="let item of pedido.detalleProductos">
-            {{ item.cantidad }} x {{ item.nombreProducto }} (${{ item.precioUnitario | number:'1.2-2' }} c/u) = ${{ item.subtotal | number:'1.2-2' }}
+            {{ item.cantidad }} x {{ item.nombreProducto }} (${{ item.precioUnitario | number:'1.2-2' }} c/u) = ${{
+            item.subtotal | number:'1.2-2' }}
           </li>
         </ul>
 
         <div class="order-actions">
-          <button *ngIf="pedido.estado === 'confirmado' || pedido.estado === 'en_preparacion'" (click)="takeOrder(pedido._id!)">
+          <button *ngIf="pedido.estado === 'confirmado' || pedido.estado === 'en_preparacion'"
+            (click)="takeOrder(pedido._id!)">
             <i class="fas fa-truck"></i> Tomar Pedido
           </button>
           <button *ngIf="pedido.estado === 'en_envio'" (click)="deliverOrder(pedido)">

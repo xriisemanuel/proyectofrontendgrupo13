@@ -4,12 +4,13 @@ import { Component, OnInit, OnDestroy, PLATFORM_ID, Inject } from '@angular/core
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { isPlatformBrowser } from '@angular/common';
+import { Router } from '@angular/router'; // <-- ¡Importa Router!
 
 // Rutas de importación de servicios (asegurando que apunten a los archivos .service.ts)
-import { AuthService } from '../../core/auth/auth'; // <-- Corregido a .service
+import { AuthService } from '../../core/auth/auth';
 import { IRepartidor, IHistorialEntrega, IPedido, IClientePerfil, IUsuario } from '../../shared/interfaces';
-import { PedidoService } from '../../data/services/pedido'; // <-- Corregido a .service
-import { RepartidorService } from '../../data/services/repartidor'; // <-- Corregido a .service
+import { PedidoService } from '../../data/services/pedido';
+import { RepartidorService } from '../../data/services/repartidor';
 
 import { catchError, tap } from 'rxjs/operators';
 import { of, Subscription } from 'rxjs';
@@ -48,16 +49,15 @@ export class DeliveryDashboard implements OnInit, OnDestroy {
   private repartidorSubscription: Subscription | undefined;
   private pedidosSubscription: Subscription | undefined;
 
-  map: any; // Cambiado de google.maps.Map a any
-  marker: any; // Cambiado de google.maps.Marker a any
+  map: any;
+  marker: any;
   geolocationWatchId: number | undefined;
   locationUpdateInterval: any;
   isTrackingLocation: boolean = false;
   isMapLoaded: boolean = false;
   private isBrowser: boolean;
 
-  // ¡REEMPLAZA ESTO CON TU CLAVE DE API DE GOOGLE MAPS!
-  private GOOGLE_MAPS_API_KEY = 'AIzaSyB3mJIYkOHsOiDcEpdIyR8dQlPzqRDCvmE'; // <-- Asegúrate de que esta sea tu clave real
+  private Maps_API_KEY = 'AIzaSyB3mJIYkOHsOiDcEpdIyR8dQlPzqRDCvmE';
   private LOCATION_UPDATE_INTERVAL_MS = 10000;
 
   constructor(
@@ -65,6 +65,7 @@ export class DeliveryDashboard implements OnInit, OnDestroy {
     private repartidorService: RepartidorService,
     private pedidoService: PedidoService,
     private toastr: ToastrService,
+    private router: Router, // <-- ¡Inyecta Router aquí!
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -84,6 +85,16 @@ export class DeliveryDashboard implements OnInit, OnDestroy {
     this.pedidosSubscription?.unsubscribe();
     this.stopLocationTracking();
   }
+
+  /**
+   * Método para cerrar la sesión del usuario.
+   */
+  logout(): void {
+    this.authService.logout(); // Asume que este método limpia el token y el estado de la sesión
+    this.toastr.info('Has cerrado sesión.', '¡Hasta pronto!');
+    this.router.navigate(['/auth/login']); // Redirige al usuario a la página de login
+  }
+
 
   /**
    * Carga el script de Google Maps API dinámicamente.
@@ -108,7 +119,7 @@ export class DeliveryDashboard implements OnInit, OnDestroy {
     this.loadingMap = true;
     const script = document.createElement('script');
     script.id = 'google-maps-script';
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${this.GOOGLE_MAPS_API_KEY}&callback=initMapCallback`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${this.Maps_API_KEY}&callback=initMapCallback`;
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);
@@ -120,12 +131,12 @@ export class DeliveryDashboard implements OnInit, OnDestroy {
       this.isMapLoaded = true;
       this.loadingMap = false;
       this.toastr.success('Mapa de Google Maps cargado.', '¡Listo!');
-      
+
       // Inicializar el mapa con la ubicación actual o una por defecto
       const lat = this.repartidor?.ubicacionActual?.lat ?? -31.3283;
       const lon = this.repartidor?.ubicacionActual?.lon ?? -64.2008;
       this.initMap(lat, lon);
-      
+
       // Opcional: Iniciar el seguimiento automáticamente si el repartidor ya está cargado y disponible
       if (this.repartidor && this.repartidor.estado === 'disponible') {
         this.startLocationTracking();

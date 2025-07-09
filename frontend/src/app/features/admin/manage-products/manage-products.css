@@ -319,3 +319,33 @@ td:last-child {
         font-size: 1.8em;
     }
 }
+.btn-salir {
+  background: linear-gradient(45deg, #ca321e 0%, #410404 100%);
+  /* Degradado de acento */
+  color: #fff200;
+  /* Texto muy oscuro para contraste */
+  border: none;
+  border-radius: 12px;
+  padding: 18px 35px;
+  font-size: 1.3em;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  width: 100%;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-top: 20px;
+}
+
+.btn-salir:hover {
+  background: linear-gradient(45deg, #ac010c 0%, #552c32 100%);
+  /* Invierte el degradado al hover */
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 15px 30px rgba(255, 255, 255, 0.6);
+}
+
+.btn-salir {
+    padding: 10px 20px;
+    font-size: 1.4em;
+  }

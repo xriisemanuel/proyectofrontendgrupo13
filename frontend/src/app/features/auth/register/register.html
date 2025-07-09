@@ -45,21 +45,12 @@
         <input type="text" id="preferenciasAlimentariasCliente" [(ngModel)]="preferenciasAlimentariasCliente"
           name="preferenciasAlimentariasCliente" placeholder="Ej: Vegetariano, Sin Gluten">
       </div>
-      <div class="form-group">
+      <!-- <div class="form-group">
         <label for="puntosCliente">Puntos de Fidelidad:</label>
         <input type="number" id="puntosCliente" [(ngModel)]="puntosCliente" name="puntosCliente" min="0">
-      </div>
+      </div> -->
     </div>
-
     <button type="submit" class="btn-primary">Registrar</button>
-
-    <!-- Los mensajes de error/éxito se mostrarán con Toastr, pero puedes mantener esto para validación interna si quieres -->
-    <!-- <div *ngIf="errorMessage" class="error-message">
-      {{ errorMessage }}
-    </div>
-    <div *ngIf="isSuccessful" class="success-message">
-      Registro exitoso. Ahora puedes <a routerLink="/login">iniciar sesión</a>.
-    </div> -->
   </form>
   <p>¿Ya tienes cuenta? <a routerLink="/login">Inicia Sesión</a></p>
 </div>

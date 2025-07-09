@@ -1,307 +1,662 @@
 /* src/app/features/delivery-dashboard/delivery-dashboard.css */
 
+/* Variables de color para fácil mantenimiento (igual que admin-dashboard) */
+:root {
+    --color-dark-blue-bg: #0A192F;
+    /* Fondo principal oscuro */
+    --color-card-bg: #172A45;
+    /* Fondo de tarjetas */
+    --color-input-bg: #0B2239;
+    /* Fondo de inputs */
+    --color-light-text: #CCD6F6;
+    /* Texto claro */
+    --color-secondary-text: #8892B0;
+    /* Texto secundario gris azulado */
+    --color-accent-cyan: #64FFDA;
+    /* Cian de acento */
+    --color-accent-orange: #FFB56B;
+    /* Naranja de acento */
+    --color-error-red: #EF476F;
+    /* Rojo para errores */
+    --color-success-green: #50FA7B;
+    /* Verde para éxito */
+    --color-gray-button: #8892B0;
+    /* Gris para botones neutrales */
+    --color-gray-button-dark: #5C677D;
+    /* Gris oscuro para hover */
+
+    /* Variables para elementos interactivos */
+    --interactive-card-border-radius: 25px;
+    --interactive-card-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+    --interactive-card-hover-transform: scale(1.005) translateY(-5px);
+    --interactive-card-hover-shadow: 0 20px 45px rgba(0, 0, 0, 0.7);
+    --interactive-card-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Estilos Globales para el Dashboard del Repartidor */
 .delivery-dashboard-container {
     font-family: 'Inter', sans-serif;
     padding: 30px;
-    max-width: 900px;
-    margin: 40px auto;
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    color: #333;
+    background-color: var(--color-dark-blue-bg);
+    min-height: 100vh;
+    color: var(--color-light-text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    box-sizing: border-box;
 }
 
-h1,
-h2 {
-    color: #2c3e50;
-    text-align: center;
+h1 {
+    font-size: 3.5em;
+    color: var(--color-accent-cyan);
+    font-weight: 800;
     margin-bottom: 20px;
+    text-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    letter-spacing: -0.05em;
+    text-align: center;
+}
+
+/* Acciones de cabecera (botón cerrar sesión) */
+.dashboard-header-actions {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.logout-button {
+    background: linear-gradient(45deg, #EF476F 0%, #B33959 100%);
+    /* Rojo degradado */
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1.1em;
     font-weight: 700;
+    transition: all 0.3s ease-out;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-h3 {
-    color: #34495e;
-    margin-top: 25px;
-    margin-bottom: 15px;
-    font-weight: 600;
+.logout-button:hover {
+    background: linear-gradient(45deg, #B33959 0%, #EF476F 100%);
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 8px 20px rgba(239, 71, 111, 0.4);
 }
 
-p {
-    font-size: 1em;
-    line-height: 1.6;
-    margin-bottom: 10px;
-}
-
+/* Mensajes de estado */
 .loading-message,
 .error-message,
 .success-message,
 .no-data-message {
-    padding: 15px;
-    border-radius: 8px;
+    padding: 20px;
+    border-radius: 15px;
     margin-bottom: 20px;
     text-align: center;
-    font-weight: 500;
+    font-weight: 600;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 800px;
 }
 
 .loading-message {
-    background-color: #e6f7ff;
-    color: #0056b3;
+    background-color: rgba(100, 255, 218, 0.1);
+    color: var(--color-accent-cyan);
+    border: 1px solid var(--color-accent-cyan);
+}
+
+.loading-message i {
+    animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .error-message {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+    background-color: rgba(239, 71, 111, 0.2);
+    color: var(--color-error-red);
+    border: 1px solid var(--color-error-red);
 }
 
 .success-message {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+    background-color: rgba(80, 250, 123, 0.2);
+    color: var(--color-success-green);
+    border: 1px solid var(--color-success-green);
 }
 
 .no-data-message {
-    background-color: #fdfdfd;
-    color: #6c757d;
-    border: 1px solid #e9ecef;
-}
-
-.repartidor-info-card,
-.assigned-orders-section,
-.location-map-section {
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
-    padding: 25px;
-    margin-bottom: 30px;
-    background-color: #fdfdfd;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.repartidor-info-card .actions {
-    display: flex;
-    flex-wrap: wrap;
-    /* Permite que los botones se envuelvan */
-    justify-content: center;
+    background-color: var(--color-card-bg);
+    color: var(--color-secondary-text);
+    border: 1px solid rgba(136, 146, 176, 0.2);
+    flex-direction: column;
     gap: 10px;
-    margin-top: 20px;
 }
 
-.repartidor-info-card .actions button {
-    background-color: #3498db;
-    color: white;
+/* Separador horizontal */
+.divider {
+    width: 80%;
     border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 500;
+    border-top: 1px solid rgba(100, 255, 218, 0.2);
+    margin: 40px 0;
 }
 
-.repartidor-info-card .actions button:hover:not([disabled]) {
-    background-color: #2980b9;
-    transform: translateY(-1px);
+/* Clase base para tarjetas interactivas */
+.interactive-card {
+    border-radius: var(--interactive-card-border-radius);
+    box-shadow: var(--interactive-card-shadow);
+    transition: var(--interactive-card-transition);
+    position: relative;
+    overflow: hidden;
+    will-change: transform, box-shadow, border-radius;
+    perspective: 1000px;
 }
 
-.repartidor-info-card .actions button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-    opacity: 0.7;
+.interactive-card::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle at center, rgba(100, 255, 218, 0.2) 0%, transparent 70%);
+    /* Cian de acento */
+    border-radius: 50%;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    transition: width 0.7s ease-out, height 0.7s ease-out, opacity 0.7s ease-out;
+    z-index: 0;
+    pointer-events: none;
 }
 
+.interactive-card:hover {
+    transform: var(--interactive-card-hover-transform);
+    box-shadow: var(--interactive-card-hover-shadow), 0 0 30px rgba(100, 255, 218, 0.4);
+    border-radius: 28px;
+}
+
+.interactive-card:hover::before {
+    width: 200%;
+    height: 200%;
+    opacity: 1;
+}
+
+.interactive-card>*:not(::before) {
+    position: relative;
+    z-index: 1;
+    transition: color 0.3s ease-out, transform 0.3s ease-out;
+}
+
+
+/* Información del Repartidor y Pedidos Asignados (secciones principales) */
+.repartidor-info-card,
+.assigned-orders-section {
+    background: var(--color-card-bg);
+    padding: 35px;
+    width: 100%;
+    max-width: 1200px;
+    box-sizing: border-box;
+}
+
+.repartidor-info-card h2,
+.assigned-orders-section h2,
+.location-map-section h2 {
+    font-size: 2.5em;
+    color: var(--color-accent-orange);
+    margin-bottom: 25px;
+    border-bottom: 2px solid rgba(255, 181, 107, 0.2);
+    padding-bottom: 15px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.repartidor-info-card p {
+    font-size: 1.1em;
+    color: var(--color-light-text);
+    margin-bottom: 10px;
+}
+
+.repartidor-info-card strong {
+    color: var(--color-accent-cyan);
+    font-weight: 600;
+}
+
+/* Estados del repartidor */
 .status-disponible {
-    color: #28a745;
-    /* Verde */
+    background-color: rgba(80, 250, 123, 0.2);
+    color: var(--color-success-green);
+    padding: 5px 10px;
+    border-radius: 5px;
     font-weight: bold;
 }
 
 .status-en-entrega {
-    color: #ffc107;
-    /* Amarillo */
+    background-color: rgba(255, 181, 107, 0.2);
+    color: var(--color-accent-orange);
+    padding: 5px 10px;
+    border-radius: 5px;
     font-weight: bold;
 }
 
-.status-fuera-servicio {
-    color: #dc3545;
-    /* Rojo */
+.status-fuera-de-servicio {
+    background-color: rgba(239, 71, 111, 0.2);
+    color: var(--color-error-red);
+    padding: 5px 10px;
+    border-radius: 5px;
     font-weight: bold;
 }
 
-hr {
-    border: 0;
-    height: 1px;
-    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
-    margin: 40px 0;
+.repartidor-info-card .actions {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(100, 255, 218, 0.1);
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
-/* Estilos del Mapa */
-.location-map-section .map-controls {
+.repartidor-info-card .actions h3 {
+    font-size: 1.5em;
+    color: var(--color-accent-orange);
+    width: 100%;
+    text-align: center;
+    margin-bottom: 15px;
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.btn-status-action {
+    background: linear-gradient(45deg, var(--color-accent-cyan) 0%, #34B399 100%);
+    color: var(--color-dark-blue-bg);
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease-out;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-status-action:hover:not([disabled]) {
+    background: linear-gradient(45deg, #34B399 0%, var(--color-accent-cyan) 100%);
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 8px 20px rgba(100, 255, 218, 0.4);
+}
+
+.btn-status-action.btn-danger {
+    background: linear-gradient(45deg, var(--color-error-red) 0%, #B33959 100%);
+}
+
+.btn-status-action.btn-danger:hover:not([disabled]) {
+    background: linear-gradient(45deg, #B33959 0%, var(--color-error-red) 100%);
+    box-shadow: 0 8px 20px rgba(239, 71, 111, 0.4);
+}
+
+button:disabled {
+    background-color: var(--color-gray-button-dark);
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+}
+
+.repartidor-info-card ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+    background-color: var(--color-input-bg);
+    border-radius: 10px;
+    padding: 15px;
+    border: 1px dashed rgba(100, 255, 218, 0.1);
+}
+
+.repartidor-info-card ul li {
+    font-size: 1em;
+    color: var(--color-light-text);
+    margin-bottom: 8px;
+    border-left: 3px solid var(--color-accent-orange);
+    padding-left: 10px;
+}
+
+
+/* Sección del Mapa - Mantiene colores claros */
+.location-map-section {
+    background: #ffffff;
+    /* Fondo blanco para el mapa */
+    color: var(--color-text-primary);
+    /* Texto oscuro para el mapa */
+    padding: 35px;
+    width: 100%;
+    max-width: 1200px;
+    box-sizing: border-box;
+    border-radius: var(--interactive-card-border-radius);
+    box-shadow: var(--interactive-card-shadow);
+}
+
+.location-map-section h2 {
+    color: var(--color-accent-blue);
+    /* Azul para el título del mapa */
+    border-bottom: 2px solid rgba(52, 152, 219, 0.2);
+    /* Borde azul */
+}
+
+.map-controls {
     display: flex;
     justify-content: center;
     gap: 15px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
-.location-map-section .map-controls button {
-    background-color: #f39c12;
-    /* Naranja para los controles del mapa */
+.btn-map-action {
+    background: linear-gradient(45deg, #3498db 0%, #2980b9 100%);
+    /* Azul para acciones del mapa */
     color: white;
     border: none;
+    border-radius: 10px;
     padding: 10px 20px;
-    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    display: inline-flex;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease-out;
+    display: flex;
     align-items: center;
     gap: 8px;
-    font-weight: 500;
 }
 
-.location-map-section .map-controls button:hover:not([disabled]) {
-    background-color: #e67e22;
-    transform: translateY(-1px);
+.btn-map-action:hover:not([disabled]) {
+    background: linear-gradient(45deg, #2980b9 0%, #3498db 100%);
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
 }
 
-.location-map-section .map-controls button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-    opacity: 0.7;
+.btn-map-action.btn-danger {
+    background: linear-gradient(45deg, #e74c3c 0%, #c0392b 100%);
+    /* Rojo para detener */
+}
+
+.btn-map-action.btn-danger:hover:not([disabled]) {
+    background: linear-gradient(45deg, #c0392b 0%, #e74c3c 100%);
+    box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3);
 }
 
 .map-container {
     width: 100%;
     height: 400px;
-    /* Altura fija para el mapa */
     background-color: #e0e0e0;
-    border-radius: 8px;
+    /* Fondo gris claro para el mapa */
+    border-radius: 15px;
     overflow: hidden;
-    /* Asegura que el mapa se ajuste al borde redondeado */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #666;
-    font-style: italic;
+    /* Asegura que el mapa no se desborde */
+    position: relative;
     box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .map-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #333;
     font-size: 1.2em;
-    color: #888;
+    font-weight: 600;
+    z-index: 10;
 }
 
 .tracking-status {
+    text-align: center;
     margin-top: 15px;
-    font-size: 0.95em;
-    color: #555;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
 }
 
-/* Pedidos Asignados */
+.tracking-status.active {
+    color: var(--color-success-green);
+}
+
+.tracking-status.inactive {
+    color: var(--color-secondary-text);
+}
+
+
+/* Estilos para las tarjetas de Pedidos Asignados */
+.orders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin-top: 20px;
+}
+
 .order-card {
-    border: 1px solid #dcdcdc;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-    background-color: #ffffff;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.03);
-    text-align: left;
-    /* Alineación de texto para el contenido del pedido */
+    background: var(--color-card-bg);
+    padding: 30px;
+    color: var(--color-light-text);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .order-card h3 {
-    color: #2c3e50;
-    margin-top: 0;
-    margin-bottom: 15px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-    font-size: 1.5em;
+    font-size: 1.8em;
+    color: var(--color-accent-cyan);
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(100, 255, 218, 0.2);
+    padding-bottom: 8px;
+}
+
+.order-card p {
+    font-size: 1em;
+    margin-bottom: 5px;
+}
+
+.order-card strong {
+    color: var(--color-accent-orange);
+}
+
+.order-card h4 {
+    font-size: 1.2em;
+    color: var(--color-accent-cyan);
+    margin-top: 15px;
+    margin-bottom: 10px;
+    border-bottom: 1px dashed rgba(100, 255, 218, 0.1);
+    padding-bottom: 5px;
 }
 
 .order-card ul {
     list-style: none;
     padding: 0;
-    margin: 15px 0;
+    margin: 0;
 }
 
 .order-card ul li {
-    background-color: #f8f8f8;
-    border-left: 3px solid #3498db;
-    padding: 8px 15px;
-    margin-bottom: 5px;
-    border-radius: 4px;
     font-size: 0.95em;
+    margin-bottom: 3px;
+    border-left: 3px solid var(--color-accent-orange);
+    padding-left: 10px;
 }
+
+.pedido-estado {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 0.9em;
+    text-transform: uppercase;
+}
+
+/* Estilos para los diferentes estados de pedido (igual que en mis-pedidos) */
+.status-pendiente,
+.status-recibido {
+    background-color: rgba(255, 181, 107, 0.2);
+    color: #FFB56B;
+    border: 1px solid #FFB56B;
+}
+
+.status-confirmado,
+.status-en_preparacion {
+    background-color: rgba(100, 255, 218, 0.2);
+    color: #64FFDA;
+    border: 1px solid #64FFDA;
+}
+
+.status-listo_para_entrega,
+.status-en_envio {
+    background-color: rgba(189, 147, 249, 0.2);
+    color: #BD93F9;
+    border: 1px solid #BD93F9;
+}
+
+.status-entregado {
+    background-color: rgba(80, 250, 123, 0.2);
+    color: #50FA7B;
+    border: 1px solid #50FA7B;
+}
+
+.status-cancelado,
+.status-fallido {
+    background-color: rgba(239, 71, 111, 0.2);
+    color: #EF476F;
+    border: 1px solid #EF476F;
+}
+
 
 .order-actions {
-    text-align: right;
-    margin-top: 20px;
     display: flex;
-    flex-wrap: wrap;
     justify-content: flex-end;
     gap: 10px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(100, 255, 218, 0.1);
+    flex-wrap: wrap;
 }
 
-.order-actions button {
-    background-color: #28a745;
-    color: white;
+.btn-order-action {
+    background: linear-gradient(45deg, var(--color-accent-orange) 0%, #E08A22 100%);
+    color: var(--color-dark-blue-bg);
     border: none;
+    border-radius: 10px;
     padding: 10px 20px;
-    border-radius: 8px;
+    font-size: 0.95em;
+    font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    display: inline-flex;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease-out;
+    display: flex;
     align-items: center;
     gap: 8px;
-    font-weight: 500;
 }
 
-.order-actions button:hover {
-    background-color: #218838;
-    transform: translateY(-1px);
+.btn-order-action:hover:not([disabled]) {
+    background: linear-gradient(45deg, #E08A22 0%, var(--color-accent-orange) 100%);
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 8px 20px rgba(255, 181, 107, 0.4);
 }
 
-.order-actions button:first-child {
-    background-color: #007bff;
+.btn-order-action.btn-success {
+    background: linear-gradient(45deg, var(--color-success-green) 0%, #34B399 100%);
 }
 
-.order-actions button:first-child:hover {
-    background-color: #0056b3;
+.btn-order-action.btn-success:hover:not([disabled]) {
+    background: linear-gradient(45deg, #34B399 0%, var(--color-success-green) 100%);
+    box-shadow: 0 8px 20px rgba(80, 250, 123, 0.4);
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+
+/* Media Queries para Responsividad */
+@media (max-width: 1200px) {
+
+    .repartidor-info-card,
+    .location-map-section,
+    .assigned-orders-section {
+        padding: 30px;
+    }
+}
+
+@media (max-width: 992px) {
     .delivery-dashboard-container {
-        padding: 20px;
-        margin: 20px auto;
+        padding: 25px;
     }
 
     h1 {
+        font-size: 3em;
+    }
+
+    .repartidor-info-card h2,
+    .assigned-orders-section h2,
+    .location-map-section h2 {
+        font-size: 2.2em;
+    }
+
+    .orders-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+    }
+}
+
+@media (max-width: 768px) {
+    .delivery-dashboard-container {
+        padding: 20px;
+        gap: 30px;
+    }
+
+    h1 {
+        font-size: 2.5em;
+    }
+
+    .dashboard-header-actions {
+        justify-content: center;
+    }
+
+    .logout-button {
+        width: 100%;
+    }
+
+    .repartidor-info-card,
+    .location-map-section,
+    .assigned-orders-section {
+        padding: 25px;
+    }
+
+    .repartidor-info-card h2,
+    .assigned-orders-section h2,
+    .location-map-section h2 {
         font-size: 2em;
     }
 
-    h2 {
-        font-size: 1.8em;
-    }
-
     .repartidor-info-card .actions,
-    .location-map-section .map-controls,
+    .map-controls,
     .order-actions {
         flex-direction: column;
         gap: 10px;
     }
 
-    .repartidor-info-card .actions button,
-    .location-map-section .map-controls button,
-    .order-actions button {
+    .btn-status-action,
+    .btn-map-action,
+    .btn-order-action {
         width: 100%;
         justify-content: center;
     }
@@ -317,14 +672,21 @@ hr {
     }
 
     h1 {
+        font-size: 2em;
+    }
+
+    .repartidor-info-card h2,
+    .assigned-orders-section h2,
+    .location-map-section h2 {
         font-size: 1.8em;
     }
 
-    h2 {
-        font-size: 1.6em;
+    .repartidor-info-card p,
+    .order-card p {
+        font-size: 0.95em;
     }
 
-    .map-container {
-        height: 250px;
+    .order-card ul li {
+        font-size: 0.9em;
     }
 }
