@@ -18,4 +18,5 @@ export class UnplashService {
   buscarImagen(query: string, perPage: number = 9, orientation: string = 'landscape') {
     return this.http.get<any>(`${this.apiUrl}?query=${query}&per_page=${perPage}&orientation=${orientation}&client_id=${this.accessKey}`);
   }
+
 }

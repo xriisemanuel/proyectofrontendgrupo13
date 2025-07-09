@@ -35,11 +35,13 @@ export class ManageProducts implements OnInit {
   ngOnInit(): void {
     this.loadProducts();
   }
+  
 
   /**
    * Carga la lista de todos los productos.
    */
   loadProducts(): void {
+    
     this.loading = true;
     this.errorMessage = null;
     this.productoService.getProducts().pipe( // Asumo que el método es getProductos
@@ -50,8 +52,9 @@ export class ManageProducts implements OnInit {
       }),
       finalize(() => this.loading = false)
     ).subscribe(productos => {
-      this.products = productos;
-    });
+  console.log('Productos recibidos:', productos); // 👈 revisá si cada producto tiene .imagen
+  this.products = productos;
+});
   }
 
   /**

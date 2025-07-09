@@ -50,7 +50,7 @@ export interface IProducto {
   descripcion?: string;
   precio: number;
   categoriaId: string; // O ICategoria['_id']
-  imagen?: string;
+  imagen?: string;// Array de URLs de imágenes
   disponible: boolean;
   stock: number;
   popularidad?: number; // Para ordenar por popularidad

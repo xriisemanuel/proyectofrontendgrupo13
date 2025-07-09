@@ -130,7 +130,7 @@ export class CreateProduct implements OnInit, OnDestroy {
 
         // Llama al servicio de Unsplash. Asegúrate de que tu servicio acepte `perPage` como parámetro.
         // Si no lo modificaste, solo devolverá 1 resultado.
-        this.unplashService.buscarImagen(this.unsplashSearchTerm, 9).pipe(takeUntil(this.destroy$)).subscribe({
+        this.unplashService.buscarImagen(this.unsplashSearchTerm, 3).pipe(takeUntil(this.destroy$)).subscribe({
             next: (response) => {
                 this.isSearchingUnsplash = false;
                 if (response && response.results && response.results.length > 0) {
@@ -148,6 +148,7 @@ export class CreateProduct implements OnInit, OnDestroy {
                 this.toastr.error(this.unsplashError, 'Error de Búsqueda');
             }
         });
+
     }
 
     // --- Lógica para seleccionar una imagen de Unsplash y procesarla con Cloudinary ---
@@ -237,8 +238,18 @@ export class CreateProduct implements OnInit, OnDestroy {
             this.isSaving = false;
             return;
         }
+        //CAMBIOS
+        const formValue = this.productForm.value;
+        const newProductData: Partial<IProducto> = {
+            nombre: formValue.nombre,
+            descripcion: formValue.descripcion,
+            precio: formValue.precio,
+            categoriaId: formValue.categoriaId,
+            stock: formValue.stock,
+            imagen: formValue.imagenUrl, // ✅ Esto es un string, como espera el modelo, 
+            disponible: formValue.estado
+        };
 
-        const newProductData: Partial<IProducto> = this.productForm.value;
         console.log('Intentando crear producto:', newProductData);
 
         this.productoService.createProduct(newProductData).pipe(takeUntil(this.destroy$)).subscribe({
