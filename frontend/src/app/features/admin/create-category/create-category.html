@@ -31,33 +31,58 @@
                     placeholder="Una breve descripción de la categoría..."></textarea>
             </div>
 
-            <div class="form-group">
-                <label for="imagenPrompt">Generar Imagen (Descripción):</label>
-                <input id="imagenPrompt" type="text" formControlName="imagenPrompt"
-                    placeholder="Ej: Plato de pizza con queso derretido">
-                <button type="button" class="btn-generate-image" (click)="buscarImagen()">
-                    <i class="fas fa-image"></i> Buscar Imagen
-                </button>
-
-                <div *ngIf="isSearchingImage" class="image-loading">
-                    <i class="fas fa-spinner fa-spin"></i> Buscando imagen...
-                </div>
-
-                <div *ngIf="generatedImageUrl" class="image-preview-area">
-                    <label>Imagen Generada:</label>
-                    <img [src]="generatedImageUrl" alt="Imagen de categoría generada" class="generated-image-preview">
-                    <button type="button" class="btn-use-generated" (click)="usarImagenGenerada()">
-                        <i class="fas fa-check-circle"></i> Usar esta Imagen
+            <div class="form-group image-search-section">
+                <label for="unsplashSearchTerm">Buscar Imagen en Unsplash:</label>
+                <div class="unsplash-search-input-group">
+                    <input id="unsplashSearchTerm" type="text" [(ngModel)]="unsplashSearchTerm"
+                        [ngModelOptions]="{standalone: true}"
+                        placeholder="Ej: Plato de comida, bebida fría, postre chocolate"
+                        (keyup.enter)="searchUnsplashImages()">
+                    <button type="button" class="btn-search-unsplash" (click)="searchUnsplashImages()"
+                        [disabled]="isSearchingUnsplash || isProcessingCloudinary">
+                        <i class="fas fa-search"></i> {{ isSearchingUnsplash ? 'Buscando...' : 'Buscar' }}
                     </button>
                 </div>
+
+                <div *ngIf="isSearchingUnsplash" class="loading-message-small">
+                    <i class="fas fa-spinner fa-spin"></i> Buscando imágenes en Unsplash...
+                </div>
+                <div *ngIf="unsplashError" class="error-message-small">
+                    <i class="fas fa-exclamation-triangle"></i> {{ unsplashError }}
+                </div>
+
+                <div class="unsplash-results-grid" *ngIf="unsplashImages.length > 0">
+                    <div *ngFor="let img of unsplashImages" class="unsplash-image-item"
+                        (click)="selectUnsplashImage(img.urls.regular)">
+                        <img [src]="img.urls.small" [alt]="img.alt_description || 'Imagen de Unsplash'">
+                        <div class="overlay" *ngIf="selectedUnsplashUrl === img.urls.regular">
+                            <i class="fas fa-check-circle"></i> Seleccionada
+                        </div>
+                    </div>
+                </div>
+                <p *ngIf="unsplashImages.length === 0 && unsplashSearchTerm && !isSearchingUnsplash && !unsplashError"
+                    class="no-results-message">
+                    No se encontraron imágenes para "{{ unsplashSearchTerm }}".
+                </p>
             </div>
 
             <div class="form-group">
-                <label for="imagen">URL de la Imagen:</label>
-                <input id="imagen" type="url" formControlName="imagen"
-                    placeholder="Ej: https://ejemplo.com/categoria.png">
+                <label for="imagen">URL de la Imagen de Categoría (Cloudinary):</label>
+                <input id="imagen" type="url" formControlName="imagen" readonly
+                    placeholder="La URL de la imagen final aparecerá aquí">
+                <div *ngIf="isProcessingCloudinary" class="loading-message-small">
+                    <i class="fas fa-spinner fa-spin"></i> Procesando imagen con Cloudinary...
+                </div>
+                <div *ngIf="processingCloudinaryError" class="error-message-small">
+                    <i class="fas fa-exclamation-triangle"></i> {{ processingCloudinaryError }}
+                </div>
+
+                <div *ngIf="f['imagen'].value && !f['imagen'].invalid" class="image-preview-area-final">
+                    <label>Imagen Final:</label>
+                    <img [src]="f['imagen'].value" alt="Imagen de categoría final" class="final-image-preview">
+                </div>
                 <div *ngIf="f['imagen'].invalid && (f['imagen'].dirty || f['imagen'].touched)" class="validation-error">
-                    <div *ngIf="f['imagen'].errors?.['pattern']">Por favor, introduce una URL de imagen válida.</div>
+                    <div *ngIf="f['imagen'].errors?.['required']">La URL de la imagen es requerida.</div>
                 </div>
             </div>
 
@@ -74,7 +99,9 @@
         </div>
 
         <div class="form-actions">
-            <button type="submit" [disabled]="categoryForm.invalid || isSaving" class="btn-save-changes">
+            <button type="submit"
+                [disabled]="categoryForm.invalid || isSaving || isSearchingUnsplash || isProcessingCloudinary"
+                class="btn-save-changes">
                 <i class="fas fa-plus-circle"></i> {{ isSaving ? 'Creando...' : 'Crear Categoría' }}
             </button>
             <button type="button" routerLink="/admin/dashboard" class="btn-cancel">
