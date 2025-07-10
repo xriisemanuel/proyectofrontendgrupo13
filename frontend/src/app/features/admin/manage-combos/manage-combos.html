@@ -24,31 +24,35 @@
     <table>
       <thead>
         <tr>
+          <th>Imagen</th>
           <th>Nombre</th>
           <th>Descripción</th>
           <th>Precio Combo</th>
           <th>Descuento (%)</th>
+          <th>Precio Final</th>
           <th>Estado</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let combo of combos">
+          <td>
+            <img *ngIf="combo.imagen" [src]="combo.imagen" alt="Imagen combo" class="combo-img-table">
+          </td>
           <td>{{ combo.nombre }}</td>
           <td>{{ combo.descripcion || 'N/A' }}</td>
           <td>{{ combo.precioCombo | currency:'USD':'symbol':'1.2-2' }}</td>
           <td>{{ combo.descuento || 0 }}%</td>
+          <td>{{ (combo.precioCombo || (combo.precioCombo * (1 - (combo.descuento || 0)/100))) | currency:'USD':'symbol':'1.2-2' }}</td>
           <td>
             <span [ngClass]="{'status-active': combo.activo, 'status-inactive': !combo.activo}">
               {{ combo.activo ? 'Activo' : 'Inactivo' }}
             </span>
           </td>
           <td class="actions-cell">
-            <!-- ¡CORREGIDO! Botón para abrir el modal de detalles -->
             <button class="action-button view-button" title="Ver Detalles" (click)="viewComboDetails(combo._id!)">
               <i class="fas fa-eye"></i>
             </button>
-            <!-- Los botones de editar y toggle status se mantienen, pero el de editar podría ir en el modal -->
             <button class="action-button edit-button" title="Editar Combo" (click)="editCombo(combo._id!)">
               <i class="fas fa-edit"></i>
             </button>

@@ -275,4 +275,98 @@ tbody tr:hover {
     text-decoration: none;
     font-weight: bold;
     transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+/* Imagen pequeña en la tabla de combos */
+.combo-img-table {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(100,255,218,0.08);
+    border: 2px solid #FFB56B;
+    background: #0B2239;
+    margin: 0 auto;
+    display: block;
+}
+
+.combos-table-container table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #172A45;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+.combos-table-container th, .combos-table-container td {
+    padding: 12px 10px;
+    text-align: center;
+    color: #CCD6F6;
+    font-size: 1em;
+}
+.combos-table-container th {
+    background: #0A192F;
+    color: #FFB56B;
+    font-weight: 800;
+    font-size: 1.08em;
+    border-bottom: 2px solid #FFB56B;
+}
+.combos-table-container tr:nth-child(even) {
+    background: #1B2B4A;
+}
+.combos-table-container tr:hover {
+    background: #22335A;
+    transition: background 0.2s;
+}
+.status-active {
+    color: #50FA7B;
+    font-weight: 700;
+}
+.status-inactive {
+    color: #EF476F;
+    font-weight: 700;
+}
+.actions-cell button {
+    margin: 0 2px;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 1.1em;
+    border: none;
+    background: linear-gradient(45deg, #6EE7B7 0%, #34B399 100%);
+    color: #0F172A;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+.actions-cell button:hover {
+    background: linear-gradient(45deg, #34B399 0%, #6EE7B7 100%);
+    transform: translateY(-2px) scale(1.07);
+}
+.actions-cell .delete-button {
+    background: linear-gradient(45deg, #ca321e 0%, #410404 100%);
+    color: #fff;
+}
+.actions-cell .delete-button:hover {
+    background: linear-gradient(45deg, #410404 0%, #ca321e 100%);
+    color: #fff;
+}
+@media (max-width: 900px) {
+    .combos-table-container table, .combos-table-container th, .combos-table-container td {
+        font-size: 0.95em;
+    }
+    .combo-img-table {
+        width: 38px;
+        height: 38px;
+    }
+}
+@media (max-width: 600px) {
+    .combos-table-container table, .combos-table-container th, .combos-table-container td {
+        font-size: 0.85em;
+        padding: 6px 2px;
+    }
+    .combo-img-table {
+        width: 28px;
+        height: 28px;
+    }
 }   

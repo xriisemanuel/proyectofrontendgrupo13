@@ -55,6 +55,18 @@ export class CreateComboComponent implements OnInit, OnDestroy {
 
     private lastProcessedUnsplashUrl: string | null = null;
 
+    // === NUEVAS PROPIEDADES PARA LA LÓGICA DE IMAGEN ===
+    useManualUrl: boolean = false;
+    manualImageUrl: string = '';
+
+    // === NUEVAS PROPIEDADES PARA LA BÚSQUEDA DINÁMICA DE PRODUCTOS ===
+    searchProductTerm: string = '';
+    filteredProductos: IProducto[] = [];
+
+    // === NUEVAS PROPIEDADES PARA EL SLIDER DE DESCUENTO Y PRECIO FINAL ===
+    precioBase: number = 0;
+    precioFinal: number = 0;
+
     // Inyección de servicios
     private unplashService = inject(UnplashService); // ¡AHORA INYECTADO!
     private http = inject(HttpClient);
@@ -82,6 +94,17 @@ export class CreateComboComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.loadProductos();
+        // Inicializar productos filtrados
+        this.filteredProductos = this.productosDisponibles;
+        // Escuchar cambios en productos seleccionados para recalcular precio
+        this.comboForm.get('productosIds')?.valueChanges.subscribe(() => {
+            this.calcularPrecioBase();
+            this.calcularPrecioFinal();
+        });
+        // Escuchar cambios en descuento para recalcular precio final
+        this.comboForm.get('descuento')?.valueChanges.subscribe(() => {
+            this.calcularPrecioFinal();
+        });
     }
 
     ngOnDestroy(): void {
@@ -183,34 +206,24 @@ export class CreateComboComponent implements OnInit, OnDestroy {
 
     // --- Lógica para seleccionar una imagen de Unsplash y procesarla con Cloudinary ---
     selectUnsplashImage(unsplashImageUrl: string): void {
+        if (this.isProcessingCloudinary) return; // Prevenir doble click mientras sube
         this.selectedUnsplashUrl = unsplashImageUrl;
         this.processingCloudinaryError = null;
-
-        if (this.lastProcessedUnsplashUrl === unsplashImageUrl && this.comboForm.get('imagen')?.value) {
-            this.toastr.info('Esta imagen de Unsplash ya fue seleccionada y procesada.', 'Información');
-            this.finalCloudinaryImageUrl = this.comboForm.get('imagen')?.value;
-            return;
-        }
-
         this.finalCloudinaryImageUrl = null;
         this.comboForm.get('imagen')?.setValue(null);
-
         this.isProcessingCloudinary = true;
-
         if (typeof cloudinary === 'undefined') {
             this.processingCloudinaryError = 'El script de Cloudinary no se ha cargado correctamente.';
             this.isProcessingCloudinary = false;
             this.toastr.error(this.processingCloudinaryError, 'Error de Carga');
             return;
         }
-
         const uploadUrl = `https://api.cloudinary.com/v1_1/${this.CLOUDINARY_CLOUD_NAME}/image/upload`;
         const formData = new FormData();
         formData.append('file', unsplashImageUrl);
         formData.append('upload_preset', this.CLOUDINARY_UPLOAD_PRESET);
-        formData.append('folder', 'subte_combos'); // Carpeta específica para combos
-        formData.append('public_id', `combo_${Date.now()}`); // Un ID público único para la imagen
-
+        formData.append('folder', 'subte_combos');
+        formData.append('public_id', `combo_${Date.now()}`);
         this.http.post(uploadUrl, formData).pipe(takeUntil(this.destroy$)).subscribe({
             next: (response: any) => {
                 this.isProcessingCloudinary = false;
@@ -237,31 +250,91 @@ export class CreateComboComponent implements OnInit, OnDestroy {
         });
     }
 
+    // === CAMPO DE BÚSQUEDA DINÁMICA DE PRODUCTOS ===
+    onSearchProductTermChange(): void {
+        const term = this.searchProductTerm.trim().toLowerCase();
+        if (!term) {
+            this.filteredProductos = this.productosDisponibles;
+        } else {
+            this.filteredProductos = this.productosDisponibles.filter(p =>
+                p.nombre.toLowerCase().includes(term)
+            );
+        }
+    }
+
+    // === SELECCIÓN DE PRODUCTOS (mantener lógica existente, pero usar filteredProductos en la vista) ===
+    // Eliminar la función onProductSelect(productoId: string) porque no se usa y causa error.
+
+    // === PRECIO AUTOCALCULADO ===
+    calcularPrecioBase(): void {
+        const seleccionados = this.comboForm.get('productosIds')?.value || [];
+        this.precioBase = this.productosDisponibles
+            .filter(p => seleccionados.includes(p._id))
+            .reduce((sum, p) => sum + (p.precio || 0), 0);
+        // Actualizar el campo de precioCombo (solo lectura)
+        this.comboForm.get('precioCombo')?.setValue(this.precioBase, { emitEvent: false });
+    }
+
+    // En calcularPrecioFinal, emitir el cambio de precio final al cambiar el slider
+    calcularPrecioFinal(): void {
+        const descuento = this.comboForm.get('descuento')?.value || 0;
+        this.precioFinal = this.precioBase * (1 - descuento / 100);
+        // Forzar el valor en el formulario para que se envíe correctamente
+        this.comboForm.get('precioCombo')?.setValue(this.precioBase, { emitEvent: false });
+        this.comboForm.get('descuento')?.setValue(descuento, { emitEvent: false });
+    }
+
+    // === LÓGICA DE IMAGEN: UNSPLASH, CLOUDINARY Y URL MANUAL ===
+    setImageSource(source: 'unsplash' | 'manual'): void {
+        this.useManualUrl = source === 'manual';
+        if (source === 'manual') {
+            this.unsplashImages = [];
+            this.selectedUnsplashUrl = null;
+            this.unsplashSearchTerm = '';
+            this.unsplashError = null;
+            this.finalCloudinaryImageUrl = null;
+            this.comboForm.get('imagen')?.setValue(null);
+        } else {
+            this.manualImageUrl = '';
+            this.processingCloudinaryError = null;
+        }
+    }
+
+    onManualImageUrlChange(): void {
+        // Validar y asignar la URL manual al formulario
+        if (this.manualImageUrl && this.manualImageUrl.startsWith('http')) {
+            this.comboForm.get('imagen')?.setValue(this.manualImageUrl);
+            this.finalCloudinaryImageUrl = this.manualImageUrl;
+        } else {
+            this.comboForm.get('imagen')?.setValue(null);
+            this.finalCloudinaryImageUrl = null;
+        }
+    }
+
     /**
      * Maneja el envío del formulario.
      */
     onSubmit(): void {
-        this.loading = true; // Establecer loading al inicio
+        this.loading = true;
         this.errorMessage = null;
         this.successMessage = null;
         this.comboForm.markAllAsTouched();
 
         if (this.comboForm.invalid) {
             this.toastr.error('Por favor, completa todos los campos obligatorios y corrige los errores.', 'Error de Validación');
-            console.log('Formulario inválido:', this.comboForm.errors, this.comboForm.value);
-            this.loading = false; // Deshabilitar loading si el formulario es inválido
+            this.loading = false;
             return;
         }
-
-        // Validación específica para la imagen si se usa Unsplash/Cloudinary
         if (!this.comboForm.get('imagen')?.value) {
             this.toastr.warning('Debes buscar y seleccionar una imagen para el combo.', 'Imagen Requerida');
             this.loading = false;
             return;
         }
-
-        const comboData = { ...this.comboForm.value };
-
+        // Forzar el precioCombo y descuento actual
+        this.comboForm.get('precioCombo')?.setValue(this.precioBase, { emitEvent: false });
+        this.comboForm.get('descuento')?.setValue(this.comboForm.get('descuento')?.value || 0, { emitEvent: false });
+        // Enviar el formulario
+        const comboData = { ...this.comboForm.value, precioFinal: this.precioFinal };
         this.comboService.createCombo(comboData).pipe(
             takeUntil(this.destroy$),
             catchError(error => {
@@ -270,26 +343,24 @@ export class CreateComboComponent implements OnInit, OnDestroy {
                 this.toastr.error(apiErrorMessage, 'Error de Creación');
                 return of(null);
             }),
-            finalize(() => this.loading = false) // Siempre deshabilitar loading al finalizar
+            finalize(() => this.loading = false)
         ).subscribe(response => {
             if (response) {
                 this.successMessage = response.mensaje || 'Combo creado exitosamente.';
                 this.toastr.success('Creación Exitosa');
                 this.comboForm.reset();
                 this.productosFormArray.clear();
-
-                // Reinicia las variables de estado de la imagen
                 this.unsplashSearchTerm = '';
                 this.unsplashImages = [];
                 this.selectedUnsplashUrl = null;
                 this.finalCloudinaryImageUrl = null;
                 this.lastProcessedUnsplashUrl = null;
-
-                // Restablecer el campo de imagen a null en el formulario después de un reinicio completo
                 this.comboForm.get('imagen')?.setValue(null);
-
+                this.precioBase = 0;
+                this.precioFinal = 0;
                 setTimeout(() => {
-                    this.router.navigate(['/admin/combos/manage']);
+                    // Navegar y forzar recarga de combos en manage-combos
+                    this.router.navigate(['/admin/combos/manage'], { queryParams: { refresh: Date.now() } });
                 }, 1500);
             }
         });
