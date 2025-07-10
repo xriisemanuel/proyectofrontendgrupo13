@@ -11,17 +11,19 @@ import { ToastrService } from 'ngx-toastr';
 import { UsuarioService } from '../../../data/services/usuario';
 import { RolService } from '../../../data/services/role';
 import { IUsuario, IRol } from '../../../shared/interfaces';
+import { CreateUserWithRoleComponent } from '../create-user/create-user';
 
 @Component({
   selector: 'app-manage-supervisores-cocina',
   templateUrl: './manage-supervisores-cocina.html',
   styleUrls: ['./manage-supervisores-cocina.css'],
   standalone: true,
-  imports: [CommonModule, RouterLink] // Necesario para directivas estructurales y navegación
+  imports: [CommonModule, RouterLink, CreateUserWithRoleComponent] // Necesario para directivas estructurales y navegación
 })
 export class ManageSupervisoresCocina implements OnInit, OnDestroy {
   supervisoresCocina: IUsuario[] = []; // Lista de usuarios que son supervisores de cocina
   isLoading: boolean = false;
+  showCreateSupervisorCocina: boolean = false;
   private destroy$ = new Subject<void>();
   private supervisorCocinaRoleId: string | null = null; // Para almacenar el ID del rol 'supervisor_cocina'
 

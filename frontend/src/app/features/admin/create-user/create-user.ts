@@ -1,10 +1,11 @@
 // proyecto/frontend/src/app/modules/admin/components/create-user/create-user.ts
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
 
 import { ToastrService } from 'ngx-toastr';
 
@@ -25,6 +26,7 @@ export class CreateUserWithRoleComponent implements OnInit, OnDestroy {
   roles: IRol[] = [];
   selectedRoleName: string = '';
   isLoading: boolean = true;
+  @Input() defaultRole: string | null = null;
 
   private destroy$ = new Subject<void>();
 
@@ -33,7 +35,8 @@ export class CreateUserWithRoleComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private usuarioService: UsuarioService,
     private router: Router,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private route: ActivatedRoute // <-- Agregado
   ) {
     this.userForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
@@ -62,7 +65,26 @@ export class CreateUserWithRoleComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Leer el parámetro de la URL si no se pasó como input
+    let shouldDisableRole = false;
+    if (!this.defaultRole) {
+      const roleFromQuery = this.route.snapshot.queryParamMap.get('role');
+      if (roleFromQuery) {
+        this.defaultRole = roleFromQuery;
+        shouldDisableRole = true;
+      }
+    } else {
+      shouldDisableRole = true;
+    }
     this.loadRoles();
+    if (this.defaultRole) {
+      this.userForm.get('rolName')?.setValue(this.defaultRole);
+      this.selectedRoleName = this.defaultRole;
+      this.onRoleChange(this.defaultRole);
+      if (shouldDisableRole) {
+        this.userForm.get('rolName')?.disable();
+      }
+    }
   }
 
   ngOnDestroy(): void {
@@ -134,6 +156,8 @@ export class CreateUserWithRoleComponent implements OnInit, OnDestroy {
     if (this.userForm.valid) {
       const formData = this.userForm.value;
       console.log('Datos del formulario a enviar (incluyendo deshabilitados):', formData);
+      console.log('Rol seleccionado (selectedRoleName):', this.selectedRoleName);
+      console.log('Rol del formulario (formData.rolName):', formData.rolName);
 
       let preferenciasArray: string[] | null = null;
       if (formData.preferenciasAlimentariasCliente) {
@@ -147,21 +171,36 @@ export class CreateUserWithRoleComponent implements OnInit, OnDestroy {
       // El backend espera 'password', no 'passwordHash'.
       // Si tu interfaz IRegisterUserPayload tiene 'passwordHash', lo mejor es cambiar la interfaz.
       // Si no puedes cambiar la interfaz ahora, puedes usar 'any' temporalmente para el payload.
-      const registerPayload: any = { // Usamos 'any' para flexibilidad si IRegisterUserPayload no se ha actualizado
+      let fechaNacimientoFormateada = formData.fechaNacimientoCliente;
+      if (this.selectedRoleName === 'cliente' && formData.fechaNacimientoCliente) {
+        // Si la fecha viene como '2025-04-23T00:00:00.000Z', la convertimos a '2025-04-23'
+        const dateObj = new Date(formData.fechaNacimientoCliente);
+        if (!isNaN(dateObj.getTime())) {
+          // Formato yyyy-MM-dd
+          const year = dateObj.getFullYear();
+          const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+          const day = dateObj.getDate().toString().padStart(2, '0');
+          fechaNacimientoFormateada = `${year}-${month}-${day}`;
+        }
+      }
+      const registerPayload: any = {
         username: formData.username,
-        password: formData.password, // <-- ¡CORREGIDO! Ahora se envía como 'password'
+        password: formData.password,
         email: formData.email,
         telefono: formData.telefono || null,
-        rolName: formData.rolName,
+        rolName: formData.rolName || this.selectedRoleName, // Usar selectedRoleName si formData.rolName está vacío
         nombre: formData.nombre,
         apellido: formData.apellido,
         direccionCliente: formData.direccionCliente || null,
-        fechaNacimientoCliente: formData.fechaNacimientoCliente || null,
+        fechaNacimientoCliente: fechaNacimientoFormateada || null,
         preferenciasAlimentariasCliente: preferenciasArray,
         puntosCliente: formData.puntosCliente !== undefined && formData.puntosCliente !== null ? formData.puntosCliente : null,
         vehiculoRepartidor: formData.vehiculoRepartidor || null,
         numeroLicenciaRepartidor: formData.numeroLicenciaRepartidor || null,
       };
+
+      console.log('Payload a enviar al backend:', JSON.stringify(registerPayload, null, 2));
+      console.log('Rol seleccionado:', this.selectedRoleName);
 
       this.authService.register(registerPayload).pipe(takeUntil(this.destroy$)).subscribe({
         next: (response) => {
@@ -177,6 +216,8 @@ export class CreateUserWithRoleComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al crear usuario y perfil:', err);
+          console.error('Error completo:', JSON.stringify(err, null, 2));
+          console.error('Error del backend:', err.error);
           const errorMsg = err.error?.mensaje || 'Error al crear usuario y perfil. Intente de nuevo.';
           this.toastr.error(errorMsg, 'Error');
           this.onRoleChange(this.selectedRoleName); // Vuelve a aplicar la lógica de habilitación/deshabilitación
@@ -188,6 +229,21 @@ export class CreateUserWithRoleComponent implements OnInit, OnDestroy {
 
       this.onRoleChange(this.selectedRoleName); // Vuelve a aplicar la lógica de habilitación/deshabilitación
       this.toastr.warning(validationErrorMsg, 'Validación');
+    }
+  }
+
+  getBackLink(): string {
+    switch ((this.defaultRole || '').toLowerCase()) {
+      case 'cliente':
+        return '/admin/clientes/manage';
+      case 'repartidor':
+        return '/admin/repartidores/manage';
+      case 'supervisor_cocina':
+        return '/admin/supervisores-cocina/manage';
+      case 'supervisorventas':
+        return '/admin/supervisores-ventas/manage';
+      default:
+        return '/admin/dashboard';
     }
   }
 

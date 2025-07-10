@@ -24,6 +24,7 @@
                 <div *ngIf="f['nombre'].invalid && (f['nombre'].dirty || f['nombre'].touched)" class="validation-error">
                     <div *ngIf="f['nombre'].errors?.['required']">El nombre del rol es requerido.</div>
                     <div *ngIf="f['nombre'].errors?.['minlength']">El nombre debe tener al menos 3 caracteres.</div>
+                    <div *ngIf="f['nombre'].errors?.['pattern']">Solo se permiten letras y espacios.</div>
                 </div>
             </div>
 

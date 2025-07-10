@@ -10,17 +10,19 @@ import { ToastrService } from 'ngx-toastr';
 import { UsuarioService } from '../../../data/services/usuario';
 import { RolService } from '../../../data/services/role';
 import { IUsuario, IRol } from '../../../shared/interfaces'; // Asegúrate de que IUsuario e IRol estén bien definidos aquí
+import { CreateUserWithRoleComponent } from '../create-user/create-user';
 
 @Component({
   selector: 'app-manage-repartidores',
   templateUrl: './manage-repartidores.html',
   styleUrls: ['./manage-repartidores.css'],
   standalone: true,
-  imports: [CommonModule, RouterLink]
+  imports: [CommonModule, RouterLink, CreateUserWithRoleComponent]
 })
 export class ManageRepartidores implements OnInit, OnDestroy {
   repartidores: IUsuario[] = [];
   isLoading: boolean = false;
+  showCreateRepartidor: boolean = false;
   private destroy$ = new Subject<void>();
   private repartidorRoleId: string | null = null;
 

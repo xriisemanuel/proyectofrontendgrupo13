@@ -34,7 +34,7 @@ export class AddRole implements OnInit, OnDestroy {
     private toastr: ToastrService
   ) {
     this.roleForm = this.fb.group({
-      nombre: ['', [Validators.required, Validators.minLength(3)]],
+      nombre: ['', [Validators.required, Validators.minLength(3), Validators.pattern('^[a-zA-Z\\s]*$')]],
       estado: [true, Validators.required]
     });
   }

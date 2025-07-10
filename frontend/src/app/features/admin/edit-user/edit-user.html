@@ -61,15 +61,16 @@
                     <div *ngIf="f['telefono'].errors?.['pattern']">Formato de teléfono inválido.</div>
                 </div>
             </div>
+            
 
-            <div class="form-group">
+            <!-- <div class="form-group">
                 <label for="rolId">Rol Asignado:</label>
-                <!-- El rol se muestra pero no se puede editar directamente aquí -->
-                <!-- ¡CORRECCIÓN AQUÍ! Eliminado el atributo 'disabled' del HTML -->
+                El rol se muestra pero no se puede editar directamente aquí 
+                ¡CORRECCIÓN AQUÍ! Eliminado el atributo 'disabled' del HTML
                 <input id="rolId" type="text" [value]="getRoleName(userForm.get('rolId')?.value)"
                     formControlName="rolId">
                 <small class="form-hint">El rol del usuario no puede ser modificado desde esta interfaz.</small>
-            </div>
+            </div> -->
         </div>
 
         <!-- Campos Específicos del Perfil de Cliente -->
@@ -96,11 +97,15 @@
                 <input id="preferenciasAlimentariasCliente" type="text"
                     formControlName="preferenciasAlimentariasCliente" placeholder="Vegetariano, Sin Gluten">
             </div>
+            <div class="back-link">
+                <a routerLink="/admin/clientes/manage"><i class="fas fa-arrow-left"></i> Volver a Gestion de
+                    Clientes</a>
+            </div>
 
-            <div class="form-group">
+            <!-- <div class="form-group">
                 <label for="puntosCliente">Puntos de Fidelidad:</label>
                 <input id="puntosCliente" type="number" formControlName="puntosCliente">
-            </div>
+            </div> -->
         </div>
 
         <!-- Campos Específicos del Perfil de Repartidor -->
@@ -127,8 +132,11 @@
                         para repartidores.</div>
                 </div>
             </div>
+            <div class="back-link">
+                <a routerLink="/admin/repartidores/manage"><i class="fas fa-arrow-left"></i> Volver a Gestion de
+                    Repartidores</a>
+            </div>
         </div>
-
         <div class="form-actions">
             <button type="submit" [disabled]="userForm.invalid || isSaving" class="btn btn-primary">
                 <i class="fas fa-save"></i> {{ isSaving ? 'Guardando...' : 'Guardar Cambios' }}
@@ -137,9 +145,8 @@
                 <i class="fas fa-times-circle"></i> Cancelar
             </a>
         </div>
+        
     </form>
 
-    <div class="back-link">
-        <a routerLink="/admin/users/manage-by-role"><i class="fas fa-arrow-left"></i> Volver a Gestión de Usuarios</a>
-    </div>
+
 </div>

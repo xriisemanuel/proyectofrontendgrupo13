@@ -11,17 +11,19 @@ import { ToastrService } from 'ngx-toastr';
 import { UsuarioService } from '../../../data/services/usuario';
 import { RolService } from '../../../data/services/role';
 import { IUsuario, IRol } from '../../../shared/interfaces';
+import { CreateUserWithRoleComponent } from '../create-user/create-user';
 
 @Component({
   selector: 'app-manage-supervisores-ventas',
   templateUrl: './manage-supervisores-ventas.html',
   styleUrls: ['./manage-supervisores-ventas.css'],
   standalone: true,
-  imports: [CommonModule, RouterLink] // Necesario para directivas estructurales y navegación
+  imports: [CommonModule, RouterLink, CreateUserWithRoleComponent] // Necesario para directivas estructurales y navegación
 })
 export class ManageSupervisoresVentas implements OnInit, OnDestroy {
   supervisoresVentas: IUsuario[] = []; // Lista de usuarios que son supervisores de ventas
   isLoading: boolean = false;
+  showCreateSupervisorVentas: boolean = false;
   private destroy$ = new Subject<void>();
   private supervisorVentasRoleId: string | null = null; // Para almacenar el ID del rol 'supervisor_ventas'
 

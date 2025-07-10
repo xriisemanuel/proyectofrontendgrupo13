@@ -5,7 +5,7 @@
     <p>Visualiza y administra los perfiles de los supervisores de ventas registrados en el sistema.</p>
 
     <div class="top-actions">
-        <button routerLink="/admin/users/create" class="btn btn-primary create-supervisor-btn">
+        <button [routerLink]="['/admin/users/create']" [queryParams]="{ role: 'supervisor_ventas' }" class="btn btn-primary create-supervisor-btn">
             <i class="fas fa-user-plus"></i> Registrar Nuevo Supervisor
         </button>
     </div>
@@ -55,6 +55,6 @@
     </div>
 
     <div class="back-link">
-        <a routerLink="/admin/dashboard"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+        <a routerLink="/admin/users/manage-by-role"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
     </div>
 </div>

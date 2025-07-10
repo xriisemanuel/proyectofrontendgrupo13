@@ -11,17 +11,19 @@ import { ToastrService } from 'ngx-toastr';
 import { UsuarioService } from '../../../data/services/usuario';
 import { RolService } from '../../../data/services/role';
 import { IUsuario, IRol, IClientePerfil } from '../../../shared/interfaces';
+import { CreateUserWithRoleComponent } from '../create-user/create-user';
 
 @Component({
   selector: 'app-manage-clientes',
   templateUrl: './manage-clientes.html',
   styleUrls: ['./manage-clientes.css'],
   standalone: true,
-  imports: [CommonModule, RouterLink] // Necesario para directivas estructurales y navegación
+  imports: [CommonModule, RouterLink, CreateUserWithRoleComponent] // Necesario para directivas estructurales y navegación
 })
 export class ManageClientes implements OnInit, OnDestroy {
   clientes: IUsuario[] = []; // Lista de usuarios que son clientes
   isLoading: boolean = false;
+  showCreateCliente: boolean = false;
   private destroy$ = new Subject<void>();
   private clienteRoleId: string | null = null; // Para almacenar el ID del rol 'cliente'
 

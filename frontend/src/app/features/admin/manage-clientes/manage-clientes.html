@@ -7,7 +7,7 @@
     <div class="top-actions">
         <!-- Redirigimos al formulario de creación de usuario general.
          Puedes considerar que al llegar aquí, el rol 'cliente' esté preseleccionado. -->
-        <button routerLink="/admin/users/create" class="btn btn-primary create-cliente-btn">
+        <button [routerLink]="['/admin/users/create']" [queryParams]="{ role: 'cliente' }" class="btn btn-primary create-cliente-btn">
             <i class="fas fa-user-plus"></i> Registrar Nuevo Cliente
         </button>
     </div>
@@ -44,7 +44,9 @@
                     <td>{{ cliente.email }}</td>
                     <td>{{ cliente.telefono || 'N/A' }}</td>
                     <td>{{ cliente.clienteId?.direccion || 'N/A' }}</td>
-                    <td>{{ cliente.clienteId?.fechaNacimiento || 'N/A' }}</td>
+                    <td>
+                        {{ cliente.clienteId && cliente.clienteId.fechaNacimiento ? (cliente.clienteId.fechaNacimiento | date:'yyyy-MM-dd') : 'N/A' }}
+                    </td>
                     <td>{{ getPreferenciasAlimentarias(cliente.clienteId) }}</td>
                     <td>{{ cliente.clienteId?.puntos || 0 }}</td>
                     <td class="actions-column">
@@ -62,6 +64,6 @@
     </div>
 
     <div class="back-link">
-        <a routerLink="/admin/dashboard"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+        <a routerLink="/admin/users/manage-by-role"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
     </div>
 </div>
