@@ -85,10 +85,10 @@
           <h4>Explorar Combos</h4>
           <p>Encuentra combinaciones especiales a mejor precio.</p>
         </a>
-        <a routerLink="/client/products" class="action-card">
+        <a (click)="goToRealizarPedido()" class="action-card">
           <i class="fas fa-utensils"></i>
           <h4>Ver Productos</h4>
-          <p>Explora todo nuestro catálogo de productos.</p>
+          <p>Explora todo nuestro catálogo de productos y realiza pedidos.</p>
         </a>
         <a routerLink="/client/categories" class="action-card">
           <i class="fas fa-folder-open"></i>
@@ -114,18 +114,18 @@
           </div>
         </div>
       </div>
-      <div class="section-footer">
+      <!-- <div class="section-footer">
         <a routerLink="/client/products" class="btn-view-all">
           Ver Todos los Productos <i class="fas fa-arrow-right"></i>
         </a>
-      </div>
+      </div> -->
     </section>
 
     <!-- Sección de Categorías (si existen) -->
     <section *ngIf="categories && categories.length > 0" class="categories-section">
       <h2 class="section-title">Explorar Categorías</h2>
       <div class="categories-grid">
-        <a *ngFor="let category of categories.slice(0, 4)" [routerLink]="['/client/categories', category._id]" class="category-card">
+        <a *ngFor="let category of categories.slice(0, 4)" [routerLink]="['/cliente/realizar-pedido']" [queryParams]="{categoriaId: category._id}" class="category-card">
           <img [src]="getCategoryImageUrl(category)" alt="{{ category.nombre }}" class="category-image">
           <div class="category-details">
             <h3 class="category-title">{{ category.nombre }}</h3>
@@ -133,11 +133,12 @@
           </div>
         </a>
       </div>
-      <div class="section-footer">
+   
+      <!--<div class="section-footer">
         <a routerLink="/client/categories" class="btn-view-all">
           Ver Todas las Categorías <i class="fas fa-arrow-right"></i>
         </a>
-      </div>
+      </div>-->
     </section>
 
   </div>

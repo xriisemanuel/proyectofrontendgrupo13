@@ -31,8 +31,8 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   }
 }
 
-/* Overlay del diálogo */
-.cdk-overlay-backdrop {
+/* Overlay del diálogo - solo cuando hay diálogos activos */
+.cdk-overlay-backdrop.cdk-overlay-backdrop-showing {
   background-color: rgba(0, 0, 0, 0.6) !important;
   backdrop-filter: blur(4px);
 }

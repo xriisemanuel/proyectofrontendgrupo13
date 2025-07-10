@@ -26,6 +26,7 @@
     <div class="filter-group">
       <label for="estadoFilter"><i class="fas fa-filter"></i> Filtrar por Estado:</label>
       <select id="estadoFilter" [(ngModel)]="selectedEstado" (change)="loadPedidos()">
+        <option value="todos">Todos los Estados</option>
         <option value="pendiente">Pendiente</option>
         <option value="confirmado">Confirmado</option>
         <option value="en_preparacion">En Preparación</option>
@@ -37,24 +38,37 @@
 
     <div class="filter-group">
       <label for="searchFilter"><i class="fas fa-search"></i> Buscar:</label>
-      <input type="text" id="searchFilter" [(ngModel)]="searchTerm" placeholder="ID, cliente, producto..." (keyup.enter)="loadPedidos()">
+      <input type="text" id="searchFilter" [(ngModel)]="searchTerm" placeholder="Buscar por ID, cliente, producto, dirección..." (keyup)="onSearchInput()">
+      <button (click)="clearSearch()" class="clear-search-btn" *ngIf="searchTerm">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
+    
     <div class="filter-group">
       <label for="showEntregados">
         <input type="checkbox" id="showEntregados" [(ngModel)]="showEntregados" (change)="loadPedidos()">
         <i class="fas fa-check-circle"></i> Mostrar Entregados
       </label>
     </div>
-    <button (click)="loadPedidos()"><i class="fas fa-sync-alt"></i> Aplicar Filtros / Recargar</button>
+    
+    <button (click)="loadPedidos()" class="refresh-btn">
+      <i class="fas fa-sync-alt"></i> Aplicar Filtros / Recargar
+    </button>
+    
+    <button (click)="clearAllFilters()" class="clear-filters-btn">
+      <i class="fas fa-eraser"></i> Limpiar Filtros
+    </button>
   </div>
 
   <!-- Tabla de Pedidos -->
   <div class="orders-table-container">
     <h2 *ngIf="pedidos.length > 0">
       <i class="fas fa-clipboard-list"></i> Pedidos 
-      <span *ngIf="!showEntregados">(Estado: {{ selectedEstado | titlecase }})</span>
-      <span *ngIf="showEntregados && selectedEstado !== 'entregado'">({{ selectedEstado | titlecase }} + Entregados)</span>
+      <span *ngIf="selectedEstado === 'todos'">(Todos los Estados)</span>
+      <span *ngIf="selectedEstado !== 'todos' && !showEntregados">(Estado: {{ selectedEstado | titlecase }})</span>
+      <span *ngIf="selectedEstado !== 'todos' && showEntregados && selectedEstado !== 'entregado'">({{ selectedEstado | titlecase }} + Entregados)</span>
       <span *ngIf="selectedEstado === 'entregado'">(Entregados)</span>
+      <span *ngIf="searchTerm" class="search-indicator"> - Búsqueda: "{{ searchTerm }}"</span>
     </h2>
     <div *ngIf="pedidos.length === 0 && !loading" class="no-data-message">
       <i class="fas fa-info-circle"></i> No hay pedidos con los filtros aplicados.

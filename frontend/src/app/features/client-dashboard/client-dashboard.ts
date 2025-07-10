@@ -186,7 +186,7 @@ export class ClientDashboard implements OnInit, OnDestroy {
   comprarProducto(product: IProducto): void {
     console.log('Comprar producto:', product.nombre);
     // Redirige a la página de realizar pedido con los parámetros del producto
-    this.router.navigate(['cliente/realizar-pedido'], { queryParams: { productId: product._id, quantity: 1 } });
+    this.router.navigate(['/cliente/realizar-pedido'], { queryParams: { productId: product._id, quantity: 1 } });
   }
 
   /**
@@ -213,6 +213,32 @@ export class ClientDashboard implements OnInit, OnDestroy {
     } else {
       console.warn('No se pudo redirigir a editar perfil: ID de usuario no disponible.');
     }
+  }
+
+  /**
+   * Redirige a la página de "Realizar Pedido".
+   */
+  goToRealizarPedido(): void {
+    this.router.navigate(['/cliente/realizar-pedido']);
+  }
+
+  /**
+   * Redirige a la página de "Realizar Pedido" filtrando por una categoría específica.
+   * @param category La categoría seleccionada
+   */
+  goToRealizarPedidoWithCategory(category: ICategoria): void {
+    console.log('Navegando a realizar pedido con categoría:', category.nombre, 'ID:', category._id);
+    console.log('Usuario autenticado:', this.authService.isAuthenticated());
+    console.log('Rol del usuario:', this.authService.getRole());
+    console.log('ID del usuario:', this.authService.getLoggedInUserId());
+    
+    this.router.navigate(['/cliente/realizar-pedido'], { 
+      queryParams: { categoriaId: category._id } 
+    }).then(() => {
+      console.log('Navegación completada exitosamente');
+    }).catch(error => {
+      console.error('Error en la navegación:', error);
+    });
   }
 
   /**

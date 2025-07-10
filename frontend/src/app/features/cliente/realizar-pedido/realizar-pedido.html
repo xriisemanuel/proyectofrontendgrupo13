@@ -18,15 +18,113 @@
     <!-- Sección de Selección de Productos -->
     <div class="product-selection-panel dashboard-panel interactive-card">
         <h3><i class="fas fa-box-open"></i> Productos Disponibles</h3>
+        
+        <!-- Indicador de producto específico -->
+        <div *ngIf="isShowingSpecificProduct" class="specific-product-indicator">
+            <div class="indicator-content">
+                <i class="fas fa-star"></i>
+                <span>Mostrando producto seleccionado desde el dashboard</span>
+                <button (click)="showAllProducts()" class="show-all-btn">
+                    <i class="fas fa-th-large"></i> Ver Todos los Productos
+                </button>
+            </div>
+        </div>
+
+        <!-- Indicador de categoría específica -->
+        <div *ngIf="selectedCategoria && !isShowingSpecificProduct" class="specific-category-indicator">
+            <div class="indicator-content">
+                <i class="fas fa-filter"></i>
+                <span>Filtrando por categoría seleccionada desde el dashboard</span>
+                <button (click)="clearCategoryFilter()" class="show-all-btn">
+                    <i class="fas fa-th-large"></i> Ver Todas las Categorías
+                </button>
+            </div>
+        </div>
+        
+        <!-- Filtros de Productos -->
+        <div class="filters-section">
+            <!-- Buscador de Productos -->
+            <div class="search-section">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input 
+                        type="text" 
+                        [(ngModel)]="searchTerm" 
+                        (input)="onSearchInput()"
+                        placeholder="Buscar productos por nombre, descripción..."
+                        class="search-input"
+                    >
+                    <button 
+                        *ngIf="searchTerm" 
+                        (click)="clearSearch()" 
+                        class="clear-search-btn"
+                        title="Limpiar búsqueda"
+                    >
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filtro por Categoría -->
+            <div class="category-filter-section">
+                <div class="category-filter-container">
+                    <i class="fas fa-filter filter-icon"></i>
+                    <select 
+                        [(ngModel)]="selectedCategoria" 
+                        (change)="onCategoryChange()"
+                        class="category-select"
+                        [disabled]="categorias.length === 0"
+                    >
+                        <option value="">Todas las categorías</option>
+                        <option *ngFor="let categoria of categorias" [value]="categoria._id">
+                            {{ categoria.nombre }}
+                        </option>
+                    </select>
+                    <button 
+                        *ngIf="selectedCategoria" 
+                        (click)="clearCategoryFilter()" 
+                        class="clear-category-btn"
+                        title="Limpiar filtro de categoría"
+                    >
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div *ngIf="categorias.length === 0" class="no-categories-message">
+                    <p><i class="fas fa-info-circle"></i> No hay categorías disponibles para filtrar</p>
+                </div>
+            </div>
+
+            <!-- Información de Filtros -->
+            <div class="filters-info">
+                <span *ngIf="searchTerm || selectedCategoria" class="filter-results">
+                    Mostrando {{ productosFiltrados.length }} de {{ productosDisponibles.length }} productos
+                </span>
+                <span *ngIf="!searchTerm && !selectedCategoria" class="total-products">
+                    {{ productosDisponibles.length }} productos disponibles
+                </span>
+                <!-- Información de depuración temporal -->
+                <div *ngIf="selectedCategoria" class="debug-info">
+                    <small>Debug: Categoría seleccionada: {{ selectedCategoria }}</small>
+                    <small>Debug: Categorías disponibles: {{ categorias.length }}</small>
+                </div>
+            </div>
+        </div>
+
         <div *ngIf="isLoading" class="loading-spinner">
             <i class="fas fa-spinner fa-spin"></i> Cargando productos...
         </div>
         <div *ngIf="!isLoading && productosDisponibles.length === 0" class="no-products">
             <p>No hay productos disponibles en este momento.</p>
         </div>
+        <div *ngIf="!isLoading && searchTerm && productosFiltrados.length === 0" class="no-search-results">
+            <p><i class="fas fa-search"></i> No se encontraron productos que coincidan con "{{ searchTerm }}"</p>
+            <button (click)="clearSearch()" class="clear-search-link">
+                <i class="fas fa-times"></i> Limpiar búsqueda
+            </button>
+        </div>
 
         <div class="products-grid">
-            <div *ngFor="let producto of productosDisponibles" class="product-card interactive-card">
+            <div *ngFor="let producto of productosFiltrados" class="product-card interactive-card">
                 <div class="product-image-container">
                     <!-- Placeholder de imagen si no hay URL, o si la URL falla -->
                     <img [src]="producto.imageUrl || 'https://placehold.co/150x150/172A45/CCD6F6?text=Producto'"
@@ -126,5 +224,44 @@
                 <i class="fas fa-paper-plane"></i> {{ isLoading ? 'Procesando...' : 'Confirmar Pedido' }}
             </button>
         </form>
+    </div>
+</div>
+
+<!-- Modal de Confirmación de Producto Agregado -->
+<div *ngIf="showCartModal" class="modal-overlay" (click)="closeCartModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3><i class="fas fa-check-circle"></i> Producto Agregado</h3>
+            <button class="modal-close-btn" (click)="closeCartModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="product-added-info">
+                <div class="product-image-container">
+                    <img [src]="addedProduct?.imageUrl || 'https://placehold.co/100x100/172A45/CCD6F6?text=Producto'"
+                        [alt]="addedProduct?.nombre"
+                        onerror="this.onerror=null;this.src='https://placehold.co/100x100/172A45/CCD6F6?text=Producto';"
+                        class="modal-product-image">
+                </div>
+                <div class="product-details">
+                    <h4>{{ addedProduct?.nombre }}</h4>
+                    <p class="product-price">${{ formatPrice(addedProduct?.precio || 0) }}</p>
+                    <p class="quantity-info">Cantidad: {{ addedProductQuantity }}</p>
+                </div>
+            </div>
+            <div class="cart-summary-modal">
+                <p><i class="fas fa-shopping-basket"></i> Tu carrito ahora tiene {{ carrito.length }} producto{{ carrito.length !== 1 ? 's' : '' }}</p>
+                <p class="total-preview">Total: ${{ formatPrice(totalPedido) }}</p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" (click)="closeCartModal()">
+                <i class="fas fa-shopping-cart"></i> Seguir Comprando
+            </button>
+            <button class="btn-primary" (click)="goToCart()">
+                <i class="fas fa-credit-card"></i> Ver Carrito
+            </button>
+        </div>
     </div>
 </div>

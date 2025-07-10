@@ -80,4 +80,9 @@ export class MisPedidosComponent implements OnInit, OnDestroy {
     // Navegar a la página de calificaciones con el pedidoId como parámetro de query
     this.router.navigate(['/calificaciones'], { queryParams: { pedidoId: pedidoId } });
   }
+
+  // Método para volver al dashboard del cliente
+  goBackToDashboard(): void {
+    this.router.navigate(['/cliente/dashboard']);
+  }
 }
