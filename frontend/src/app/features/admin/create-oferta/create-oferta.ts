@@ -43,6 +43,7 @@ export class CreateOfertaComponent implements OnInit {
     this.ofertaForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
       descripcion: ['', Validators.maxLength(500)],
+      imagen: ['', [Validators.required, Validators.pattern('https?://.+')]],
       descuento: [null, [Validators.required, Validators.min(0), Validators.max(100)]],
       fechaInicio: [this.formatDate(new Date()), Validators.required], // Formato YYYY-MM-DD
       fechaFin: ['', Validators.required],
@@ -212,6 +213,12 @@ export class CreateOfertaComponent implements OnInit {
       }
       if (control.errors?.['max']) {
         return `El valor máximo es ${control.errors['max'].max}.`;
+      }
+      if (control.errors?.['pattern']) {
+        if (field === 'imagen') {
+          return 'Debe ser una URL válida que comience con http:// o https://';
+        }
+        return 'Formato inválido.';
       }
       if (control.errors?.['fechaInvalida']) {
         return 'La fecha de fin no puede ser anterior a la fecha de inicio.';

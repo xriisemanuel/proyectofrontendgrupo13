@@ -29,6 +29,15 @@
             </div>
 
             <div class="form-group">
+                <label for="imagen">URL de la Imagen <span class="required-star">*</span></label>
+                <input id="imagen" type="url" formControlName="imagen" placeholder="https://ejemplo.com/imagen-oferta.jpg">
+                <div *ngIf="getFieldError('imagen')" class="error-text">
+                    {{ getFieldError('imagen') }}
+                </div>
+                <small class="form-help">Ingresa la URL de una imagen para la oferta (debe ser una URL válida)</small>
+            </div>
+
+            <div class="form-group">
                 <label for="descuento">Descuento (%) <span class="required-star">*</span></label>
                 <input id="descuento" type="number" formControlName="descuento" placeholder="Ej: 15 (para 15%)">
                 <div *ngIf="getFieldError('descuento')" class="error-text">

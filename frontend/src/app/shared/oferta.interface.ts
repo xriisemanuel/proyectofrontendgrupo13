@@ -5,6 +5,7 @@ export interface IOferta {
   _id?: string;
   nombre: string;
   descripcion?: string;
+  imagen: string;
   descuento: number; // Porcentaje de descuento (ej. 10 para 10%)
   fechaInicio: Date | string; // Puede venir como string de la API
   fechaFin: Date | string; // Puede venir como string de la API

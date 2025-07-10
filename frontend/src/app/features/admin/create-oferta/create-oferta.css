@@ -60,6 +60,7 @@ p {
 .form-group input[type="text"],
 .form-group input[type="number"],
 .form-group input[type="date"],
+.form-group input[type="url"],
 .form-group textarea {
     width: calc(100% - 24px);
     /* Ancho completo menos padding */
@@ -82,6 +83,13 @@ p {
     /* Color de foco */
     box-shadow: 0 0 0 3px rgba(80, 250, 123, 0.3);
     outline: none;
+}
+
+.form-help {
+    color: #6272a4;
+    font-size: 0.85em;
+    margin-top: 5px;
+    font-style: italic;
 }
 
 .form-group textarea {

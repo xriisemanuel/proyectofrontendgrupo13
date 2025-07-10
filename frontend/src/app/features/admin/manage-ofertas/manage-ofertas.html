@@ -25,6 +25,7 @@
             <table class="ofertas-table">
                 <thead>
                     <tr>
+                        <th>Imagen</th>
                         <th>Nombre</th>
                         <th>Descripción</th>
                         <th>Descuento</th>
@@ -39,6 +40,16 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let oferta of ofertas">
+                        <td class="image-cell">
+                            <div class="oferta-image-container">
+                                <img *ngIf="oferta.imagen" [src]="oferta.imagen" [alt]="oferta.nombre" 
+                                     class="oferta-image" (error)="onImageError($event)">
+                                <div *ngIf="!oferta.imagen" class="no-image-placeholder">
+                                    <i class="fas fa-image"></i>
+                                    <span>Sin imagen</span>
+                                </div>
+                            </div>
+                        </td>
                         <td>{{ oferta.nombre }}</td>
                         <td>{{ oferta.descripcion || 'N/A' }}</td>
                         <td class="discount-cell">{{ oferta.descuento }}%</td>

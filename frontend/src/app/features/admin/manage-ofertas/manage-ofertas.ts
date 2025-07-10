@@ -65,6 +65,22 @@ export class ManageOfertasComponent implements OnInit {
   }
 
   /**
+   * Maneja errores de carga de imágenes.
+   * @param event El evento de error de la imagen.
+   */
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.style.display = 'none';
+    const container = img.parentElement;
+    if (container) {
+      const placeholder = container.querySelector('.no-image-placeholder') as HTMLElement;
+      if (placeholder) {
+        placeholder.style.display = 'flex';
+      }
+    }
+  }
+
+  /**
    * Abre un diálogo para ver los detalles de una oferta.
    * @param ofertaId El ID de la oferta a visualizar.
    */
