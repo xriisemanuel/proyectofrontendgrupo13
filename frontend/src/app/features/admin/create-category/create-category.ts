@@ -49,6 +49,9 @@ export class CreateCategory implements OnInit, OnDestroy {
     // === CORRECCIÓN AQUÍ: DECLARACIÓN DE lastProcessedUnsplashUrl ===
     private lastProcessedUnsplashUrl: string | null = null;
 
+    // Propiedad para controlar el tipo de entrada de imagen
+    useManualUrl: boolean = false;
+
     // Inyección de servicios
     private unplashService = inject(UnplashService);
     private http = inject(HttpClient);
@@ -66,7 +69,7 @@ export class CreateCategory implements OnInit, OnDestroy {
         this.categoryForm = this.fb.group({
             nombre: ['', [Validators.required, Validators.minLength(3)]],
             descripcion: [''],
-            imagen: [null, [Validators.required]],
+            imagen: [null, [Validators.required, Validators.maxLength(2048)]],
             estado: [true, Validators.required],
         });
     }
@@ -244,4 +247,34 @@ export class CreateCategory implements OnInit, OnDestroy {
     }
 
     get f() { return this.categoryForm.controls; }
+
+    // Método para cambiar entre modo Unsplash y URL manual
+    setImageSource(source: 'unsplash' | 'manual'): void {
+        this.useManualUrl = source === 'manual';
+        
+        // Si cambiamos a URL manual, limpiar los resultados de Unsplash
+        if (source === 'manual') {
+            this.unsplashImages = [];
+            this.selectedUnsplashUrl = null;
+            this.unsplashSearchTerm = '';
+            this.unsplashError = null;
+        }
+        
+        // Si cambiamos a Unsplash, limpiar errores de Cloudinary
+        if (source === 'unsplash') {
+            this.processingCloudinaryError = null;
+        }
+    }
+
+    onImageError(event: any): void {
+        // Si la imagen falla al cargar, mostrar placeholder
+        event.target.style.display = 'none';
+        const container = event.target.parentElement;
+        if (container) {
+            const placeholder = container.querySelector('.no-image-placeholder');
+            if (placeholder) {
+                placeholder.style.display = 'flex';
+            }
+        }
+    }
 }

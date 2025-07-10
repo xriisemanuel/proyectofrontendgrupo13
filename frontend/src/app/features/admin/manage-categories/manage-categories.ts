@@ -43,8 +43,14 @@ export class ManageCategories implements OnInit {
     this.successMessage = null;
     this.categoriaService.getCategorias().pipe(
       catchError(error => {
-        this.errorMessage = 'Error al cargar las categorías: ' + (error.message || 'Error desconocido');
-        this.toastr.error(this.errorMessage, 'Error de Carga');
+        let errorMessage = 'Error al cargar las categorías.';
+        if (error.error && error.error.mensaje) {
+          errorMessage = error.error.mensaje;
+        } else if (error.message) {
+          errorMessage = 'Error al cargar las categorías: ' + error.message;
+        }
+        this.errorMessage = errorMessage;
+        this.toastr.error(errorMessage, 'Error de Carga');
         return of([]);
       }),
       finalize(() => this.loading = false)
@@ -64,8 +70,20 @@ export class ManageCategories implements OnInit {
           this.loading = true;
           this.categoriaService.deleteCategoria(id).pipe(
             catchError(error => {
-              this.errorMessage = error.message || 'Error al eliminar la categoría.';
-              this.toastr.error(this.errorMessage ?? 'Error al eliminar la categoría.', 'Error de Eliminación');
+              // Extraer el mensaje personalizado del backend si está disponible
+              let errorMessage = 'Error al eliminar la categoría.';
+              if (error.error && error.error.mensaje) {
+                errorMessage = error.error.mensaje;
+                // Solo mostrar la sugerencia si no es muy larga
+                if (error.error.sugerencia && error.error.sugerencia.length < 50) {
+                  errorMessage += ` ${error.error.sugerencia}`;
+                }
+              } else if (error.message) {
+                errorMessage = error.message;
+              }
+              
+              this.errorMessage = errorMessage;
+              this.toastr.error(errorMessage, 'Error de Eliminación');
               return of(null);
             }),
             finalize(() => this.loading = false)
@@ -98,8 +116,14 @@ export class ManageCategories implements OnInit {
 
     serviceCall.pipe(
       catchError(error => {
-        this.errorMessage = `Error al ${action} la categoría: ` + (error.message || 'Error desconocido');
-        this.toastr.error(this.errorMessage, `Error al ${action} Categoría`);
+        let errorMessage = `Error al ${action} la categoría.`;
+        if (error.error && error.error.mensaje) {
+          errorMessage = error.error.mensaje;
+        } else if (error.message) {
+          errorMessage = `Error al ${action} la categoría: ${error.message}`;
+        }
+        this.errorMessage = errorMessage;
+        this.toastr.error(errorMessage, `Error al ${action} Categoría`);
         return of(null);
       }),
       finalize(() => this.loading = false)
