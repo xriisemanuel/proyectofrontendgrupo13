@@ -4,44 +4,64 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router'; // Importa Router
 import { ProductoService } from '../../../data/services/producto';
-import { IProducto } from '../../../shared/interfaces'; // Asegúrate de que la ruta es correcta
+import { CategoriaService } from '../../../data/services/categoria';
+import { IProducto } from '../../../shared/interfaces'; 
+import { ICategoria } from '../../../shared/interfaces';
+
+// Asegúrate de que la ruta es correcta
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { ConfirmDialogService } from '../../../shared/confirm-dialog';
+import { FormsModule } from '@angular/forms';
 
+interface ProductoConCategoriaNombre extends IProducto {
+  categoriaNombre: string;
+}
 @Component({
   selector: 'app-manage-products',
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink
+    RouterLink,
+    FormsModule
   ],
   templateUrl: './manage-products.html',
   styleUrls: ['./manage-products.css']
 })
 export class ManageProducts implements OnInit {
-  products: IProducto[] = []; // Renombrado a 'products' para mayor claridad
+  //products: IProducto[] = []; // Renombrado a 'products' para mayor claridad
+  products: ProductoConCategoriaNombre[] = [];
+  categorias: ICategoria[] = [];
+  searchTerm: string = '';
+  categoriaSeleccionada: string = '';
+  productosOriginales: ProductoConCategoriaNombre[] = [];
+  productoSeleccionado: ProductoConCategoriaNombre | null = null;
+  //categorias: { _id: string; nombre: string }[] = [];
+
+
   loading = false;
   errorMessage: string | null = null;
 
   constructor(
     private productoService: ProductoService,
+    private categoriaService: CategoriaService,
     private toastr: ToastrService,
     private confirmDialogService: ConfirmDialogService,
     private router: Router // Inyecta Router
   ) { }
 
-  ngOnInit(): void {
-    this.loadProducts();
-  }
-  
+ngOnInit(): void {
+  this.loadProducts();
+  this.loadCategorias(); // 👈 nuevo método para cargar categorías
+}
+
 
   /**
    * Carga la lista de todos los productos.
    */
   loadProducts(): void {
-    
+
     this.loading = true;
     this.errorMessage = null;
     this.productoService.getProducts().pipe( // Asumo que el método es getProductos
@@ -52,17 +72,42 @@ export class ManageProducts implements OnInit {
       }),
       finalize(() => this.loading = false)
     ).subscribe(productos => {
-  console.log('Productos recibidos:', productos); // 👈 revisá si cada producto tiene .imagen
-  this.products = productos;
-});
+      console.log('Productos recibidos:', productos);
+
+      this.products = productos.map(producto => {
+        const categoriaNombre =
+          typeof producto.categoriaId === 'object' && producto.categoriaId !== null
+            ? producto.categoriaId.nombre
+            : 'Sin categoría';
+
+        return {
+          ...producto,
+          categoriaNombre
+        };
+      });
+
+      this.productosOriginales = [...this.products];
+    });
+
   }
+loadCategorias(): void {
+  this.categoriaService.getCategorias().subscribe({
+    next: (data) => {
+      this.categorias = data;
+    },
+    error: () => {
+      this.toastr.error('Error al cargar categorías', 'Error');
+    }
+  });
+}
 
   /**
    * Navega al componente de edición de producto.
    * @param id El ID del producto a editar.
    */
+
   editProduct(id: string): void {
-    this.router.navigate(['/admin/products/edit', id]); // Asumo esta ruta para edición
+    this.router.navigate(['/admin/products/edit', id]);
   }
 
   /**
@@ -131,4 +176,28 @@ export class ManageProducts implements OnInit {
       }
     });
   }
+
+  filtrarProductos(): void {
+  const termino = this.searchTerm.toLowerCase().trim();
+  const categoria = this.categoriaSeleccionada;
+
+  this.products = this.productosOriginales.filter(producto => {
+    const coincideNombre = producto.nombre.toLowerCase().includes(termino);
+    const coincideCategoria = !categoria || (
+      typeof producto.categoriaId === 'object' &&
+      producto.categoriaId !== null &&
+      producto.categoriaId._id === categoria
+    );
+    return coincideNombre && coincideCategoria;
+  });
+}
+
+verDetallesProducto(producto: ProductoConCategoriaNombre): void {
+  this.productoSeleccionado = producto;
+}
+
+cerrarDetallesProducto(): void {
+  this.productoSeleccionado = null;
+}
+
 }

@@ -22,6 +22,17 @@
     <i class="fas fa-info-circle"></i> No hay productos registrados. ¡Crea uno nuevo!
   </div>
 
+  <!---BUSCADOR-->
+  <div class="filters">
+    <input type="text" class="form-control" placeholder="Buscar por nombre..." [(ngModel)]="searchTerm"
+      (ngModelChange)="filtrarProductos()" />
+
+    <select class="form-select" [(ngModel)]="categoriaSeleccionada" (change)="filtrarProductos()">
+      <option value="">Todas las categorías</option>
+      <option *ngFor="let cat of categorias" [value]="cat._id">{{ cat.nombre }}</option>
+    </select>
+  </div>
+
   <div *ngIf="!loading && products.length > 0" class="products-table-container">
     <table>
       <thead>
@@ -40,12 +51,14 @@
         <tr *ngFor="let producto of products">
           <td>
             <!-- CORREGIDO: Usar 'imagen' en lugar de 'imagenUrl' -->
-        <img [src]="producto.imagen" alt="Imagen de Producto" class="product-image">
+            <img [src]="producto.imagen || 'https://placehold.co/150x100/172A45/CCD6F6?text=No+Image'"
+          alt="Imagen de Producto" class="producto-image">
           </td>
           <td>{{ producto.nombre }}</td>
           <td>{{ producto.descripcion || 'Sin descripción' }}</td>
           <td>{{ producto.precio | currency:'USD':'symbol':'1.2-2' }}</td>
-          <td>{{ producto.categoriaId }}</td> <!-- Asumo que categoriaId es el nombre de la categoría, si es un ID, necesitarás una función para resolverlo -->
+          <td>{{ producto.categoriaNombre }}</td>
+          <!-- Asumo que categoriaId es el nombre de la categoría, si es un ID, necesitarás una función para resolverlo -->
           <td>{{ producto.stock }}</td>
           <td>
             <!-- CORREGIDO: Usar 'disponible' en lugar de 'estado' -->
@@ -54,19 +67,26 @@
             </span>
           </td>
           <td class="actions-cell">
+            <!-- BOTON OJITO CARD-->
+            <button class="action-button view-button" title="Ver Detalles" (click)="verDetallesProducto(producto)">
+              <i class="fas fa-eye"></i>
+            </button>
+
             <!-- CORREGIDO: Usar producto._id! -->
-            <button class="action-button edit-button" title="Editar Producto" (click)="editProduct(producto._id!)">
+            <button class="action-button btn-edit" title="Editar Producto" (click)="editProduct(producto._id!)">
               <i class="fas fa-edit"></i>
             </button>
-            <button
-              class="action-button toggle-status-button"
+
+            <button class="action-button toggle-status-button"
               [ngClass]="{'toggle-active': !producto.disponible, 'toggle-inactive': producto.disponible}"
               [title]="producto.disponible ? 'Desactivar Producto' : 'Activar Producto'"
               (click)="toggleProductStatus(producto)">
-              <i class="fas" [ngClass]="{'fa-toggle-on': producto.disponible, 'fa-toggle-off': !producto.disponible}"></i>
+              <i class="fas"
+                [ngClass]="{'fa-toggle-on': producto.disponible, 'fa-toggle-off': !producto.disponible}"></i>
             </button>
             <!-- CORREGIDO: Usar producto._id! -->
-            <button class="action-button delete-button" title="Eliminar Producto" (click)="deleteProduct(producto._id!, producto.nombre)">
+            <button class="action-button delete-button" title="Eliminar Producto"
+              (click)="deleteProduct(producto._id!, producto.nombre)">
               <i class="fas fa-trash-alt"></i>
             </button>
           </td>
@@ -74,5 +94,28 @@
       </tbody>
     </table>
   </div>
+
+  <div *ngIf="productoSeleccionado" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>{{ productoSeleccionado.nombre }}</h3>
+      <button class="close-button" (click)="cerrarDetallesProducto()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p><strong>Descripción:</strong> {{ productoSeleccionado.descripcion || 'N/A' }}</p>
+      <p><strong>Precio:</strong> {{ productoSeleccionado.precio | currency:'USD':'symbol':'1.2-2' }}</p>
+      <p><strong>Stock:</strong> {{ productoSeleccionado.stock }}</p>
+      <p><strong>Estado:</strong>
+        <span [ngClass]="{ 'status-active': productoSeleccionado.disponible, 'status-inactive': !productoSeleccionado.disponible }">
+          {{ productoSeleccionado.disponible ? 'Disponible' : 'No disponible' }}
+        </span>
+      </p>
+      <p><strong>Categoría:</strong> {{ productoSeleccionado.categoriaNombre || 'Sin categoría' }}</p>
+    </div>
+  </div>
+</div>
+
   <button class="btn-salir" routerLink="/admin/dashboard">Volver</button>
 </div>

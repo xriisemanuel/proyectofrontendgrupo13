@@ -131,6 +131,13 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['admin'] } // Solo admins pueden crear productos
   },
+   // --- ¡NUEVA RUTA PARA EDITAR PRODUCTO! ---
+   {
+    path: 'admin/products/edit/:id', // Ruta para editar un producto específico
+    loadComponent: () => import('./features/admin/edit-products/edit-products').then(m => m.EditProducts),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin'] } // Solo admins pueden editar productos
+   },
   // --- ¡NUEVA RUTA PARA GESTIONAR CATEGORÍAS! ---
   {
     path: 'admin/categories', // Ruta para la lista de categorías

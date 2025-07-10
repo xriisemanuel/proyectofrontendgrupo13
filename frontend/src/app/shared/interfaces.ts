@@ -49,7 +49,11 @@ export interface IProducto {
   nombre: string;
   descripcion?: string;
   precio: number;
-  categoriaId: string; // O ICategoria['_id']
+  categoriaId: string | {
+  _id: string;
+  nombre: string;
+  descripcion?: string;
+}; // O ICategoria['_id']
   imagen?: string;// Array de URLs de imágenes
   disponible: boolean;
   stock: number;
