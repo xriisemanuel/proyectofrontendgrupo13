@@ -33,6 +33,7 @@ export class CreateProduct implements OnInit, OnDestroy {
     isLoadingCategories: boolean = true;
     isSaving: boolean = false;
     private destroy$ = new Subject<void>();
+    usarUrlManual: boolean = false;
 
     // Propiedades para mostrar mensajes generales en la UI
     errorMessage: string | null = null;
@@ -110,49 +111,51 @@ export class CreateProduct implements OnInit, OnDestroy {
     }
 
     // --- Lógica para buscar imagen en Unsplash ---
-    searchUnsplashImages(): void {
-        // Limpiar mensajes de estado
-        this.errorMessage = null;
-        this.successMessage = null;
-        this.unsplashError = null;
+   searchUnsplashImages(): void {
+  this.errorMessage = null;
+  this.successMessage = null;
+  this.unsplashError = null;
+  this.unsplashImages = [];
+  this.selectedUnsplashUrl = null;
+  this.finalCloudinaryImageUrl = null;
+  this.lastProcessedUnsplashUrl = null;
+
+  // Solo limpiar el campo si ya se había seleccionado una imagen de Unsplash antes
+  const imagenActual = this.productForm.get('imagenUrl')?.value;
+  if (imagenActual && imagenActual === this.lastProcessedUnsplashUrl) {
+    this.productForm.get('imagenUrl')?.setValue(null);
+  }
+
+  if (!this.unsplashSearchTerm.trim()) {
+    this.toastr.warning('Por favor, ingresa un término de búsqueda para Unsplash.', 'Advertencia');
+    return;
+  }
+
+  this.isSearchingUnsplash = true;
+
+  this.unplashService.buscarImagen(this.unsplashSearchTerm, 6).pipe(takeUntil(this.destroy$)).subscribe({
+    next: (response) => {
+      this.isSearchingUnsplash = false;
+      if (response?.results?.length > 0) {
+        this.unsplashImages = response.results;
+        this.toastr.success(`Se encontraron ${response.results.length} imágenes en Unsplash.`, 'Resultados');
+      } else {
         this.unsplashImages = [];
-        this.selectedUnsplashUrl = null;
-        this.finalCloudinaryImageUrl = null;
-        this.productForm.get('imagenUrl')?.setValue(null);
-        this.lastProcessedUnsplashUrl = null; // Limpiar también la última URL procesada al iniciar una nueva búsqueda
-
-        if (!this.unsplashSearchTerm.trim()) {
-            this.toastr.warning('Por favor, ingresa un término de búsqueda para Unsplash.', 'Advertencia');
-            return;
-        }
-
-        this.isSearchingUnsplash = true;
-
-        // Llama al servicio de Unsplash. Asegúrate de que tu servicio acepte `perPage` como parámetro.
-        // Si no lo modificaste, solo devolverá 1 resultado.
-        this.unplashService.buscarImagen(this.unsplashSearchTerm, 3).pipe(takeUntil(this.destroy$)).subscribe({
-            next: (response) => {
-                this.isSearchingUnsplash = false;
-                if (response && response.results && response.results.length > 0) {
-                    this.unsplashImages = response.results;
-                    this.toastr.success(`Se encontraron ${response.results.length} imágenes en Unsplash.`, 'Resultados');
-                } else {
-                    this.unsplashImages = [];
-                    this.toastr.info('No se encontraron imágenes para el término proporcionado en Unsplash.', 'Sin Resultados');
-                }
-            },
-            error: (err) => {
-                this.isSearchingUnsplash = false;
-                console.error('Error al buscar en Unsplash:', err);
-                this.unsplashError = 'Error al buscar imágenes en Unsplash. Por favor, intenta de nuevo.';
-                this.toastr.error(this.unsplashError, 'Error de Búsqueda');
-            }
-        });
-
+        this.toastr.info('No se encontraron imágenes para el término proporcionado en Unsplash.', 'Sin Resultados');
+      }
+    },
+    error: (err) => {
+      this.isSearchingUnsplash = false;
+      console.error('Error al buscar en Unsplash:', err);
+      this.unsplashError = 'Error al buscar imágenes en Unsplash. Por favor, intenta de nuevo.';
+      this.toastr.error(this.unsplashError, 'Error de Búsqueda');
     }
+  });
+}
 
     // --- Lógica para seleccionar una imagen de Unsplash y procesarla con Cloudinary ---
     selectUnsplashImage(unsplashImageUrl: string): void {
+        
         this.selectedUnsplashUrl = unsplashImageUrl;
         this.processingCloudinaryError = null;
 
@@ -166,7 +169,11 @@ export class CreateProduct implements OnInit, OnDestroy {
 
         // Si el usuario selecciona una imagen diferente, entonces limpiamos la URL final y el campo del formulario
         this.finalCloudinaryImageUrl = null;
-        this.productForm.get('imagenUrl')?.setValue(null);
+       const imagenActual = this.productForm.get('imagenUrl')?.value;
+if (imagenActual && imagenActual === this.lastProcessedUnsplashUrl) {
+  this.productForm.get('imagenUrl')?.setValue(null);
+}
+
 
         this.isProcessingCloudinary = true;
 

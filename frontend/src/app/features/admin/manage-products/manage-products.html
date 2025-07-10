@@ -33,6 +33,13 @@
     </select>
   </div>
 
+  <select class="form-select" [(ngModel)]="estadoSeleccionado" (change)="filtrarProductos()">
+  <option value="">Todos los estados</option>
+  <option [value]="'true'">Solo activos</option>
+  <option [value]="'false'">Solo inactivos</option>
+</select>
+
+
   <div *ngIf="!loading && products.length > 0" class="products-table-container">
     <table>
       <thead>
@@ -52,7 +59,7 @@
           <td>
             <!-- CORREGIDO: Usar 'imagen' en lugar de 'imagenUrl' -->
             <img [src]="producto.imagen || 'https://placehold.co/150x100/172A45/CCD6F6?text=No+Image'"
-          alt="Imagen de Producto" class="producto-image">
+              alt="Imagen de Producto" class="producto-image">
           </td>
           <td>{{ producto.nombre }}</td>
           <td>{{ producto.descripcion || 'Sin descripción' }}</td>
@@ -96,23 +103,57 @@
   </div>
 
   <div *ngIf="productoSeleccionado" class="modal-overlay">
-  <div class="modal-content">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>{{ productoSeleccionado.nombre }}</h3>
+        <button class="close-button" (click)="cerrarDetallesProducto()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Descripción:</strong> {{ productoSeleccionado.descripcion || 'N/A' }}</p>
+        <p><strong>Precio:</strong> {{ productoSeleccionado.precio | currency:'USD':'symbol':'1.2-2' }}</p>
+        <p><strong>Stock:</strong> {{ productoSeleccionado.stock }}</p>
+        <p><strong>Estado:</strong>
+          <span
+            [ngClass]="{ 'status-active': productoSeleccionado.disponible, 'status-inactive': !productoSeleccionado.disponible }">
+            {{ productoSeleccionado.disponible ? 'Disponible' : 'No disponible' }}
+          </span>
+        </p>
+        <p><strong>Categoría:</strong> {{ productoSeleccionado.categoriaNombre || 'Sin categoría' }}</p>
+        <div class="modal-actions">
+          <button class="action-button btn-edit" title="Editar Producto"
+            (click)="editProduct(productoSeleccionado._id!)">
+            <i class="fas fa-edit"></i> Editar
+          </button>
+          <button class="action-button btn-edit" title="Eliminar Producto"
+            (click)="confirmarEliminacion(productoSeleccionado)">
+            <i class="fas fa-trash-alt"></i> Eliminar
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+ <div *ngIf="productoAEliminar" class="modal-overlay">
+  <div class="confirm-modal-box">
     <div class="modal-header">
-      <h3>{{ productoSeleccionado.nombre }}</h3>
-      <button class="close-button" (click)="cerrarDetallesProducto()">
+      <h3><i class="fas fa-exclamation-circle" style="color: #ff6e6e; margin-right: 0.5rem;"></i> ¿Eliminar producto?</h3>
+      <button class="close-button" (click)="cancelarEliminacion()">
         <i class="fas fa-times"></i>
       </button>
     </div>
     <div class="modal-body">
-      <p><strong>Descripción:</strong> {{ productoSeleccionado.descripcion || 'N/A' }}</p>
-      <p><strong>Precio:</strong> {{ productoSeleccionado.precio | currency:'USD':'symbol':'1.2-2' }}</p>
-      <p><strong>Stock:</strong> {{ productoSeleccionado.stock }}</p>
-      <p><strong>Estado:</strong>
-        <span [ngClass]="{ 'status-active': productoSeleccionado.disponible, 'status-inactive': !productoSeleccionado.disponible }">
-          {{ productoSeleccionado.disponible ? 'Disponible' : 'No disponible' }}
-        </span>
-      </p>
-      <p><strong>Categoría:</strong> {{ productoSeleccionado.categoriaNombre || 'Sin categoría' }}</p>
+      <p>¿Estás seguro de que querés eliminar <strong>{{ productoAEliminar.nombre }}</strong>?</p>
+      <div class="modal-actions">
+        <button class="action-button btn-edit" (click)="eliminarProductoConfirmado()">
+          <i class="fas fa-check-circle"></i> Confirmar
+        </button>
+        <button class="action-button btn-edit" (click)="cancelarEliminacion()">
+          <i class="fas fa-times-circle"></i> Cancelar
+        </button>
+      </div>
     </div>
   </div>
 </div>

@@ -37,6 +37,9 @@ export class ManageProducts implements OnInit {
   categoriaSeleccionada: string = '';
   productosOriginales: ProductoConCategoriaNombre[] = [];
   productoSeleccionado: ProductoConCategoriaNombre | null = null;
+  productoAEliminar: ProductoConCategoriaNombre | null = null;
+  estadoSeleccionado: string = ''; // 'true', 'false' o ''
+
   //categorias: { _id: string; nombre: string }[] = [];
 
 
@@ -180,6 +183,7 @@ loadCategorias(): void {
   filtrarProductos(): void {
   const termino = this.searchTerm.toLowerCase().trim();
   const categoria = this.categoriaSeleccionada;
+  const estado = this.estadoSeleccionado;
 
   this.products = this.productosOriginales.filter(producto => {
     const coincideNombre = producto.nombre.toLowerCase().includes(termino);
@@ -188,7 +192,9 @@ loadCategorias(): void {
       producto.categoriaId !== null &&
       producto.categoriaId._id === categoria
     );
-    return coincideNombre && coincideCategoria;
+    const coincideEstado = estado === '' || String(producto.disponible) === estado;
+
+    return coincideNombre && coincideCategoria && coincideEstado;
   });
 }
 
@@ -199,5 +205,32 @@ verDetallesProducto(producto: ProductoConCategoriaNombre): void {
 cerrarDetallesProducto(): void {
   this.productoSeleccionado = null;
 }
+
+confirmarEliminacion(producto: ProductoConCategoriaNombre): void {
+  this.productoSeleccionado = null; // 👈 cerrar el modal de detalles
+  this.productoAEliminar = producto;
+}
+
+cancelarEliminacion(): void {
+  this.productoAEliminar = null;
+}
+
+eliminarProductoConfirmado(): void {
+  if (!this.productoAEliminar?._id) return;
+
+  this.productoService.deleteProduct(this.productoAEliminar._id).subscribe({
+    next: () => {
+      this.toastr.success('Producto eliminado correctamente');
+      this.products = this.products.filter(p => p._id !== this.productoAEliminar!._id);
+      this.productosOriginales = this.productosOriginales.filter(p => p._id !== this.productoAEliminar!._id);
+      this.productoAEliminar = null;
+      this.productoSeleccionado = null; // 👈 asegurate de cerrar también el modal de detalles
+    },
+    error: () => {
+      this.toastr.error('Error al eliminar el producto');
+    }
+  });
+}
+
 
 }
