@@ -15,7 +15,7 @@ export const routes: Routes = [
   // Ruta Home (pública, accesible sin autenticación)
   {
     path: 'home',
-    loadComponent: () => import('./public/home-page/home-page').then(m => m.HomePageComponent)
+    loadComponent: () => import('./features/cliente/pages/home/home').then(m => m.Home)
   },
   // Rutas públicas de autenticación (login y register)
   // Ya no usan authRedirectGuard. Serán accesibles directamente.

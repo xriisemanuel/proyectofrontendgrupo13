@@ -1,0 +1,27 @@
+<nav class="main-navigation">
+  <div class="nav-container">
+    <div class="nav-buttons">
+      <button 
+        *ngFor="let button of buttons" 
+        class="nav-button"
+        [class.active]="button.active"
+        [class.loading]="loading"
+        [disabled]="loading"
+        (click)="onButtonClick(button)">
+        
+        <span class="button-content">
+          <span class="button-icon">
+            <span *ngIf="button.key === 'categorias'">📂</span>
+            <span *ngIf="button.key === 'combos'">🎁</span>
+            <span *ngIf="button.key === 'ofertas'">🏷️</span>
+          </span>
+          <span class="button-text">{{ button.name }}</span>
+        </span>
+        
+        <div *ngIf="loading && button.active" class="button-loading">
+          <div class="loading-dot"></div>
+        </div>
+      </button>
+    </div>
+  </div>
+</nav>

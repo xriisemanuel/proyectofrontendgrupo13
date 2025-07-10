@@ -1,0 +1,59 @@
+<div class="product-card" (click)="onCardClick()">
+  <div class="card-image-container">
+    <img 
+      [src]="getProductImage()" 
+      [alt]="product.nombre"
+      class="product-image"
+      (error)="onImageError($event)"
+      loading="lazy">
+    
+    <!-- Badge de disponibilidad -->
+    <div class="availability-badge" [class.available]="product.disponible" [class.unavailable]="!product.disponible">
+      <span *ngIf="product.disponible" class="badge-text">Disponible</span>
+      <span *ngIf="!product.disponible" class="badge-text">Agotado</span>
+    </div>
+    
+    <!-- Overlay de hover -->
+    <div class="card-overlay">
+      <div class="overlay-content">
+        <button class="quick-view-btn" (click)="onCardClick()">
+          <span class="btn-icon">👁️</span>
+          <span class="btn-text">Ver Detalles</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="card-content">
+    <div class="product-info">
+      <h3 class="product-name">{{ product.nombre }}</h3>
+      <p class="product-description" *ngIf="product.descripcion">
+        {{ product.descripcion.length > 80 ? (product.descripcion | slice:0:80) + '...' : product.descripcion }}
+      </p>
+      
+      <!-- Información de categoría -->
+      <div class="category-info" *ngIf="product.categoriaId">
+        <span class="category-badge">
+          📂 {{ typeof product.categoriaId === 'string' ? 'Categoría' : product.categoriaId.nombre }}
+        </span>
+      </div>
+    </div>
+    
+    <div class="card-footer">
+      <div class="price-section">
+        <span class="price">{{ getFormattedPrice() }}</span>
+        <span class="stock-info" *ngIf="product.stock !== undefined">
+          Stock: {{ product.stock }}
+        </span>
+      </div>
+      
+      <button 
+        class="add-to-cart-btn"
+        [disabled]="!product.disponible"
+        (click)="onAddToCart($event)">
+        <span class="btn-icon">🛒</span>
+        <span class="btn-text">{{ product.disponible ? 'Agregar' : 'Agotado' }}</span>
+      </button>
+    </div>
+  </div>
+</div>
