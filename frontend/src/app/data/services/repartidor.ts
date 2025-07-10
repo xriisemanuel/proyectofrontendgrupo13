@@ -80,7 +80,7 @@ export class RepartidorService {
    * @returns Observable de la respuesta del backend.
    */
   registrarEntregaRepartidor(repartidorId: string, entregaData: Partial<IHistorialEntrega>): Observable<any> {
-    return this.http.post<any>(`${REPARTIDOR_API}/${repartidorId}/entregas`, entregaData, { headers: this.getAuthHeaders() });
+    return this.http.patch<any>(`${REPARTIDOR_API}/${repartidorId}/registrar-entrega`, entregaData, { headers: this.getAuthHeaders() });
   }
 
   // Si en el futuro quieres usar el endpoint por ID de repartidor:

@@ -523,3 +523,32 @@ button:disabled {
     gap: 15px;
   }
 }
+
+/* Estilos para el checkbox de mostrar entregados */
+.filter-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  accent-color: #50fa7b;
+  cursor: pointer;
+}
+
+.filter-group input[type="checkbox"]:checked {
+  background-color: #50fa7b;
+  border-color: #50fa7b;
+}
+
+.filter-group label[for="showEntregados"] {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: #8be9fd;
+  font-weight: 600;
+  font-size: 1.1em;
+  gap: 5px;
+}
+
+.filter-group label[for="showEntregados"]:hover {
+  color: #50fa7b;
+  transition: color 0.3s ease;
+}

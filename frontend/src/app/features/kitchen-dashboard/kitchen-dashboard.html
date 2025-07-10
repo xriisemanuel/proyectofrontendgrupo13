@@ -39,12 +39,23 @@
       <label for="searchFilter"><i class="fas fa-search"></i> Buscar:</label>
       <input type="text" id="searchFilter" [(ngModel)]="searchTerm" placeholder="ID, cliente, producto..." (keyup.enter)="loadPedidos()">
     </div>
+    <div class="filter-group">
+      <label for="showEntregados">
+        <input type="checkbox" id="showEntregados" [(ngModel)]="showEntregados" (change)="loadPedidos()">
+        <i class="fas fa-check-circle"></i> Mostrar Entregados
+      </label>
+    </div>
     <button (click)="loadPedidos()"><i class="fas fa-sync-alt"></i> Aplicar Filtros / Recargar</button>
   </div>
 
   <!-- Tabla de Pedidos -->
   <div class="orders-table-container">
-    <h2 *ngIf="pedidos.length > 0"><i class="fas fa-clipboard-list"></i> Pedidos (Estado: {{ selectedEstado | titlecase }})</h2>
+    <h2 *ngIf="pedidos.length > 0">
+      <i class="fas fa-clipboard-list"></i> Pedidos 
+      <span *ngIf="!showEntregados">(Estado: {{ selectedEstado | titlecase }})</span>
+      <span *ngIf="showEntregados && selectedEstado !== 'entregado'">({{ selectedEstado | titlecase }} + Entregados)</span>
+      <span *ngIf="selectedEstado === 'entregado'">(Entregados)</span>
+    </h2>
     <div *ngIf="pedidos.length === 0 && !loading" class="no-data-message">
       <i class="fas fa-info-circle"></i> No hay pedidos con los filtros aplicados.
     </div>

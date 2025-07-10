@@ -388,7 +388,7 @@ export class DeliveryDashboard implements OnInit, OnDestroy {
 
   /**
    * Carga los pedidos asignados al repartidor actualmente logueado.
-   * Filtra por estados relevantes para el repartidor (confirmado, en_preparacion, en_envio).
+   * Incluye pedidos asignados y pedidos disponibles para tomar.
    */
   loadPedidosAsignados(): void {
     if (!this.repartidor?._id) {
@@ -399,7 +399,8 @@ export class DeliveryDashboard implements OnInit, OnDestroy {
 
     this.loadingPedidos = true;
     this.errorMessage = null;
-    this.pedidosSubscription = this.pedidoService.getPedidosByRepartidorId(this.repartidor._id, ['confirmado', 'en_preparacion', 'en_envio'])
+    // Cargar todos los pedidos disponibles para el repartidor (asignados + disponibles para tomar)
+    this.pedidosSubscription = this.pedidoService.getPedidos(['confirmado', 'en_preparacion', 'en_envio'])
       .pipe(
         tap((pedidos: IPedido[]) => {
           this.pedidosAsignados = pedidos;

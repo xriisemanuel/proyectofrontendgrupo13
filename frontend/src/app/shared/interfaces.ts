@@ -150,10 +150,17 @@ export interface ICalificacionProducto {
   comentario?: string | null; // Opcional, puede ser null
 }
 
+// Interfaz para el pedido populado en calificaciones
+export interface IPedidoPopulado {
+  _id: string;
+  fechaPedido?: Date;
+  estado?: string;
+}
+
 // Interfaz para la calificación general de un pedido
 export interface ICalificacion {
   _id?: string; // ID generado por MongoDB
-  pedidoId: string;
+  pedidoId: string | IPedidoPopulado; // Puede ser string o objeto populado
   clienteId: string;
   puntuacionComida: number; // 1-5 estrellas
   puntuacionServicio: number; // 1-5 estrellas

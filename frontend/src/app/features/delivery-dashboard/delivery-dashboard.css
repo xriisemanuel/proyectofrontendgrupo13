@@ -543,6 +543,53 @@ button:disabled {
     border: 1px solid #EF476F;
 }
 
+/* Estilos para pedidos asignados vs disponibles */
+.order-card.assigned {
+    border-left: 5px solid var(--color-success-green);
+    background: linear-gradient(135deg, rgba(80, 250, 123, 0.05) 0%, rgba(52, 179, 153, 0.05) 100%);
+}
+
+.order-card.available {
+    border-left: 5px solid var(--color-accent-orange);
+    background: linear-gradient(135deg, rgba(255, 181, 107, 0.05) 0%, rgba(224, 138, 34, 0.05) 100%);
+}
+
+.order-status-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+}
+
+.assigned-badge {
+    background: linear-gradient(45deg, var(--color-success-green) 0%, #34B399 100%);
+    color: var(--color-dark-blue-bg);
+    box-shadow: 0 3px 10px rgba(80, 250, 123, 0.3);
+}
+
+.available-badge {
+    background: linear-gradient(45deg, var(--color-accent-orange) 0%, #E08A22 100%);
+    color: var(--color-dark-blue-bg);
+    box-shadow: 0 3px 10px rgba(255, 181, 107, 0.3);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 3px 10px rgba(255, 181, 107, 0.3);
+    }
+    50% {
+        box-shadow: 0 3px 15px rgba(255, 181, 107, 0.5);
+    }
+    100% {
+        box-shadow: 0 3px 10px rgba(255, 181, 107, 0.3);
+    }
+}
+
 
 .order-actions {
     display: flex;

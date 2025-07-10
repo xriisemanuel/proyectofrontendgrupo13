@@ -2,7 +2,12 @@
 
 <div class="calificaciones-container">
     <div class="dashboard-header">
-        <h2><i class="fas fa-star"></i> Calificar Pedidos</h2>
+        <div class="header-content">
+            <button class="btn-back" (click)="goBack()" title="Volver atrás">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2><i class="fas fa-star"></i> Calificar Pedidos</h2>
+        </div>
     </div>
     <p class="intro-text">Comparte tu experiencia y califica los pedidos que has recibido.</p>
 
@@ -85,24 +90,31 @@
         <div *ngIf="calificaciones.length > 0" class="calificaciones-grid">
             <div *ngFor="let calificacion of calificaciones" class="calificacion-card">
                 <div class="card-header">
-                    <h4>Pedido #{{ calificacion.pedidoId | slice:0:8 }}</h4>
+                    <h4>Pedido #{{ getPedidoId(calificacion.pedidoId) | slice:0:8 }}</h4>
                     <div class="rating-summary">
-                        <p>Comida:
+                        <p>Comida ({{ calificacion.puntuacionComida }}):
                             <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star"
-                                [class.active]="star <= calificacion.puntuacionComida"></i>
+                                [class.active]="star <= getPuntuacionValida(calificacion.puntuacionComida)"
+                                [title]="'Star ' + star + ' <= ' + getPuntuacionValida(calificacion.puntuacionComida) + ' = ' + (star <= getPuntuacionValida(calificacion.puntuacionComida))"></i>
                         </p>
-                        <p>Servicio:
+                        <p>Servicio ({{ calificacion.puntuacionServicio }}):
                             <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star"
-                                [class.active]="star <= calificacion.puntuacionServicio"></i>
+                                [class.active]="star <= getPuntuacionValida(calificacion.puntuacionServicio)"></i>
                         </p>
-                        <p>Entrega:
+                        <p>Entrega ({{ calificacion.puntuacionEntrega }}):
                             <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star"
-                                [class.active]="star <= calificacion.puntuacionEntrega"></i>
+                                [class.active]="star <= getPuntuacionValida(calificacion.puntuacionEntrega)"></i>
                         </p>
                     </div>
                 </div>
                 <p class="card-comment">{{ calificacion.comentario || 'Sin comentario.' }}</p>
                 <span class="card-date">{{ calificacion.fechaCalificacion | date:'shortDate' }}</span>
+                <div class="card-actions">
+                    <button class="btn-delete" (click)="deleteCalificacion(calificacion._id!)" 
+                            title="Eliminar calificación">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                </div>
             </div>
         </div>
     </div>

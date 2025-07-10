@@ -75,8 +75,9 @@ export class MisPedidosComponent implements OnInit, OnDestroy {
     this.router.navigate(['/client/mis-pedidos', pedidoId]); // Ejemplo de ruta
   }
 
-  // Método para calificar un pedido (opcional, si tienes una ruta de calificación)
+  // Método para calificar un pedido
   rateOrder(pedidoId: string): void {
-    this.router.navigate(['/client/calificar-pedido', pedidoId]); // Ejemplo de ruta
+    // Navegar a la página de calificaciones con el pedidoId como parámetro de query
+    this.router.navigate(['/calificaciones'], { queryParams: { pedidoId: pedidoId } });
   }
 }

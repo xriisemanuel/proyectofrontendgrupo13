@@ -101,10 +101,13 @@
   <hr>
 
   <div class="assigned-orders-section" *ngIf="repartidor && !loadingPedidos">
-    <h2>Pedidos Asignados</h2>
+    <h2>Pedidos Disponibles</h2>
     <div *ngIf="pedidosAsignados.length > 0; else noPedidos">
-      <div *ngFor="let pedido of pedidosAsignados" class="order-card">
+      <div *ngFor="let pedido of pedidosAsignados" class="order-card" [ngClass]="{'assigned': pedido.repartidorId, 'available': !pedido.repartidorId}">
         <h3>Pedido #{{ pedido._id }}</h3>
+        <div class="order-status-badge" [ngClass]="{'assigned-badge': pedido.repartidorId, 'available-badge': !pedido.repartidorId}">
+          {{ pedido.repartidorId ? 'Asignado a ti' : 'Disponible para tomar' }}
+        </div>
         <p><strong>Cliente:</strong> {{ getClienteFullName(pedido.clienteId) }}</p>
         <p><strong>Dirección de Entrega:</strong> {{ pedido.direccionEntrega }}</p>
         <p><strong>Estado:</strong> {{ pedido.estado | titlecase }}</p>
@@ -122,18 +125,18 @@
         </ul>
 
         <div class="order-actions">
-          <button *ngIf="pedido.estado === 'confirmado' || pedido.estado === 'en_preparacion'"
+          <button *ngIf="(pedido.estado === 'confirmado' || pedido.estado === 'en_preparacion' || pedido.estado === 'en_envio') && !pedido.repartidorId"
             (click)="takeOrder(pedido._id!)">
             <i class="fas fa-truck"></i> Tomar Pedido
           </button>
-          <button *ngIf="pedido.estado === 'en_envio'" (click)="deliverOrder(pedido)">
+          <button *ngIf="pedido.estado === 'en_envio' && pedido.repartidorId" (click)="deliverOrder(pedido)">
             <i class="fas fa-box"></i> Marcar como Entregado
           </button>
         </div>
       </div>
     </div>
     <ng-template #noPedidos>
-      <p class="no-data-message">No tienes pedidos asignados actualmente.</p>
+      <p class="no-data-message">No hay pedidos disponibles actualmente.</p>
     </ng-template>
   </div>
 </div>

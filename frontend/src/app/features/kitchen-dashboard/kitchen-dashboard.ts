@@ -37,6 +37,7 @@ export class KitchenDashboard implements OnInit, OnDestroy {
   loading = true; // Para indicar si los datos están cargando
   selectedEstado: string = 'pendiente'; // Estado inicial del filtro
   searchTerm: string = ''; // Término de búsqueda para el filtro
+  showEntregados: boolean = false; // Control para mostrar pedidos entregados
 
   private pedidosSubscription: Subscription | undefined; // Para manejar la suscripción y evitar fugas de memoria
 
@@ -59,17 +60,23 @@ export class KitchenDashboard implements OnInit, OnDestroy {
 
   /**
    * Carga los pedidos basándose en el estado seleccionado y el término de búsqueda.
-   * Se asume que el backend puede filtrar por estado y que el término de búsqueda
-   * se aplicará en el frontend si el backend no lo soporta directamente.
+   * Incluye opción para mostrar pedidos entregados junto con el estado seleccionado.
    */
   loadPedidos(): void {
     this.loading = true; // Activa el indicador de carga
     this.errorMessage = null; // Limpia cualquier mensaje de error anterior
     this.successMessage = null; // Limpia cualquier mensaje de éxito anterior
 
-    // Llama al servicio de pedidos, pasando el estado seleccionado como filtro
-    // Asumimos que getPedidos en PedidoService ahora puede manejar un array de estados
-    this.pedidosSubscription = this.pedidoService.getPedidos([this.selectedEstado])
+    // Determinar qué estados cargar
+    let estadosACargar = [this.selectedEstado];
+    
+    // Si el estado seleccionado no es 'entregado' y showEntregados está activado, incluir entregados
+    if (this.selectedEstado !== 'entregado' && this.showEntregados) {
+      estadosACargar.push('entregado');
+    }
+
+    // Llama al servicio de pedidos, pasando los estados como filtro
+    this.pedidosSubscription = this.pedidoService.getPedidos(estadosACargar)
       .pipe(
         tap(data => {
           // Si hay un término de búsqueda, filtra los pedidos en el frontend
