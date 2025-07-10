@@ -11,16 +11,16 @@ import { ProductCard } from '../product-card/product-card';
   styleUrl: './product-grid.css'
 })
 export class ProductGrid {
-  @Input() products: IProducto[] = [];
+  @Input() products: any[] = [];
   @Input() loading: boolean = false;
-  @Output() productSelected = new EventEmitter<IProducto>();
-  @Output() addToCart = new EventEmitter<IProducto>();
+  @Output() productSelected = new EventEmitter<any>();
+  @Output() addToCart = new EventEmitter<any>();
 
-  onProductClick(product: IProducto): void {
+  onProductClick(product: any): void {
     this.productSelected.emit(product);
   }
 
-  onAddToCart(product: IProducto): void {
+  onAddToCart(product: any): void {
     this.addToCart.emit(product);
   }
 }

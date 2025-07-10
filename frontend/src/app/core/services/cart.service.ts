@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { IProducto } from '../../shared/interfaces';
 
 export interface CartItem {
-  product: IProducto;
+  product: any;
   quantity: number;
 }
 
@@ -49,7 +48,7 @@ export class CartService {
   /**
    * Agrega un producto al carrito
    */
-  addToCart(product: IProducto, quantity: number = 1): void {
+  addToCart(product: any, quantity: number = 1): void {
     const currentItems = this.cartItems.value;
     const existingItem = currentItems.find(item => item.product._id === product._id);
 
@@ -130,7 +129,8 @@ export class CartService {
    */
   private calculateTotal(items: CartItem[]): void {
     const total = items.reduce((sum, item) => {
-      return sum + (item.product.precio * item.quantity);
+      const price = item.product.precio || item.product.precioCombo || item.product.precioFinal || 0;
+      return sum + (price * item.quantity);
     }, 0);
     this.cartTotal.next(total);
   }
@@ -175,7 +175,10 @@ export class CartService {
   getCartSummary(): { totalItems: number; totalPrice: number; itemCount: number } {
     const items = this.cartItems.value;
     const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-    const totalPrice = items.reduce((sum, item) => sum + (item.product.precio * item.quantity), 0);
+    const totalPrice = items.reduce((sum, item) => {
+      const price = item.product.precio || item.product.precioCombo || item.product.precioFinal || 0;
+      return sum + (price * item.quantity);
+    }, 0);
     const itemCount = items.length;
 
     return { totalItems, totalPrice, itemCount };

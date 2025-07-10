@@ -19,11 +19,11 @@ export interface HomeState {
   hasError: boolean;
 
   // Estados de datos
-  categories: any[];
-  products: any[];
-  filteredProducts: any[];
-  combos: any[];
-  ofertas: any[];
+  categories: unknown[];
+  products: unknown[];
+  filteredProducts: unknown[];
+  combos: unknown[];
+  ofertas: unknown[];
   
   // Estados de navegación
   activeSection: 'categorias' | 'combos' | 'ofertas';
@@ -39,10 +39,10 @@ export interface ApiResponse<T> {
 }
 
 export interface ProductsResponse {
-  products: any[];
+  products: unknown[];
   total: number;
 }
 
 export interface CategoriesResponse {
-  categories: any[];
+  categories: unknown[];
 } 

@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subject, takeUntil, catchError, finalize } from 'rxjs';
+import { Subject, takeUntil, catchError, finalize, firstValueFrom } from 'rxjs';
 import { of } from 'rxjs';
 
 // Importar servicios existentes
@@ -11,7 +11,8 @@ import { OfertaService } from '../../../../data/services/oferta';
 import { CartService } from '../../../../core/services/cart.service';
 
 // Importar interfaces
-import { IProducto, ICategoria } from '../../../../shared/interfaces';
+import { IProducto, ICategoria, ICombo } from '../../../../shared/interfaces';
+import { IOfertaPopulated } from '../../../../shared/oferta.interface';
 import { MainButton, HomeState } from './home.interfaces';
 
 // Importar componentes hijos
@@ -47,8 +48,8 @@ export class Home implements OnInit, OnDestroy {
   categories: ICategoria[] = [];
   products: IProducto[] = [];
   filteredProducts: IProducto[] = [];
-  combos: any[] = [];
-  ofertas: any[] = [];
+  combos: ICombo[] = [];
+  ofertas: IOfertaPopulated[] = [];
 
   // Navegación
   activeSection: 'categorias' | 'combos' | 'ofertas' = 'categorias';
@@ -102,17 +103,23 @@ export class Home implements OnInit, OnDestroy {
     this.errorMessage = '';
 
     // Cargar categorías primero
-    this.loadCategories().then(() => {
-      // Una vez cargadas las categorías, cargar productos de la primera categoría
-      if (this.categories.length > 0) {
-        this.selectedCategoryId = this.categories[0]._id || null;
-        this.loadProductsByCategory(this.selectedCategoryId);
-      } else {
-        this.isLoading = false;
-      }
-    }).catch(error => {
-      this.handleError(error);
-    });
+    this.loadCategories()
+      .then(() => {
+        // Una vez cargadas las categorías, cargar productos de la primera categoría
+        if (this.categories.length > 0) {
+          this.selectedCategoryId = this.categories[0]._id || null;
+          if (this.selectedCategoryId) {
+            this.loadProductsByCategory(this.selectedCategoryId);
+          } else {
+            this.isLoading = false;
+          }
+        } else {
+          this.isLoading = false;
+        }
+      })
+      .catch(error => {
+        this.handleError(error);
+      });
   }
 
   /**
@@ -122,7 +129,7 @@ export class Home implements OnInit, OnDestroy {
     this.isLoadingCategories = true;
     
     try {
-      const categories = await this.categoriaService.getCategorias(true).toPromise();
+      const categories = await firstValueFrom(this.categoriaService.getCategorias(true));
       this.categories = categories || [];
       this.isLoadingCategories = false;
     } catch (error) {
@@ -242,14 +249,16 @@ export class Home implements OnInit, OnDestroy {
    * Maneja la selección de categoría
    */
   onCategorySelected(categoryId: string): void {
-    this.selectedCategoryId = categoryId;
-    this.loadProductsByCategory(categoryId);
+    if (categoryId) {
+      this.selectedCategoryId = categoryId;
+      this.loadProductsByCategory(categoryId);
+    }
   }
 
   /**
    * Maneja la selección de producto
    */
-  onProductSelected(product: IProducto): void {
+  onProductSelected(product: any): void {
     console.log('Producto seleccionado:', product);
     // Aquí puedes implementar la lógica para agregar al carrito
     // o navegar a la página de detalles del producto
@@ -258,7 +267,7 @@ export class Home implements OnInit, OnDestroy {
   /**
    * Maneja la adición de producto al carrito
    */
-  onAddToCart(product: IProducto): void {
+  onAddToCart(product: any): void {
     this.cartService.addToCart(product, 1);
     console.log('Producto agregado al carrito:', product.nombre);
     // Aquí podrías mostrar una notificación de éxito
