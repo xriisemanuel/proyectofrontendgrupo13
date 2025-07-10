@@ -2,7 +2,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, Router } from '@angular/router'; // Importa Router
+import { RouterLink, Router, ActivatedRoute } from '@angular/router'; // Importa Router
 import { ComboService } from '../../../data/services/combo'; // Asegúrate de que la ruta sea correcta
 import { ICombo } from '../../../shared/interfaces';
 import { catchError, finalize } from 'rxjs/operators';
@@ -35,11 +35,24 @@ export class ManageCombosComponent implements OnInit {
     private toastr: ToastrService,
     private confirmDialogService: ConfirmDialogService,
     private router: Router, // Inyecta Router
+    private route: ActivatedRoute,
     public dialog: MatDialog // Inyecta MatDialog
   ) { }
 
   ngOnInit(): void {
-    this.loadCombos();
+    // Verificar si hay parámetros de query para recargar
+    this.route.queryParams.subscribe(params => {
+      if (params['refresh']) {
+        // Si viene de create o edit, mostrar mensaje y recargar
+        this.toastr.info('Recargando lista de combos...', 'Actualización');
+        setTimeout(() => {
+          this.loadCombos();
+        }, 500);
+      } else {
+        // Carga normal
+        this.loadCombos();
+      }
+    });
   }
 
   /**
@@ -66,7 +79,7 @@ export class ManageCombosComponent implements OnInit {
    */
   viewComboDetails(comboId: string): void {
     const dialogRef = this.dialog.open(ComboDetailModalComponent, {
-      width: '650px', // Ancho del modal
+      width: '1000px', // Ancho del modal
       data: { comboId: comboId }, // Pasa el ID del combo al modal
       panelClass: 'custom-dialog-container' // Clase CSS para estilizar el contenedor del diálogo
     });
@@ -94,25 +107,24 @@ export class ManageCombosComponent implements OnInit {
    * @param comboNombre El nombre del combo para el mensaje de confirmación.
    */
   deleteCombo(comboId: string, comboNombre: string): void {
-    this.confirmDialogService.confirm(`¿Estás seguro de que quieres eliminar el combo "${comboNombre}"? Esta acción es irreversible.`)
-      .then((confirmed) => {
-        if (confirmed) {
-          this.loading = true;
-          this.comboService.deleteCombo(comboId).pipe(
-            catchError(error => {
-              this.errorMessage = error.message || 'Error al eliminar el combo.';
-              this.toastr.error(this.errorMessage ?? 'Error al eliminar el combo.', 'Error de Eliminación');
-              return of(null);
-            }),
-            finalize(() => this.loading = false)
-          ).subscribe(response => {
-            if (response) {
-              this.toastr.success('Combo eliminado exitosamente.', 'Eliminación Exitosa');
-              this.loadCombos(); // Recargar la lista de combos
-            }
-          });
-        }
-      });
+    this.confirmDialogService.confirmDelete(comboNombre, 'combo').subscribe(confirmed => {
+      if (confirmed) {
+        this.loading = true;
+        this.comboService.deleteCombo(comboId).pipe(
+          catchError(error => {
+            this.errorMessage = error.message || 'Error al eliminar el combo.';
+            this.toastr.error(this.errorMessage ?? 'Error al eliminar el combo.', 'Error de Eliminación');
+            return of(null);
+          }),
+          finalize(() => this.loading = false)
+        ).subscribe(response => {
+          if (response) {
+            this.toastr.success('Combo eliminado exitosamente.', 'Eliminación Exitosa');
+            this.loadCombos(); // Recargar la lista de combos
+          }
+        });
+      }
+    });
   }
 
   /**

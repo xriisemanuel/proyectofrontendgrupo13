@@ -369,4 +369,32 @@ tbody tr:hover {
         width: 28px;
         height: 28px;
     }
+}
+
+/* Estilos para el precio gratuito */
+.free-price {
+    color: #50fa7b;
+    font-weight: bold;
+    font-size: 1.1em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background-color: rgba(80, 250, 123, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(80, 250, 123, 0.3);
+}
+
+/* Estilos para el precio final con descuento */
+td:nth-child(5) {
+    font-weight: 500;
+}
+
+/* Resaltar descuentos altos */
+td:nth-child(4) {
+    font-weight: 500;
+}
+
+td:nth-child(4):has(span:contains("100")) {
+    color: #50fa7b;
+    font-weight: bold;
 }   

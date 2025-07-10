@@ -90,6 +90,8 @@
                     <button type="button" [class.selected]="useManualUrl" (click)="setImageSource('manual')">Ingresar URL manual</button>
                 </div>
             </div>
+            
+            <!-- === SECCIÓN DE BÚSQUEDA EN UNSPLASH === -->
             <div *ngIf="!useManualUrl" class="form-group image-search-section">
                 <label for="unsplashSearchTerm">Buscar Imagen en Unsplash:</label>
                 <div class="unsplash-search-input-group">
@@ -120,14 +122,21 @@
                     No se encontraron imágenes para "{{ unsplashSearchTerm }}".
                 </p>
             </div>
+            
+            <!-- === SECCIÓN DE URL MANUAL === -->
             <div *ngIf="useManualUrl" class="form-group">
                 <label for="manualImageUrl">URL de la Imagen (Internet):</label>
                 <input id="manualImageUrl" type="url" [(ngModel)]="manualImageUrl" [ngModelOptions]="{standalone: true}" (input)="onManualImageUrlChange()" placeholder="Pega aquí la URL de la imagen">
             </div>
-            <div *ngIf="!useManualUrl && selectedUnsplashUrl" class="selected-unsplash-preview">
-                <img [src]="selectedUnsplashUrl" alt="Imagen seleccionada de Unsplash">
-                <div class="label">Imagen seleccionada</div>
+            
+            <!-- === PREVISUALIZACIÓN SOLO PARA URL MANUAL === -->
+            <div *ngIf="useManualUrl && comboForm.get('imagen')?.value && !comboForm.get('imagen')?.invalid"
+                class="image-preview-area-final">
+                <label>Previsualización de la imagen:</label>
+                <img [src]="comboForm.get('imagen')?.value" alt="Imagen de combo final" class="final-image-preview">
             </div>
+            
+            <!-- === CAMPO FINAL DE IMAGEN === -->
             <div class="form-group">
                 <label for="imagen">URL de la Imagen del Combo (Cloudinary o Internet):</label>
                 <input id="imagen" type="url" formControlName="imagen" readonly placeholder="La URL de la imagen final aparecerá aquí">
@@ -137,23 +146,19 @@
                 <div *ngIf="processingCloudinaryError" class="error-message-small">
                     <i class="fas fa-exclamation-triangle"></i> {{ processingCloudinaryError }}
                 </div>
-                <div *ngIf="comboForm.get('imagen')?.value && !comboForm.get('imagen')?.invalid"
-                    class="image-preview-area-final">
-                    <label>Imagen Final:</label>
-                    <img [src]="comboForm.get('imagen')?.value" alt="Imagen de combo final" class="final-image-preview">
-                </div>
                 <div *ngIf="comboForm.get('imagen')?.invalid && (comboForm.get('imagen')?.dirty || comboForm.get('imagen')?.touched)"
                     class="validation-error">
                     <div *ngIf="comboForm.get('imagen')?.errors?.['required']">La URL de la imagen es requerida.</div>
                 </div>
             </div>
+            
             <div class="form-actions">
                 <button type="submit"
                     [disabled]="comboForm.invalid || loading || isSearchingUnsplash || isProcessingCloudinary"
                     class="submit-button">
                     <i class="fas fa-plus-circle"></i> {{ loading ? 'Creando...' : 'Crear Combo' }}
                 </button>
-                <button type="button" routerLink="/admin/dashboard" class="cancel-button">
+                <button type="button" routerLink="/admin/combos/manage" class="cancel-button">
                     <i class="fas fa-times-circle"></i> Cancelar
                 </button>
             </div>

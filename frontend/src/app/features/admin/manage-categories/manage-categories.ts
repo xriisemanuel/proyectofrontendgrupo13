@@ -64,38 +64,37 @@ export class ManageCategories implements OnInit {
   }
 
   deleteCategory(id: string, nombre: string): void {
-    this.confirmDialogService.confirm(`¿Estás seguro de que quieres eliminar la categoría "${nombre}"? Esta acción es irreversible.`)
-      .then((confirmed) => {
-        if (confirmed) {
-          this.loading = true;
-          this.categoriaService.deleteCategoria(id).pipe(
-            catchError(error => {
-              // Extraer el mensaje personalizado del backend si está disponible
-              let errorMessage = 'Error al eliminar la categoría.';
-              if (error.error && error.error.mensaje) {
-                errorMessage = error.error.mensaje;
-                // Solo mostrar la sugerencia si no es muy larga
-                if (error.error.sugerencia && error.error.sugerencia.length < 50) {
-                  errorMessage += ` ${error.error.sugerencia}`;
-                }
-              } else if (error.message) {
-                errorMessage = error.message;
+    this.confirmDialogService.confirmDelete(nombre, 'categoría').subscribe(confirmed => {
+      if (confirmed) {
+        this.loading = true;
+        this.categoriaService.deleteCategoria(id).pipe(
+          catchError(error => {
+            // Extraer el mensaje personalizado del backend si está disponible
+            let errorMessage = 'Error al eliminar la categoría.';
+            if (error.error && error.error.mensaje) {
+              errorMessage = error.error.mensaje;
+              // Solo mostrar la sugerencia si no es muy larga
+              if (error.error.sugerencia && error.error.sugerencia.length < 50) {
+                errorMessage += ` ${error.error.sugerencia}`;
               }
-              
-              this.errorMessage = errorMessage;
-              this.toastr.error(errorMessage, 'Error de Eliminación');
-              return of(null);
-            }),
-            finalize(() => this.loading = false)
-          ).subscribe(response => {
-            if (response) {
-              this.successMessage = 'Categoría eliminada exitosamente.';
-              this.toastr.success(this.successMessage, 'Eliminación Exitosa');
-              this.loadCategorias(); // Recargar la lista de categorías
+            } else if (error.message) {
+              errorMessage = error.message;
             }
-          });
-        }
-      });
+            
+            this.errorMessage = errorMessage;
+            this.toastr.error(errorMessage, 'Error de Eliminación');
+            return of(null);
+          }),
+          finalize(() => this.loading = false)
+        ).subscribe(response => {
+          if (response) {
+            this.successMessage = 'Categoría eliminada exitosamente.';
+            this.toastr.success(this.successMessage, 'Eliminación Exitosa');
+            this.loadCategorias(); // Recargar la lista de categorías
+          }
+        });
+      }
+    });
   }
 
   toggleCategoryStatus(category: ICategoria): void {

@@ -9,6 +9,7 @@ import { ToastrService } from 'ngx-toastr';
 // --- ¡IMPORTACIÓN CORRECTA Y ÚNICA DE INTERFACES! ---
 import { UsuarioService } from '../../../data/services/usuario';
 import { IRol, IUsuario } from '../../../shared/interfaces';
+import { ConfirmDialogService } from '../../../shared/confirm-dialog';
 // --- FIN DE IMPORTACIÓN ---
 
 @Component({
@@ -31,7 +32,8 @@ export class ManageRoles implements OnInit, OnDestroy {
   constructor(
     private usuarioService: UsuarioService,
     private router: Router,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private confirmDialogService: ConfirmDialogService
   ) { }
 
   ngOnInit(): void {
@@ -102,20 +104,22 @@ export class ManageRoles implements OnInit, OnDestroy {
   }
 
   deleteRole(roleId: string): void {
-    if (confirm('¿Estás seguro de que quieres eliminar este rol? Esta acción no se puede deshacer.')) {
-      this.usuarioService.deleteRol(roleId).pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          this.toastr.success(response.mensaje || 'Rol eliminado exitosamente!', 'Eliminado');
-          console.log('Rol eliminado:', response);
-          this.loadRoles();
-          this.loadAdminUsers();
-        },
-        error: (err) => {
-          console.error('Error al eliminar el rol:', err);
-          this.toastr.error(err.error?.mensaje || 'Error al eliminar el rol. Asegúrese de que no esté en uso.', 'Error');
-        }
-      });
-    }
+    this.confirmDialogService.confirmDelete('este rol', 'rol').subscribe(confirmed => {
+      if (confirmed) {
+        this.usuarioService.deleteRol(roleId).pipe(takeUntil(this.destroy$)).subscribe({
+          next: (response) => {
+            this.toastr.success(response.mensaje || 'Rol eliminado exitosamente!', 'Eliminado');
+            console.log('Rol eliminado:', response);
+            this.loadRoles();
+            this.loadAdminUsers();
+          },
+          error: (err) => {
+            console.error('Error al eliminar el rol:', err);
+            this.toastr.error(err.error?.mensaje || 'Error al eliminar el rol. Asegúrese de que no esté en uso.', 'Error');
+          }
+        });
+      }
+    });
   }
 
   editUser(userId: string): void {
@@ -124,17 +128,19 @@ export class ManageRoles implements OnInit, OnDestroy {
   }
 
   deleteUser(userId: string): void {
-    if (confirm('¿Estás seguro de que quieres eliminar este usuario?')) {
-      this.usuarioService.deleteUsuario(userId).pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          this.toastr.success(response.mensaje || 'Usuario eliminado exitosamente.', 'Eliminado');
-          this.loadAdminUsers();
-        },
-        error: (err) => {
-          console.error('Error al eliminar usuario:', err);
-          this.toastr.error(err.error?.mensaje || 'Error al eliminar usuario.', 'Error');
-        }
-      });
-    }
+    this.confirmDialogService.confirmDelete('este usuario', 'usuario').subscribe(confirmed => {
+      if (confirmed) {
+        this.usuarioService.deleteUsuario(userId).pipe(takeUntil(this.destroy$)).subscribe({
+          next: (response) => {
+            this.toastr.success(response.mensaje || 'Usuario eliminado exitosamente.', 'Eliminado');
+            this.loadAdminUsers();
+          },
+          error: (err) => {
+            console.error('Error al eliminar usuario:', err);
+            this.toastr.error(err.error?.mensaje || 'Error al eliminar usuario.', 'Error');
+          }
+        });
+      }
+    });
   }
 }

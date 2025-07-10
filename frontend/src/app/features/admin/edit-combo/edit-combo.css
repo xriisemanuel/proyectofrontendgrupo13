@@ -17,7 +17,7 @@
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
     padding: 35px;
     width: 100%;
-    max-width: 700px;
+    max-width: 800px;
     border: 1px solid rgba(139, 233, 253, 0.1);
     backdrop-filter: blur(5px);
 }
@@ -80,49 +80,393 @@ p {
     min-height: 80px;
 }
 
+/* === ESTILOS PARA BÚSQUEDA DE PRODUCTOS === */
 .products-selection-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
     padding: 15px;
     background-color: rgba(68, 71, 90, 0.4);
     border-radius: 8px;
     border: 1px solid rgba(139, 233, 253, 0.1);
-    max-height: 300px;
+    max-height: 400px;
     overflow-y: auto;
 }
 
-.product-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background-color: #44475a;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #6272a4;
-    font-size: 0.95em;
-    color: #f8f8f2;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+.cards-3 {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
 
-.product-item:hover {
-    background-color: #6272a4;
+.product-card {
+    background-color: #44475a;
+    border-radius: 8px;
+    border: 1px solid #6272a4;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.product-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(139, 233, 253, 0.2);
     border-color: #bd93f9;
 }
 
-.product-item input[type="checkbox"] {
+.product-card-content {
+    padding: 15px;
+}
+
+.product-img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.product-info {
+    margin-bottom: 10px;
+}
+
+.product-title {
+    font-weight: 600;
+    color: #f8f8f2;
+    margin-bottom: 5px;
+    font-size: 1em;
+}
+
+.product-price {
+    color: #50fa7b;
+    font-weight: 600;
+    font-size: 1.1em;
+}
+
+.product-select {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.product-select input[type="checkbox"] {
     width: 18px;
     height: 18px;
     accent-color: #50fa7b;
     cursor: pointer;
 }
 
-.product-item label {
+.product-select label {
+    margin-bottom: 0;
+    cursor: pointer;
+    font-weight: 500;
+    color: #8be9fd;
+    font-size: 0.9em;
+}
+
+/* === ESTILOS PARA PRECIOS Y DESCUENTO === */
+.precio-base,
+.precio-final {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: rgba(68, 71, 90, 0.6);
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1.1em;
+    color: #8be9fd;
+    border: 1px solid rgba(139, 233, 253, 0.3);
+}
+
+.precio-final {
+    color: #50fa7b;
+    background-color: rgba(80, 250, 123, 0.1);
+    border-color: rgba(80, 250, 123, 0.3);
+}
+
+input[type="range"] {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: #6272a4;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #bd93f9;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #bd93f9;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.slider-value {
+    text-align: center;
+    margin-top: 8px;
+    color: #c0c0c0;
+    font-size: 0.9em;
+}
+
+/* === ESTILOS PARA UNSPLASH === */
+.image-source-options {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.image-source-options button {
+    flex: 1;
+    padding: 10px 15px;
+    border: 2px solid #6272a4;
+    background-color: #44475a;
+    color: #f8f8f2;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.image-source-options button:hover {
+    border-color: #bd93f9;
+    background-color: #bd93f9;
+    color: #282a36;
+}
+
+.image-source-options button.selected {
+    border-color: #50fa7b;
+    background-color: #50fa7b;
+    color: #282a36;
+}
+
+.unsplash-search-input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.unsplash-search-input-group input {
+    flex: 1;
+}
+
+.btn-search-unsplash {
+    padding: 12px 20px;
+    background-color: #bd93f9;
+    color: #282a36;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-search-unsplash:hover:not(:disabled) {
+    background-color: #a47ae8;
+    transform: translateY(-1px);
+}
+
+.btn-search-unsplash:disabled {
+    background-color: #6272a4;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.unsplash-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.unsplash-image-item-card {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.unsplash-image-item-card:hover {
+    transform: scale(1.05);
+    border-color: #bd93f9;
+}
+
+.unsplash-image-item-card img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(80, 250, 123, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #282a36;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+/* === ESTILOS PARA MENSAJES === */
+.loading-message,
+.error-message,
+.info-message-small,
+.loading-message-small,
+.error-message-small,
+.no-results-message {
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9em;
+}
+
+.loading-message,
+.loading-message-small {
+    background-color: rgba(139, 233, 253, 0.15);
+    border: 1px solid #8be9fd;
+    color: #8be9fd;
+}
+
+.error-message,
+.error-message-small {
+    background-color: rgba(255, 85, 85, 0.15);
+    color: #ff5555;
+    border: 1px solid #ff5555;
+}
+
+.info-message-small {
+    background-color: rgba(98, 114, 164, 0.15);
+    color: #6272a4;
+    border: 1px solid #6272a4;
+}
+
+.no-results-message {
+    background-color: rgba(255, 184, 108, 0.15);
+    color: #ffb86c;
+    border: 1px solid #ffb86c;
+    text-align: center;
+    justify-content: center;
+}
+
+/* === ESTILOS PARA PREVISUALIZACIÓN === */
+.image-preview-area-final {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: rgba(68, 71, 90, 0.4);
+    border-radius: 8px;
+    border: 1px solid rgba(139, 233, 253, 0.1);
+}
+
+.final-image-preview {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 6px;
+    margin-top: 10px;
+    border: 1px solid rgba(139, 233, 253, 0.3);
+}
+
+/* === ESTILOS PARA VALIDACIÓN === */
+.validation-error {
+    color: #ff5555;
+    font-size: 0.85em;
+    margin-top: 5px;
+}
+
+/* === ESTILOS PARA EL PRECIO FINAL Y ESTADO === */
+.price-display {
+    padding: 12px;
+    background-color: rgba(68, 71, 90, 0.4);
+    border-radius: 8px;
+    border: 1px solid rgba(139, 233, 253, 0.1);
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.1em;
+}
+
+.free-price {
+    color: #50fa7b;
+    font-weight: bold;
+    font-size: 1.2em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background-color: rgba(80, 250, 123, 0.1);
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid rgba(80, 250, 123, 0.3);
+    display: inline-block;
+}
+
+.final-price {
+    color: #8be9fd;
+    font-size: 1.2em;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background-color: rgba(68, 71, 90, 0.4);
+    border-radius: 8px;
+    border: 1px solid rgba(139, 233, 253, 0.1);
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #50fa7b;
+    cursor: pointer;
+}
+
+.checkbox-group label {
     margin-bottom: 0;
     cursor: pointer;
     font-weight: 500;
     color: #f8f8f2;
     flex-grow: 1;
+}
+
+.form-help {
+    display: block;
+    margin-top: 5px;
+    color: #6272a4;
+    font-size: 0.85em;
+    font-style: italic;
+}
+
+/* Estilo para campos de solo lectura */
+.form-group input[readonly] {
+    background-color: rgba(68, 71, 90, 0.6);
+    color: #8be9fd;
+    font-weight: 500;
+    cursor: not-allowed;
+}
+
+.form-group input[readonly]:focus {
+    border-color: #6272a4;
+    box-shadow: none;
 }
 
 .required-star {
@@ -175,7 +519,6 @@ p {
 
 .submit-button {
     background-color: #bd93f9;
-    /* Púrpura para guardar cambios */
     color: #282a36;
     border: 2px solid #bd93f9;
     box-shadow: 0 4px 10px rgba(189, 147, 249, 0.3);
@@ -204,40 +547,10 @@ p {
 }
 
 .cancel-button:hover {
-    background-color: #e04c4c;
-    border-color: #e04c4c;
+    background-color: #e74c3c;
+    border-color: #e74c3c;
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(255, 85, 85, 0.5);
-}
-
-.loading-message {
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    text-align: center;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    background-color: rgba(139, 233, 253, 0.15);
-    border: 1px solid #8be9fd;
-    color: #8be9fd;
-}
-
-.error-message {
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    text-align: center;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    background-color: rgba(255, 85, 85, 0.15);
-    color: #ff5555;
-    border: 1px solid #ff5555;
 }
 
 @keyframes fadeIn {
@@ -245,27 +558,38 @@ p {
         opacity: 0;
         transform: translateY(-10px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
+/* === RESPONSIVE DESIGN === */
 @media (max-width: 768px) {
     .form-card {
-        padding: 25px;
-        margin: 20px;
+        padding: 20px;
+        margin: 10px;
     }
 
     .form-actions {
         flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
     }
 
     .submit-button,
     .cancel-button {
         width: 100%;
+        justify-content: center;
+    }
+
+    .products-selection-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .unsplash-results-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .image-source-options {
+        flex-direction: column;
     }
 }

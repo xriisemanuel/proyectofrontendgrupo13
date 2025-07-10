@@ -42,9 +42,21 @@ export class ManageProducts implements OnInit {
 
   //categorias: { _id: string; nombre: string }[] = [];
 
-
   loading = false;
   errorMessage: string | null = null;
+
+  // Propiedades computadas para evitar filter() en el template
+  get productosSinImagen(): number {
+    return this.products.filter(p => !p.imagen).length;
+  }
+
+  get totalProductos(): number {
+    return this.products.length;
+  }
+
+  get hayProductosSinImagen(): boolean {
+    return this.productosSinImagen > 0;
+  }
 
   constructor(
     private productoService: ProductoService,
@@ -59,6 +71,25 @@ ngOnInit(): void {
   this.loadCategorias(); // 👈 nuevo método para cargar categorías
 }
 
+
+  /**
+   * Verifica si una imagen se puede cargar correctamente.
+   * @param imageUrl La URL de la imagen a verificar.
+   * @returns Promise<boolean> True si la imagen se puede cargar, false en caso contrario.
+   */
+  verificarImagen(imageUrl: string): Promise<boolean> {
+    return new Promise((resolve) => {
+      if (!imageUrl) {
+        resolve(false);
+        return;
+      }
+      
+      const img = new Image();
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(false);
+      img.src = imageUrl;
+    });
+  }
 
   /**
    * Carga la lista de todos los productos.
@@ -83,11 +114,18 @@ ngOnInit(): void {
             ? producto.categoriaId.nombre
             : 'Sin categoría';
 
+        // Debug: Verificar si el producto tiene imagen
+        console.log(`Producto: ${producto.nombre}, Imagen: ${producto.imagen}`);
+
         return {
           ...producto,
           categoriaNombre
         };
       });
+
+      // Debug: Contar productos con imágenes
+      const productosConImagen = this.products.filter(p => p.imagen).length;
+      console.log(`Total productos: ${this.products.length}, Con imagen: ${productosConImagen}`);
 
       this.productosOriginales = [...this.products];
     });
@@ -119,25 +157,24 @@ loadCategorias(): void {
    * @param nombre El nombre del producto para el mensaje de confirmación.
    */
   deleteProduct(id: string, nombre: string): void {
-    this.confirmDialogService.confirm(`¿Estás seguro de que quieres eliminar el producto "${nombre}"? Esta acción es irreversible.`)
-      .then((confirmed) => {
-        if (confirmed) {
-          this.loading = true;
-          this.productoService.deleteProduct(id).pipe( // Asumo el método deleteProducto
-            catchError(error => {
-              this.errorMessage = error.message || 'Error al eliminar el producto.';
-              this.toastr.error(this.errorMessage ?? 'Error al eliminar el producto.', 'Error de Eliminación');
-              return of(null);
-            }),
-            finalize(() => this.loading = false)
-          ).subscribe(response => {
-            if (response) {
-              this.toastr.success('Producto eliminado exitosamente.', 'Eliminación Exitosa');
-              this.loadProducts(); // Recargar la lista de productos
-            }
-          });
-        }
-      });
+    this.confirmDialogService.confirmDelete(nombre, 'producto').subscribe(confirmed => {
+      if (confirmed) {
+        this.loading = true;
+        this.productoService.deleteProduct(id).pipe( // Asumo el método deleteProducto
+          catchError(error => {
+            this.errorMessage = error.message || 'Error al eliminar el producto.';
+            this.toastr.error(this.errorMessage ?? 'Error al eliminar el producto.', 'Error de Eliminación');
+            return of(null);
+          }),
+          finalize(() => this.loading = false)
+        ).subscribe(response => {
+          if (response) {
+            this.toastr.success('Producto eliminado exitosamente.', 'Eliminación Exitosa');
+            this.loadProducts(); // Recargar la lista de productos
+          }
+        });
+      }
+    });
   }
 
   /**
@@ -216,21 +253,40 @@ cancelarEliminacion(): void {
 }
 
 eliminarProductoConfirmado(): void {
-  if (!this.productoAEliminar?._id) return;
+  if (!this.productoAEliminar?._id || !this.productoAEliminar.nombre) return;
 
-  this.productoService.deleteProduct(this.productoAEliminar._id).subscribe({
-    next: () => {
-      this.toastr.success('Producto eliminado correctamente');
-      this.products = this.products.filter(p => p._id !== this.productoAEliminar!._id);
-      this.productosOriginales = this.productosOriginales.filter(p => p._id !== this.productoAEliminar!._id);
+  const productoAEliminar = this.productoAEliminar;
+  const nombreProducto = productoAEliminar.nombre;
+  const productoId = productoAEliminar._id;
+  
+  if (!nombreProducto || !productoId) return;
+  
+  this.confirmDialogService.confirmDelete(nombreProducto, 'producto').subscribe(confirmed => {
+    if (confirmed) {
+      this.productoService.deleteProduct(productoId).subscribe({
+        next: () => {
+          this.toastr.success('Producto eliminado correctamente');
+          this.products = this.products.filter(p => p._id !== productoId);
+          this.productosOriginales = this.productosOriginales.filter(p => p._id !== productoId);
+          this.productoAEliminar = null;
+          this.productoSeleccionado = null; // 👈 asegurate de cerrar también el modal de detalles
+        },
+        error: () => {
+          this.toastr.error('Error al eliminar el producto');
+        }
+      });
+    } else {
       this.productoAEliminar = null;
-      this.productoSeleccionado = null; // 👈 asegurate de cerrar también el modal de detalles
-    },
-    error: () => {
-      this.toastr.error('Error al eliminar el producto');
     }
   });
 }
+
+  onImgError(event: Event) {
+    const element = event.target as HTMLImageElement;
+    if (element) {
+      element.src = 'https://placehold.co/80x60/667eea/ffffff?text=Sin+Imagen';
+    }
+  }
 
 
 }

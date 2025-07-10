@@ -12,6 +12,7 @@ import { UsuarioService } from '../../../data/services/usuario';
 import { RolService } from '../../../data/services/role';
 import { IUsuario, IRol } from '../../../shared/interfaces';
 import { CreateUserWithRoleComponent } from '../create-user/create-user';
+import { ConfirmDialogService } from '../../../shared/confirm-dialog';
 
 @Component({
   selector: 'app-manage-supervisores-ventas',
@@ -31,7 +32,8 @@ export class ManageSupervisoresVentas implements OnInit, OnDestroy {
     private usuarioService: UsuarioService,
     private rolService: RolService,
     private router: Router,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private confirmDialogService: ConfirmDialogService
   ) { }
 
   ngOnInit(): void {
@@ -115,19 +117,21 @@ export class ManageSupervisoresVentas implements OnInit, OnDestroy {
    * @param userName El nombre del usuario supervisor de ventas para el mensaje de confirmación.
    */
   deleteSupervisorVentas(userId: string, userName: string): void {
-    if (confirm(`¿Estás seguro de que quieres eliminar al supervisor de ventas ${userName}? Esta acción es irreversible.`)) {
-      this.usuarioService.deleteUsuario(userId).pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          this.toastr.success(response.mensaje || 'Supervisor de ventas eliminado exitosamente.', '¡Eliminado!');
-          this.loadSupervisoresVentas(); // Recargar la lista después de la eliminación
-        },
-        error: (err) => {
-          console.error('Error al eliminar supervisor de ventas:', err);
-          const errorMessage = err.error?.mensaje || 'Error al eliminar supervisor de ventas. Intente de nuevo.';
-          this.toastr.error(errorMessage, 'Error de Eliminación');
-        }
-      });
-    }
+    this.confirmDialogService.confirmDelete(userName, 'supervisor de ventas').subscribe(confirmed => {
+      if (confirmed) {
+        this.usuarioService.deleteUsuario(userId).pipe(takeUntil(this.destroy$)).subscribe({
+          next: (response) => {
+            this.toastr.success(response.mensaje || 'Supervisor de ventas eliminado exitosamente.', '¡Eliminado!');
+            this.loadSupervisoresVentas(); // Recargar la lista después de la eliminación
+          },
+          error: (err) => {
+            console.error('Error al eliminar supervisor de ventas:', err);
+            const errorMessage = err.error?.mensaje || 'Error al eliminar supervisor de ventas. Intente de nuevo.';
+            this.toastr.error(errorMessage, 'Error de Eliminación');
+          }
+        });
+      }
+    });
   }
 
   /**

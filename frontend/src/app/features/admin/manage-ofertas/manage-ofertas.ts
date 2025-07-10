@@ -113,25 +113,24 @@ export class ManageOfertasComponent implements OnInit {
    * @param ofertaNombre El nombre de la oferta para el mensaje de confirmación.
    */
   deleteOferta(ofertaId: string, ofertaNombre: string): void {
-    this.confirmDialogService.confirm(`¿Estás seguro de que quieres eliminar la oferta "${ofertaNombre}"? Esta acción es irreversible.`)
-      .then((confirmed) => {
-        if (confirmed) {
-          this.loading = true;
-          this.ofertaService.deleteOferta(ofertaId).pipe(
-            catchError(error => {
-              this.errorMessage = error.message || 'Error al eliminar la oferta.';
-              this.toastr.error(this.errorMessage ?? 'Error al eliminar la oferta.', 'Error de Eliminación');
-              return of(null);
-            }),
-            finalize(() => this.loading = false)
-          ).subscribe(response => {
-            if (response) {
-              this.toastr.success('Oferta eliminada exitosamente.', 'Eliminación Exitosa');
-              this.loadOfertas(); // Recargar la lista de ofertas
-            }
-          });
-        }
-      });
+    this.confirmDialogService.confirmDelete(ofertaNombre, 'oferta').subscribe(confirmed => {
+      if (confirmed) {
+        this.loading = true;
+        this.ofertaService.deleteOferta(ofertaId).pipe(
+          catchError(error => {
+            this.errorMessage = error.message || 'Error al eliminar la oferta.';
+            this.toastr.error(this.errorMessage ?? 'Error al eliminar la oferta.', 'Error de Eliminación');
+            return of(null);
+          }),
+          finalize(() => this.loading = false)
+        ).subscribe(response => {
+          if (response) {
+            this.toastr.success('Oferta eliminada exitosamente.', 'Eliminación Exitosa');
+            this.loadOfertas(); // Recargar la lista de ofertas
+          }
+        });
+      }
+    });
   }
 
   /**

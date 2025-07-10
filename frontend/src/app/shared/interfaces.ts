@@ -122,8 +122,9 @@ export interface ICombo {
   descripcion?: string;
   productosIds: string[]; // Array de IDs de productos (se usará para enviar al backend)
   productosDetalles?: IProducto[]; // Para cuando los productosIds vienen populados del backend
-  precioCombo: number;
-  descuento?: number; // Porcentaje
+  precioCombo: number; // Precio base (suma de productos individuales)
+  descuento?: number; // Porcentaje de descuento
+  precioFinal?: number; // Precio final después de aplicar el descuento
   imagen?: string;
   activo?: boolean; // Coincide con 'estado' en el modelo de backend, aunque aquí usaremos 'activo'
   createdAt?: Date;

@@ -27,8 +27,7 @@
           <th>Imagen</th>
           <th>Nombre</th>
           <th>Descripción</th>
-          <th>Precio Combo</th>
-          <th>Descuento (%)</th>
+          <th>Descuento aplicado (%)</th>
           <th>Precio Final</th>
           <th>Estado</th>
           <th>Acciones</th>
@@ -41,9 +40,11 @@
           </td>
           <td>{{ combo.nombre }}</td>
           <td>{{ combo.descripcion || 'N/A' }}</td>
-          <td>{{ combo.precioCombo | currency:'USD':'symbol':'1.2-2' }}</td>
           <td>{{ combo.descuento || 0 }}%</td>
-          <td>{{ (combo.precioCombo || (combo.precioCombo * (1 - (combo.descuento || 0)/100))) | currency:'USD':'symbol':'1.2-2' }}</td>
+          <td>
+            <span *ngIf="combo.descuento === 100" class="free-price">GRATIS</span>
+            <span *ngIf="combo.descuento !== 100">{{ combo.precioFinal | currency:'USD':'symbol':'1.2-2' }}</span>
+          </td>       
           <td>
             <span [ngClass]="{'status-active': combo.activo, 'status-inactive': !combo.activo}">
               {{ combo.activo ? 'Activo' : 'Inactivo' }}

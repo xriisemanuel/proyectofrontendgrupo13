@@ -22,6 +22,15 @@
     <i class="fas fa-info-circle"></i> No hay productos registrados. ¡Crea uno nuevo!
   </div>
 
+  <!-- Mensaje informativo sobre imágenes -->
+  <div *ngIf="!loading && products.length > 0" class="info-message">
+    <i class="fas fa-info-circle"></i> 
+    Mostrando {{ totalProductos }} productos. 
+    <span *ngIf="hayProductosSinImagen">
+      {{ productosSinImagen }} productos sin imagen.
+    </span>
+  </div>
+
   <!---BUSCADOR-->
   <div class="filters">
     <input type="text" class="form-control" placeholder="Buscar por nombre..." [(ngModel)]="searchTerm"
@@ -57,9 +66,18 @@
       <tbody>
         <tr *ngFor="let producto of products">
           <td>
-            <!-- CORREGIDO: Usar 'imagen' en lugar de 'imagenUrl' -->
-            <img [src]="producto.imagen || 'https://placehold.co/150x100/172A45/CCD6F6?text=No+Image'"
-              alt="Imagen de Producto" class="producto-image">
+            <div class="image-container">
+              <!-- Mejorado: Manejo de imágenes con fallback más atractivo -->
+              <img *ngIf="producto.imagen" 
+                   [src]="producto.imagen" 
+                   [alt]="'Imagen de ' + producto.nombre" 
+                   class="producto-image"
+                   (error)="onImgError($event)">
+              <img *ngIf="!producto.imagen" 
+                   src="https://placehold.co/80x60/667eea/ffffff?text=Sin+Imagen" 
+                   [alt]="'Sin imagen para ' + producto.nombre" 
+                   class="producto-image">
+            </div>
           </td>
           <td>{{ producto.nombre }}</td>
           <td>{{ producto.descripcion || 'Sin descripción' }}</td>

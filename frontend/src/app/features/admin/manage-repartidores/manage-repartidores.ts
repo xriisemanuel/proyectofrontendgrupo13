@@ -11,6 +11,7 @@ import { UsuarioService } from '../../../data/services/usuario';
 import { RolService } from '../../../data/services/role';
 import { IUsuario, IRol } from '../../../shared/interfaces'; // Asegúrate de que IUsuario e IRol estén bien definidos aquí
 import { CreateUserWithRoleComponent } from '../create-user/create-user';
+import { ConfirmDialogService } from '../../../shared/confirm-dialog';
 
 @Component({
   selector: 'app-manage-repartidores',
@@ -30,7 +31,8 @@ export class ManageRepartidores implements OnInit, OnDestroy {
     private usuarioService: UsuarioService,
     private rolService: RolService,
     private router: Router,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private confirmDialogService: ConfirmDialogService
   ) { }
 
   ngOnInit(): void {
@@ -101,19 +103,21 @@ export class ManageRepartidores implements OnInit, OnDestroy {
   }
 
   deleteRepartidor(userId: string, userName: string): void {
-    if (confirm(`¿Estás seguro de que quieres eliminar al repartidor ${userName}? Esta acción es irreversible.`)) {
-      this.usuarioService.deleteUsuario(userId).pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          this.toastr.success(response.mensaje || 'Repartidor eliminado exitosamente.', '¡Eliminado!');
-          this.loadRepartidores();
-        },
-        error: (err) => {
-          console.error('Error al eliminar repartidor:', err);
-          const errorMessage = err.error?.mensaje || 'Error al eliminar repartidor. Intente de nuevo.';
-          this.toastr.error(errorMessage, 'Error de Eliminación');
-        }
-      });
-    }
+    this.confirmDialogService.confirmDelete(userName, 'repartidor').subscribe(confirmed => {
+      if (confirmed) {
+        this.usuarioService.deleteUsuario(userId).pipe(takeUntil(this.destroy$)).subscribe({
+          next: (response) => {
+            this.toastr.success(response.mensaje || 'Repartidor eliminado exitosamente.', '¡Eliminado!');
+            this.loadRepartidores();
+          },
+          error: (err) => {
+            console.error('Error al eliminar repartidor:', err);
+            const errorMessage = err.error?.mensaje || 'Error al eliminar repartidor. Intente de nuevo.';
+            this.toastr.error(errorMessage, 'Error de Eliminación');
+          }
+        });
+      }
+    });
   }
 
   getRoleName(user: IUsuario): string {

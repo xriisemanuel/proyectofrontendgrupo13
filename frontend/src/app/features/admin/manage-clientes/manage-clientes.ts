@@ -12,6 +12,7 @@ import { UsuarioService } from '../../../data/services/usuario';
 import { RolService } from '../../../data/services/role';
 import { IUsuario, IRol, IClientePerfil } from '../../../shared/interfaces';
 import { CreateUserWithRoleComponent } from '../create-user/create-user';
+import { ConfirmDialogService } from '../../../shared/confirm-dialog';
 
 @Component({
   selector: 'app-manage-clientes',
@@ -31,7 +32,8 @@ export class ManageClientes implements OnInit, OnDestroy {
     private usuarioService: UsuarioService,
     private rolService: RolService,
     private router: Router,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private confirmDialogService: ConfirmDialogService
   ) { }
 
   ngOnInit(): void {
@@ -114,19 +116,21 @@ export class ManageClientes implements OnInit, OnDestroy {
    * @param userName El nombre del usuario cliente para el mensaje de confirmación.
    */
   deleteCliente(userId: string, userName: string): void {
-    if (confirm(`¿Estás seguro de que quieres eliminar al cliente ${userName}? Esta acción es irreversible.`)) {
-      this.usuarioService.deleteUsuario(userId).pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          this.toastr.success(response.mensaje || 'Cliente eliminado exitosamente.', '¡Eliminado!');
-          this.loadClientes(); // Recargar la lista después de la eliminación
-        },
-        error: (err) => {
-          console.error('Error al eliminar cliente:', err);
-          const errorMessage = err.error?.mensaje || 'Error al eliminar cliente. Intente de nuevo.';
-          this.toastr.error(errorMessage, 'Error de Eliminación');
-        }
-      });
-    }
+    this.confirmDialogService.confirmDelete(userName, 'cliente').subscribe(confirmed => {
+      if (confirmed) {
+        this.usuarioService.deleteUsuario(userId).pipe(takeUntil(this.destroy$)).subscribe({
+          next: (response) => {
+            this.toastr.success(response.mensaje || 'Cliente eliminado exitosamente.', '¡Eliminado!');
+            this.loadClientes(); // Recargar la lista después de la eliminación
+          },
+          error: (err) => {
+            console.error('Error al eliminar cliente:', err);
+            const errorMessage = err.error?.mensaje || 'Error al eliminar cliente. Intente de nuevo.';
+            this.toastr.error(errorMessage, 'Error de Eliminación');
+          }
+        });
+      }
+    });
   }
 
   /**

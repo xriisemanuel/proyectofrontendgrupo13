@@ -77,12 +77,11 @@ export class OfertaDetailModalComponent implements OnInit {
       return;
     }
 
-    this.confirmDialogService.confirm(`¿Estás seguro de que quieres eliminar la oferta "${this.oferta.nombre}"? Esta acción es irreversible.`)
-      .then((confirmed) => {
-        if (confirmed) {
-          this.dialogRef.close('deleted'); // Notifica al componente padre para que maneje la eliminación
-        }
-      });
+    this.confirmDialogService.confirmDelete(this.oferta.nombre, 'oferta').subscribe(confirmed => {
+      if (confirmed) {
+        this.dialogRef.close('deleted'); // Notifica al componente padre para que maneje la eliminación
+      }
+    });
   }
 
   /**
