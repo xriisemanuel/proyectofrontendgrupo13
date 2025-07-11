@@ -1,22 +1,276 @@
-<!-- src/app/components/client-dashboard/client-dashboard.html -->
 <div class="client-dashboard-wrapper">
   <!-- Mensajes de Carga y Error -->
   <div *ngIf="isLoading" class="loading-message">
-    <i class="fas fa-spinner fa-spin"></i> Cargando tu información...
+      <i class="fas fa-spinner fa-spin"></i> Cargando tu información...
   </div>
 
   <div *ngIf="errorMessage && !isLoading" class="error-panel">
-    <i class="fas fa-exclamation-triangle"></i>
-    <p>{{ errorMessage }}</p>
-    <p>Por favor, asegúrate de haber iniciado sesión con una cuenta de cliente.</p>
-    <a [routerLink]="['/login']" class="btn-go-to-login">
-      <i class="fas fa-sign-in-alt"></i> Ir a Iniciar Sesión
-    </a>
+      <i class="fas fa-exclamation-triangle"></i>
+      <p>{{ errorMessage }}</p>
+      <p>Por favor, asegúrate de haber iniciado sesión con una cuenta de cliente.</p>
+      <a [routerLink]="['/login']" class="btn-go-to-login">
+          <i class="fas fa-sign-in-alt"></i> Ir a Iniciar Sesión
+      </a>
   </div>
 
   <!-- Contenido Principal del Dashboard (Solo si no hay carga ni error y hay datos) -->
   <div *ngIf="!isLoading && !errorMessage && cliente && usuario" class="dashboard-content">
 
+<<<<<<< HEAD
+      <!-- Tarjeta de Bienvenida y Perfil del Cliente -->
+      <div class="welcome-profile-card">
+          <!-- Encabezado de Bienvenida -->
+          <div class="welcome-header">
+              <div class="welcome-content">
+                  <h1 class="welcome-title">
+                      ¡Bienvenido de vuelta, <span class="highlight-name">{{ usuario.nombre }} {{ usuario.apellido }}</span>!
+                  </h1>
+                  <p class="welcome-subtitle">Tu experiencia personalizada comienza aquí</p>
+              </div>
+              <div class="welcome-actions">
+                  <button class="btn-edit-profile" (click)="goToEditProfile()">
+                      <i class="fas fa-user-edit"></i> Editar Perfil
+                  </button>
+              </div>
+          </div>
+
+          <!-- Información Detallada del Cliente -->
+          <div class="client-info-section">
+              <h2 class="section-title">Tu Información Personal</h2>
+              <div class="info-grid">
+                  <div class="info-card">
+                      <div class="info-icon">
+                          <i class="fas fa-user"></i>
+                      </div>
+                      <div class="info-content">
+                          <h3>Datos de Usuario</h3>
+                          <div class="info-details">
+                              <p><strong>Usuario:</strong> {{ usuario.username }}</p>
+                              <p><strong>Email:</strong> {{ usuario.email }}</p>
+                              <p><strong>Teléfono:</strong> {{ usuario.telefono || 'No especificado' }}</p>
+                              <p><strong>Fecha de Nacimiento:</strong> {{ cliente.fechaNacimiento ? (cliente.fechaNacimiento | date:'dd/MM/yyyy') : 'No especificada' }}</p>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="info-card">
+                      <div class="info-icon">
+                          <i class="fas fa-home"></i>
+                      </div>
+                      <div class="info-content">
+                          <h3>Dirección de Entrega</h3>
+                          <div class="info-details">
+                              <p>{{ cliente.direccion || 'No especificada' }}</p>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="info-card">
+                      <div class="info-icon">
+                          <i class="fas fa-utensils"></i>
+                      </div>
+                      <div class="info-content">
+                          <h3>Preferencias Alimentarias</h3>
+                          <div class="info-details">
+                              <p>{{ cliente.preferenciasAlimentarias?.length ? cliente.preferenciasAlimentarias?.join(', ') : 'Ninguna especificada' }}</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <br>
+          <br>
+          <br>
+
+          <!-- Sección de Pedidos Recientes -->
+          <section class="dashboard-section">
+              <div class="section-header">
+                  <h2 class="section-title">
+                      <i class="fas fa-clock"></i> Pedidos Recientes
+                  </h2>
+                  <button class="btn-ver-todos" (click)="toggleShowAllPedidos()">
+                      <i class="fas fa-list"></i> {{ showAllPedidos ? 'Ver Menos' : 'Ver Todos' }}
+                  </button>
+              </div>
+
+              <div *ngIf="isLoadingPedidos" class="loading-indicator">
+                  <i class="fas fa-spinner fa-spin"></i> Cargando pedidos...
+              </div>
+
+              <div *ngIf="!isLoadingPedidos && pedidosRecientes.length === 0" class="no-data-message">
+                  <p><i class="fas fa-box-open"></i> No tienes pedidos recientes.</p>
+                  <p>¡Haz tu primer pedido y disfruta de nuestros productos!</p>
+              </div>
+
+              <div *ngIf="!isLoadingPedidos && pedidosRecientes.length > 0" class="pedidos-grid">
+                  <div *ngFor="let pedido of (showAllPedidos ? pedidosHistorial : pedidosRecientes)" class="pedido-card">
+                      <div class="pedido-header">
+                          <h4>Pedido #{{ pedido._id | slice:0:8 }}</h4>
+                          <span class="pedido-estado" [ngClass]="getPedidoStatusClass(pedido.estado)">
+                              {{ pedido.estado | titlecase }}
+                          </span>
+                      </div>
+                      <div class="pedido-info">
+                          <p><strong>Fecha:</strong> {{ pedido.fechaPedido | date:'shortDate' }}</p>
+                          <p><strong>Total:</strong> {{ pedido.total | currency:'USD':'symbol':'1.2-2' }}</p>
+                          <p><strong>Productos:</strong> {{ pedido.detalleProductos?.length || 0 }} items</p>
+                      </div>
+                      <div class="pedido-actions">
+                          <button *ngIf="pedido.estado === 'entregado'" class="btn-calificar" (click)="goToCalificaciones()">
+                              <i class="fas fa-star"></i> Calificar
+                          </button>
+                          <button class="btn-ver-detalles" (click)="openPedidoModal(pedido)">
+                              <i class="fas fa-eye"></i> Ver Detalles
+                          </button>
+                      </div>
+                  </div>
+              </div>
+          </section>
+          <br>
+          <br>
+
+          <!-- Sección de Calificaciones -->
+          <section class="dashboard-section">
+              <div class="section-header">
+                  <h2 class="section-title">
+                      <i class="fas fa-star"></i> Mis Calificaciones
+                  </h2>
+                  <button class="btn-ver-todos" (click)="goToCalificaciones()">
+                      <i class="fas fa-plus"></i> Nueva Calificación
+                  </button>
+              </div>
+
+              <div *ngIf="isLoadingCalificaciones" class="loading-indicator">
+                  <i class="fas fa-spinner fa-spin"></i> Cargando calificaciones...
+              </div>
+
+              <div *ngIf="!isLoadingCalificaciones && calificaciones.length === 0" class="no-data-message">
+                  <p><i class="fas fa-comment-dots"></i> Aún no has enviado ninguna calificación.</p>
+                  <p>¡Califica tus pedidos y comparte tu experiencia!</p>
+              </div>
+
+              <div *ngIf="!isLoadingCalificaciones && calificaciones.length > 0" class="calificaciones-summary">
+                  <div class="rating-overview">
+                      <div class="average-rating">
+                          <h3>Promedio General</h3>
+                          <div class="rating-display">
+                              <span class="rating-number">{{ getAverageRating() }}</span>
+                              <div class="stars">
+                                  <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star"
+                                     [class.active]="star <= getAverageRating()"></i>
+                              </div>
+                          </div>
+                          <p>{{ calificaciones.length }} calificaciones enviadas</p>
+                      </div>
+                  </div>
+
+                  <div class="recent-calificaciones">
+                      <h4>Calificaciones Recientes</h4>
+                      <div class="calificaciones-grid">
+                          <div *ngFor="let calificacion of calificaciones.slice(0, 3)" class="calificacion-card">
+                              <div class="calificacion-header">
+                                  <span class="pedido-id">Pedido #{{ getPedidoId(calificacion.pedidoId) | slice:0:8 }}</span>
+                                  <span class="calificacion-fecha">{{ calificacion.fechaCalificacion | date:'shortDate' }}</span>
+                              </div>
+                              <div class="calificacion-ratings">
+                                  <div class="rating-item">
+                                      <span>Comida:</span>
+                                      <div class="stars">
+                                          <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star"
+                                             [class.active]="star <= (calificacion.puntuacionComida || 0)"></i>
+                                      </div>
+                                  </div>
+                                  <div class="rating-item">
+                                      <span>Servicio:</span>
+                                      <div class="stars">
+                                          <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star"
+                                             [class.active]="star <= (calificacion.puntuacionServicio || 0)"></i>
+                                      </div>
+                                  </div>
+                                  <div class="rating-item">
+                                      <span>Entrega:</span>
+                                      <div class="stars">
+                                          <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star"
+                                             [class.active]="star <= (calificacion.puntuacionEntrega || 0)"></i>
+                                      </div>
+                                  </div>
+                              </div>
+                              <p *ngIf="calificacion.comentario" class="calificacion-comentario">
+                                  "{{ calificacion.comentario }}"
+                              </p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </section>
+          <br>
+          <br>
+
+          <!-- Sección de Historial de Pedidos -->
+          <section class="dashboard-section">
+              <div class="section-header">
+                  <h2 class="section-title">
+                      <i class="fas fa-history"></i> Historial de Pedidos
+                  </h2>
+                  <div class="historial-stats">
+                      <span class="stat-item">
+                          <i class="fas fa-check-circle"></i> Completados: {{ getPedidosCountByStatus('entregado') }}
+                      </span>
+                      <span class="stat-item">
+                          <i class="fas fa-clock"></i> En Proceso: {{ getPedidosCountByStatus('en_proceso') }}
+                      </span>
+                      <span class="stat-item">
+                          <i class="fas fa-hourglass-half"></i> Pendientes: {{ getPedidosCountByStatus('pendiente') }}
+                      </span>
+                  </div>
+              </div>
+
+              <div *ngIf="isLoadingPedidos" class="loading-indicator">
+                  <i class="fas fa-spinner fa-spin"></i> Cargando historial...
+              </div>
+
+              <div *ngIf="!isLoadingPedidos && pedidosHistorial.length === 0" class="no-data-message">
+                  <p><i class="fas fa-history"></i> No tienes historial de pedidos.</p>
+                  <p>¡Comienza a hacer pedidos para ver tu historial aquí!</p>
+              </div>
+
+              <div *ngIf="!isLoadingPedidos && pedidosHistorial.length > 0" class="historial-table">
+                  <div class="table-header">
+                      <div class="header-cell">Pedido</div>
+                      <div class="header-cell">Fecha</div>
+                      <div class="header-cell">Total</div>
+                      <div class="header-cell">Estado</div>
+                      <div class="header-cell">Acciones</div>
+                  </div>
+
+                  <div *ngFor="let pedido of pedidosHistorial.slice(0, 10)" class="table-row">
+                      <div class="table-cell" data-label="Pedido">#{{ pedido._id | slice:0:8 }}</div>
+                      <div class="table-cell" data-label="Fecha">{{ pedido.fechaPedido | date:'shortDate' }}</div>
+                      <div class="table-cell" data-label="Total">{{ pedido.total | currency:'USD':'symbol':'1.2-2' }}</div>
+                      <div class="table-cell" data-label="Estado">
+                          <span class="pedido-estado" [ngClass]="getPedidoStatusClass(pedido.estado)">
+                              {{ pedido.estado | titlecase }}
+                          </span>
+                      </div>
+                      <div class="table-cell" data-label="Acciones">
+                          <button *ngIf="pedido.estado === 'entregado'" class="btn-action" (click)="goToCalificaciones()" title="Calificar">
+                              <i class="fas fa-star"></i>
+                          </button>
+                          <button class="btn-action" (click)="goToMisPedidos()" title="Ver Detalles">
+                              <i class="fas fa-eye"></i>
+                          </button>
+                      </div>
+                  </div>
+              </div>
+
+              <div *ngIf="pedidosHistorial.length > 10" class="ver-mas-container">
+                  <button class="btn-ver-mas" (click)="goToMisPedidos()">
+                      <i class="fas fa-list"></i> Ver Todos los Pedidos
+                  </button>
+              </div>
+          </section>
+      </div>
+=======
     <!-- Tarjeta de Bienvenida y Perfil del Cliente -->
     <div class="welcome-profile-card">
       <!-- Encabezado de Bienvenida -->
@@ -275,95 +529,96 @@
         </div>
       </section>
     </div>
+>>>>>>> 31c3c15613bd56188e27c8a8faecbda6670c1ff8
   </div>
 </div>
 
 <!-- Modal de Detalles del Pedido -->
 <div *ngIf="showPedidoModal" class="modal-overlay" (click)="closePedidoModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>Detalles del Pedido #{{ selectedPedido?._id | slice:0:8 }}</h3>
-      <button class="modal-close" (click)="closePedidoModal()">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    
-    <div class="modal-body" *ngIf="selectedPedido">
-      <div class="pedido-details-section">
-        <h4>Información General</h4>
-        <div class="details-grid">
-          <div class="detail-item">
-            <span class="detail-label">Estado:</span>
-            <span class="pedido-estado" [ngClass]="getPedidoStatusClass(selectedPedido.estado)">
-              {{ selectedPedido.estado | titlecase }}
-            </span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Fecha:</span>
-            <span>{{ selectedPedido.fechaPedido | date:'fullDate' }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Método de Pago:</span>
-            <span>{{ selectedPedido.metodoPago | titlecase }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Dirección:</span>
-            <span>{{ selectedPedido.direccionEntrega }}</span>
-          </div>
-        </div>
+      <div class="modal-header">
+          <h3>Detalles del Pedido #{{ selectedPedido?._id | slice:0:8 }}</h3>
+          <button class="modal-close" (click)="closePedidoModal()">
+              <i class="fas fa-times"></i>
+          </button>
       </div>
-      
-      <div class="pedido-details-section">
-        <h4>Productos</h4>
-        <div class="productos-list">
-          <div *ngFor="let item of selectedPedido.detalleProductos" class="producto-item">
-            <div class="producto-info">
-              <span class="producto-nombre">{{ item.nombreProducto }}</span>
-              <span class="producto-cantidad">{{ item.cantidad }}x</span>
-            </div>
-            <div class="producto-precio">
-              <span class="precio-unitario">{{ item.precioUnitario | currency:'USD':'symbol':'1.2-2' }} c/u</span>
-              <span class="precio-total">{{ (item.precioUnitario * item.cantidad) | currency:'USD':'symbol':'1.2-2' }}</span>
-            </div>
+
+      <div class="modal-body" *ngIf="selectedPedido">
+          <div class="pedido-details-section">
+              <h4>Información General</h4>
+              <div class="details-grid">
+                  <div class="detail-item">
+                      <span class="detail-label">Estado:</span>
+                      <span class="pedido-estado" [ngClass]="getPedidoStatusClass(selectedPedido.estado)">
+                          {{ selectedPedido.estado | titlecase }}
+                      </span>
+                  </div>
+                  <div class="detail-item">
+                      <span class="detail-label">Fecha:</span>
+                      <span>{{ selectedPedido.fechaPedido | date:'fullDate' }}</span>
+                  </div>
+                  <div class="detail-item">
+                      <span class="detail-label">Método de Pago:</span>
+                      <span>{{ selectedPedido.metodoPago | titlecase }}</span>
+                  </div>
+                  <div class="detail-item">
+                      <span class="detail-label">Dirección:</span>
+                      <span>{{ selectedPedido.direccionEntrega }}</span>
+                  </div>
+              </div>
           </div>
-        </div>
+
+          <div class="pedido-details-section">
+              <h4>Productos</h4>
+              <div class="productos-list">
+                  <div *ngFor="let item of selectedPedido.detalleProductos" class="producto-item">
+                      <div class="producto-info">
+                          <span class="producto-nombre">{{ item.nombreProducto }}</span>
+                          <span class="producto-cantidad">{{ item.cantidad }}x</span>
+                      </div>
+                      <div class="producto-precio">
+                          <span class="precio-unitario">{{ item.precioUnitario | currency:'USD':'symbol':'1.2-2' }} c/u</span>
+                          <span class="precio-total">{{ (item.precioUnitario * item.cantidad) | currency:'USD':'symbol':'1.2-2' }}</span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <div class="pedido-details-section">
+              <h4>Resumen de Costos</h4>
+              <div class="costos-summary">
+                  <div class="costo-item">
+                      <span>Subtotal:</span>
+                      <span>{{ selectedPedido.subtotal | currency:'USD':'symbol':'1.2-2' }}</span>
+                  </div>
+                  <div class="costo-item" *ngIf="selectedPedido.descuentos">
+                      <span>Descuentos:</span>
+                      <span>-{{ selectedPedido.descuentos | currency:'USD':'symbol':'1.2-2' }}</span>
+                  </div>
+                  <div class="costo-item" *ngIf="selectedPedido.costoEnvio">
+                      <span>Envío:</span>
+                      <span>{{ selectedPedido.costoEnvio | currency:'USD':'symbol':'1.2-2' }}</span>
+                  </div>
+                  <div class="costo-item total">
+                      <span><strong>Total:</strong></span>
+                      <span><strong>{{ selectedPedido.total | currency:'USD':'symbol':'1.2-2' }}</strong></span>
+                  </div>
+              </div>
+          </div>
+
+          <div class="pedido-details-section" *ngIf="selectedPedido.observaciones">
+              <h4>Observaciones</h4>
+              <p class="observaciones">{{ selectedPedido.observaciones }}</p>
+          </div>
       </div>
-      
-      <div class="pedido-details-section">
-        <h4>Resumen de Costos</h4>
-        <div class="costos-summary">
-          <div class="costo-item">
-            <span>Subtotal:</span>
-            <span>{{ selectedPedido.subtotal | currency:'USD':'symbol':'1.2-2' }}</span>
-          </div>
-          <div class="costo-item" *ngIf="selectedPedido.descuentos">
-            <span>Descuentos:</span>
-            <span>-{{ selectedPedido.descuentos | currency:'USD':'symbol':'1.2-2' }}</span>
-          </div>
-          <div class="costo-item" *ngIf="selectedPedido.costoEnvio">
-            <span>Envío:</span>
-            <span>{{ selectedPedido.costoEnvio | currency:'USD':'symbol':'1.2-2' }}</span>
-          </div>
-          <div class="costo-item total">
-            <span><strong>Total:</strong></span>
-            <span><strong>{{ selectedPedido.total | currency:'USD':'symbol':'1.2-2' }}</strong></span>
-          </div>
-        </div>
+
+      <div class="modal-footer">
+          <button *ngIf="selectedPedido?.estado === 'entregado'" class="btn-calificar" (click)="goToCalificaciones()">
+              <i class="fas fa-star"></i> Calificar Pedido
+          </button>
+          <button class="btn-salir" (click)="closePedidoModal()">
+              <i class="fas fa-times"></i> Salir
+          </button>
       </div>
-      
-      <div class="pedido-details-section" *ngIf="selectedPedido.observaciones">
-        <h4>Observaciones</h4>
-        <p class="observaciones">{{ selectedPedido.observaciones }}</p>
-      </div>
-    </div>
-    
-    <div class="modal-footer">
-      <button *ngIf="selectedPedido?.estado === 'entregado'" class="btn-calificar" (click)="goToCalificaciones()">
-        <i class="fas fa-star"></i> Calificar Pedido
-      </button>
-      <button class="btn-salir" (click)="closePedidoModal()">
-        <i class="fas fa-times"></i> Salir
-      </button>
-    </div>
   </div>
 </div>
