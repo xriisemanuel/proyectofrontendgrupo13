@@ -38,7 +38,7 @@ export class ClientDashboard implements OnInit, OnDestroy {
   errorMessage: string = ''; // Mensaje de error si algo falla
 
   // Propiedades para almacenar productos y categorías
-  products: IProducto[] = []; // Para almacenar productos destacados
+  products: IProducto[] = []; // Para almacenar productos dhkjhkjhkestacados
   categories: ICategoria[] = []; // Para almacenar categorías
 
   // Propiedades para pedidos y calificaciones
