@@ -17,6 +17,18 @@ export const routes: Routes = [
     path: 'home',
     loadComponent: () => import('./features/cliente/pages/home/home').then(m => m.Home)
   },
+  
+  // Ruta específica para combos
+  {
+    path: 'combos',
+    loadComponent: () => import('./features/cliente/pages/combos/combos').then(m => m.CombosComponent)
+  },
+
+  // Ruta específica para ofertas
+  {
+    path: 'ofertas',
+    loadComponent: () => import('./features/cliente/pages/ofertas/ofertas').then(m => m.OfertasComponent)
+  },
 
   // Rutas públicas de autenticación (login y register)
   // Ya no usan authRedirectGuard. Serán accesibles directamente.
@@ -209,14 +221,14 @@ export const routes: Routes = [
     path: 'delivery/dashboard',
     loadComponent: () => import('./features/delivery-dashboard/delivery-dashboard').then(m => m.DeliveryDashboard),
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['repartidor'] } // Solo los repartidores pueden acceder a este dashboard
+    data: { roles: ['repartidor','admin'] } // Solo los repartidores pueden acceder a este dashboard
   },
   // --- ¡NUEVA RUTA PARA DASHBOARD DE COCINA! ---
   {
     path: 'kitchen/dashboard',
     loadComponent: () => import('./features/kitchen-dashboard/kitchen-dashboard').then(m => m.KitchenDashboard),
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['supervisor_cocina'] } // Solo el supervisor de cocina puede acceder
+    data: { roles: ['supervisor_cocina', 'admin'] } // Solo el supervisor de cocina puede acceder
   },
   {
     path: 'cliente/dashboard',
@@ -248,6 +260,27 @@ export const routes: Routes = [
     loadComponent: () => import('./features/cliente/client-profile-edit/client-profile-edit').then(m => m.ClientProfileEditComponent), // Asegúrate de que el componente esté correctamente importado
     canActivate: [authGuard, roleGuard],
     data: { roles: ['cliente', 'admin'] } // Permite que un admin también pueda editar perfiles de cliente si es necesario
+  },
+  // --- NUEVA RUTA: CARRO DE COMPRAS ---
+  {
+    path: 'cart',
+    loadComponent: () => import('./features/cliente/pages/cart/cart').then(m => m.CartComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['cliente'] } // Solo los clientes pueden acceder al carrito
+  },
+  // --- NUEVA RUTA: PERFIL DEL CLIENTE ---
+  {
+    path: 'client/profile',
+    loadComponent: () => import('./features/cliente/client-profile-edit/client-profile-edit').then(m => m.ClientProfileEditComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['cliente'] } // Solo los clientes pueden acceder a su perfil
+  },
+  // --- ¡NUEVA RUTA PARA EDITAR PERFIL DE REPARTIDOR! ---
+  {
+    path: 'delivery/profile/edit',
+    loadComponent: () => import('./features/delivery-profile-edit/delivery-profile-edit').then(m => m.DeliveryProfileEditComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['repartidor'] } // Solo los repartidores pueden editar su perfil
   },
   { path: '**', redirectTo: 'home' }
 ];

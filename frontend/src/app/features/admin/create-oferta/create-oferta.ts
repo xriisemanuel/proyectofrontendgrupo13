@@ -2,7 +2,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray, FormControl } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray, FormControl, FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { OfertaService } from '../../../data/services/oferta';
 import { ProductoService } from '../../../data/services/producto';
@@ -18,6 +18,7 @@ import { ToastrService } from 'ngx-toastr';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     RouterLink
   ],
   templateUrl: './create-oferta.html',
@@ -31,6 +32,8 @@ export class CreateOfertaComponent implements OnInit {
   loadingProducts = false;
   loadingCategories = false;
   errorMessage: string | null = null;
+  selectedTipoOferta: 'producto' | 'categoria' = 'producto';
+  searchTerm: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -43,39 +46,66 @@ export class CreateOfertaComponent implements OnInit {
     this.ofertaForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
       descripcion: ['', Validators.maxLength(500)],
-      imagen: ['', [Validators.required, Validators.pattern('https?://.+')]],
-      descuento: [null, [Validators.required, Validators.min(0), Validators.max(100)]],
-      fechaInicio: [this.formatDate(new Date()), Validators.required], // Formato YYYY-MM-DD
+      porcentajeDescuento: [null, [Validators.required, Validators.min(1), Validators.max(99)]],
+      fechaInicio: [this.formatDate(new Date()), Validators.required],
       fechaFin: ['', Validators.required],
+      tipoOferta: ['producto', [Validators.required]],
       productosAplicables: this.fb.array([]),
       categoriasAplicables: this.fb.array([])
     });
 
-    // Validar que al menos un producto o categoría sea seleccionado
     this.ofertaForm.setValidators(this.atLeastOneApplicableValidator());
   }
 
   ngOnInit(): void {
     this.loadProductos();
     this.loadCategorias();
+    this.setupFormListeners();
   }
 
-  // Validador personalizado para asegurar que al menos un producto o categoría esté seleccionado
+  setupFormListeners(): void {
+    // Escuchar cambios en tipoOferta
+    this.ofertaForm.get('tipoOferta')?.valueChanges.subscribe(tipo => {
+      this.selectedTipoOferta = tipo;
+      this.clearApplicableArrays();
+      this.updateValidation();
+    });
+  }
+
+  clearApplicableArrays(): void {
+    this.productosAplicablesArray.clear();
+    this.categoriasAplicablesArray.clear();
+    this.ofertaForm.updateValueAndValidity();
+  }
+
+  updateValidation(): void {
+    if (this.selectedTipoOferta === 'producto') {
+      this.ofertaForm.get('productosAplicables')?.setValidators([Validators.required, Validators.minLength(1)]);
+      this.ofertaForm.get('categoriasAplicables')?.clearValidators();
+    } else {
+      this.ofertaForm.get('categoriasAplicables')?.setValidators([Validators.required, Validators.minLength(1)]);
+      this.ofertaForm.get('productosAplicables')?.clearValidators();
+    }
+    this.ofertaForm.get('productosAplicables')?.updateValueAndValidity();
+    this.ofertaForm.get('categoriasAplicables')?.updateValueAndValidity();
+  }
+
   atLeastOneApplicableValidator(): import('@angular/forms').ValidatorFn {
     return (control: import('@angular/forms').AbstractControl): { [key: string]: boolean } | null => {
+      const tipoOferta = control.get('tipoOferta')?.value;
       const productos = control.get('productosAplicables') as FormArray;
       const categorias = control.get('categoriasAplicables') as FormArray;
 
-      if (productos && categorias && productos.length === 0 && categorias.length === 0) {
-        return { atLeastOneApplicable: true };
+      if (tipoOferta === 'producto' && productos && productos.length === 0) {
+        return { productosRequired: true };
+      }
+      if (tipoOferta === 'categoria' && categorias && categorias.length === 0) {
+        return { categoriasRequired: true };
       }
       return null;
     };
   }
 
-  /**
-   * Formatea una fecha a 'YYYY-MM-DD' para el input type="date".
-   */
   private formatDate(date: Date): string {
     const d = new Date(date);
     let month = '' + (d.getMonth() + 1);
@@ -134,7 +164,8 @@ export class CreateOfertaComponent implements OnInit {
         this.productosAplicablesArray.removeAt(index);
       }
     }
-    this.ofertaForm.updateValueAndValidity(); // Revalida el formulario para el validador de al menos uno
+    this.ofertaForm.updateValueAndValidity();
+    this.productosAplicablesArray.markAsTouched();
   }
 
   onCategoriaChange(event: Event, categoriaId: string): void {
@@ -147,14 +178,22 @@ export class CreateOfertaComponent implements OnInit {
         this.categoriasAplicablesArray.removeAt(index);
       }
     }
-    this.ofertaForm.updateValueAndValidity(); // Revalida el formulario para el validador de al menos uno
+    this.ofertaForm.updateValueAndValidity();
+    this.categoriasAplicablesArray.markAsTouched();
+  }
+
+  isProductoSelected(productoId: string): boolean {
+    return this.productosAplicablesArray.controls.some(control => control.value === productoId);
+  }
+
+  isCategoriaSelected(categoriaId: string): boolean {
+    return this.categoriasAplicablesArray.controls.some(control => control.value === categoriaId);
   }
 
   onSubmit(): void {
     this.errorMessage = null;
     this.ofertaForm.markAllAsTouched();
 
-    // Revalidar fechas antes de enviar
     const fechaInicio = new Date(this.ofertaForm.get('fechaInicio')?.value);
     const fechaFin = new Date(this.ofertaForm.get('fechaFin')?.value);
 
@@ -163,35 +202,37 @@ export class CreateOfertaComponent implements OnInit {
       this.ofertaForm.get('fechaFin')?.setErrors({ 'fechaInvalida': true });
       return;
     } else {
-      this.ofertaForm.get('fechaFin')?.setErrors(null); // Limpiar error si ya es válido
+      this.ofertaForm.get('fechaFin')?.setErrors(null);
     }
 
     if (this.ofertaForm.invalid) {
       this.toastr.error('Por favor, completa todos los campos obligatorios y corrige los errores.', 'Error de Validación');
       console.log('Errores del formulario:', this.ofertaForm.errors);
-      console.log('Estado de controles:', this.ofertaForm.controls);
       return;
     }
 
     this.loading = true;
-    const nuevaOferta = {
+    const ofertaData = {
       ...this.ofertaForm.value,
-      fechaInicio: new Date(this.ofertaForm.value.fechaInicio), // Convertir a Date object
-      fechaFin: new Date(this.ofertaForm.value.fechaFin), // Convertir a Date object
-      // 'estado' no se envía, ya que el backend lo maneja por defecto como true al crear
+      fechaInicio: new Date(this.ofertaForm.value.fechaInicio),
+      fechaFin: new Date(this.ofertaForm.value.fechaFin),
     };
 
-    this.ofertaService.createOferta(nuevaOferta).pipe(
+    this.ofertaService.createOferta(ofertaData).pipe(
       catchError(error => {
         this.errorMessage = error.message || 'Error al crear la oferta.';
-        this.toastr.error(this.errorMessage ?? 'Error al crear la oferta.', 'Error de Creación');
+        this.toastr.error(this.errorMessage || 'Error al crear la oferta.', 'Error de Creación');
+        console.error('Error al crear la oferta:', error);
         return of(null);
       }),
-      finalize(() => this.loading = false)
+      finalize(() => {
+        this.loading = false;
+        console.log('Creación de oferta finalizada. loading:', this.loading);
+      })
     ).subscribe(response => {
       if (response) {
         this.toastr.success('Oferta creada exitosamente.', 'Creación Exitosa');
-        this.router.navigate(['/admin/ofertas']); // Redirige a la gestión de ofertas
+        this.router.navigate(['/admin/ofertas']);
       }
     });
   }
@@ -214,21 +255,36 @@ export class CreateOfertaComponent implements OnInit {
       if (control.errors?.['max']) {
         return `El valor máximo es ${control.errors['max'].max}.`;
       }
-      if (control.errors?.['pattern']) {
-        if (field === 'imagen') {
-          return 'Debe ser una URL válida que comience con http:// o https://';
-        }
-        return 'Formato inválido.';
-      }
       if (control.errors?.['fechaInvalida']) {
         return 'La fecha de fin no puede ser anterior a la fecha de inicio.';
       }
     }
-    // Para el validador a nivel de formulario
-    if (field === 'productosYCategorias' && this.ofertaForm.errors?.['atLeastOneApplicable'] &&
-        (this.productosAplicablesArray.touched || this.categoriasAplicablesArray.touched)) {
-        return 'Debe seleccionar al menos un producto o una categoría para la oferta.';
+    
+    // Validaciones específicas para arrays
+    if (field === 'productosAplicables' && this.ofertaForm.errors?.['productosRequired'] && this.productosAplicablesArray.touched) {
+      return 'Debe seleccionar al menos un producto para la oferta.';
     }
+    if (field === 'categoriasAplicables' && this.ofertaForm.errors?.['categoriasRequired'] && this.categoriasAplicablesArray.touched) {
+      return 'Debe seleccionar al menos una categoría para la oferta.';
+    }
+    
     return null;
+  }
+
+  isFieldInvalid(field: string): boolean {
+    const control = this.ofertaForm.get(field);
+    return !!(control && control.invalid && (control.touched || control.dirty));
+  }
+
+  // Filtrar productos por búsqueda
+  get productosFiltrados(): IProducto[] {
+    if (!this.searchTerm.trim()) {
+      return this.productosDisponibles;
+    }
+    const searchLower = this.searchTerm.toLowerCase();
+    return this.productosDisponibles.filter(producto =>
+      producto.nombre.toLowerCase().includes(searchLower) ||
+      producto.descripcion?.toLowerCase().includes(searchLower)
+    );
   }
 }

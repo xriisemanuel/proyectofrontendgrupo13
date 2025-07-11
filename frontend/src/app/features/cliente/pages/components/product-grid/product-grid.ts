@@ -13,6 +13,7 @@ import { ProductCard } from '../product-card/product-card';
 export class ProductGrid {
   @Input() products: any[] = [];
   @Input() loading: boolean = false;
+  @Input() emptyMessage: string = 'No se encontraron productos';
   @Output() productSelected = new EventEmitter<any>();
   @Output() addToCart = new EventEmitter<any>();
   @Output() buyNow = new EventEmitter<any>();

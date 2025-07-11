@@ -2,38 +2,16 @@
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// Importa ValidatorFn, AbstractControl, ValidationErrors para tipar el validador externo
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray, FormControl, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray, FormControl, FormsModule } from '@angular/forms';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { OfertaService } from '../../../data/services/oferta';
 import { ProductoService } from '../../../data/services/producto';
 import { CategoriaService } from '../../../data/services/categoria';
 import { IProducto, ICategoria } from '../../../shared/interfaces';
-import { IOferta } from '../../../shared/oferta.interface';
-import { catchError, finalize, tap } from 'rxjs/operators';
+import { IOfertaPopulated } from '../../../shared/oferta.interface';
+import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
-
-// Validador personalizado para asegurar que al menos un producto o categoría esté seleccionado
-// ¡Esta es la "otra manera"! Es una función independiente, no un método de clase.
-// Por lo tanto, no necesita 'bind(this)' porque no depende del contexto de 'this' del componente.
-const atLeastOneApplicableValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
-  const form = control as FormGroup;
-  const productos = form.get('productosAplicables') as FormArray;
-  const categorias = form.get('categoriasAplicables') as FormArray;
-
-  // Si los FormArray aún no están inicializados (ej. al inicio de la carga),
-  // no se puede validar, así que se devuelve null.
-  if (!productos || !categorias) {
-    return null;
-  }
-
-  if (productos.length === 0 && categorias.length === 0) {
-    return { atLeastOneApplicable: true };
-  }
-  return null;
-};
-
 
 @Component({
   selector: 'app-edit-oferta',
@@ -41,6 +19,7 @@ const atLeastOneApplicableValidator: ValidatorFn = (control: AbstractControl): V
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     RouterLink
   ],
   templateUrl: './edit-oferta.html',
@@ -48,173 +27,98 @@ const atLeastOneApplicableValidator: ValidatorFn = (control: AbstractControl): V
 })
 export class EditOfertaComponent implements OnInit {
   ofertaForm: FormGroup;
+  ofertaId: string = '';
+  ofertaOriginal: IOfertaPopulated | null = null;
   productosDisponibles: IProducto[] = [];
   categoriasDisponibles: ICategoria[] = [];
-  ofertaId: string | null = null;
   loading = false;
+  loadingOferta = false;
   loadingProducts = false;
   loadingCategories = false;
-  loadingOferta = true;
   errorMessage: string | null = null;
+  selectedTipoOferta: 'producto' | 'categoria' = 'producto';
+  searchTerm: string = '';
 
   constructor(
     private fb: FormBuilder,
     private ofertaService: OfertaService,
     private productoService: ProductoService,
     private categoriaService: CategoriaService,
-    private route: ActivatedRoute,
     private router: Router,
+    private route: ActivatedRoute,
     private toastr: ToastrService
   ) {
-    console.log('Constructor de EditOfertaComponent iniciado.');
     this.ofertaForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
       descripcion: ['', Validators.maxLength(500)],
-      descuento: [null, [Validators.required, Validators.min(0), Validators.max(100)]],
+      porcentajeDescuento: [null, [Validators.required, Validators.min(1), Validators.max(99)]],
       fechaInicio: ['', Validators.required],
       fechaFin: ['', Validators.required],
+      tipoOferta: ['producto', [Validators.required]],
       productosAplicables: this.fb.array([]),
       categoriasAplicables: this.fb.array([])
     });
 
-    // APLICANDO EL VALIDADOR DIRECTAMENTE COMO UNA FUNCIÓN INDEPENDIENTE
-    // Ya no se necesita 'bind(this)'
-    this.ofertaForm.setValidators(atLeastOneApplicableValidator);
-    console.log('Formulario de oferta inicializado.');
+    this.ofertaForm.setValidators(this.atLeastOneApplicableValidator());
   }
 
   ngOnInit(): void {
-    console.log('ngOnInit de EditOfertaComponent iniciado.');
-    this.ofertaId = this.route.snapshot.paramMap.get('id');
-    console.log('ID de oferta de la URL:', this.ofertaId);
+    this.ofertaId = this.route.snapshot.params['id'];
+    if (!this.ofertaId) {
+      this.toastr.error('ID de oferta no proporcionado.', 'Error');
+      this.router.navigate(['/admin/ofertas']);
+      return;
+    }
 
-    if (this.ofertaId) {
-      this.loadAllData(this.ofertaId);
+    this.loadOferta();
+    this.loadProductos();
+    this.loadCategorias();
+    this.setupFormListeners();
+  }
+
+  setupFormListeners(): void {
+    this.ofertaForm.get('tipoOferta')?.valueChanges.subscribe(tipo => {
+      this.selectedTipoOferta = tipo;
+      this.clearApplicableArrays();
+      this.updateValidation();
+    });
+  }
+
+  clearApplicableArrays(): void {
+    this.productosAplicablesArray.clear();
+    this.categoriasAplicablesArray.clear();
+    this.ofertaForm.updateValueAndValidity();
+  }
+
+  updateValidation(): void {
+    if (this.selectedTipoOferta === 'producto') {
+      this.ofertaForm.get('productosAplicables')?.setValidators([Validators.required, Validators.minLength(1)]);
+      this.ofertaForm.get('categoriasAplicables')?.clearValidators();
     } else {
-      this.errorMessage = 'ID de oferta no proporcionado para la edición.';
-      this.loadingOferta = false;
-      this.toastr.error(this.errorMessage, 'Error');
-      console.error('Error: ID de oferta no encontrado en la URL.');
+      this.ofertaForm.get('categoriasAplicables')?.setValidators([Validators.required, Validators.minLength(1)]);
+      this.ofertaForm.get('productosAplicables')?.clearValidators();
     }
+    this.ofertaForm.get('productosAplicables')?.updateValueAndValidity();
+    this.ofertaForm.get('categoriasAplicables')?.updateValueAndValidity();
   }
 
-  /**
-   * Carga los productos y categorías disponibles, y luego los detalles de la oferta.
-   */
-  loadAllData(id: string): void {
-    console.log('Iniciando carga de todos los datos (productos, categorías, oferta).');
-    this.loadingProducts = true;
-    this.loadingCategories = true;
+  atLeastOneApplicableValidator(): import('@angular/forms').ValidatorFn {
+    return (control: import('@angular/forms').AbstractControl): { [key: string]: boolean } | null => {
+      const tipoOferta = control.get('tipoOferta')?.value;
+      const productos = control.get('productosAplicables') as FormArray;
+      const categorias = control.get('categoriasAplicables') as FormArray;
 
-    // Cargar productos
-    // Asumiendo que el método es getProducts() en ProductoService
-    this.productoService.getProducts().pipe(
-      catchError(error => {
-        this.errorMessage = 'Error al cargar los productos disponibles: ' + (error.message || 'Error desconocido');
-        this.toastr.error(this.errorMessage, 'Error de Carga de Productos');
-        console.error('Error en loadProducts:', error);
-        return of([]);
-      }),
-      finalize(() => {
-        this.loadingProducts = false;
-        console.log('Carga de productos finalizada. loadingProducts:', this.loadingProducts);
-        this.checkAllDataLoaded(id);
-      })
-    ).subscribe(productos => {
-      this.productosDisponibles = productos.filter(p => p.disponible && p.stock > 0);
-      console.log('Productos disponibles cargados:', this.productosDisponibles.length);
-    });
-
-    // Cargar categorías
-    // Asumiendo que el método es getCategorias() en CategoriaService
-    this.categoriaService.getCategorias().pipe(
-      catchError(error => {
-        this.errorMessage = 'Error al cargar las categorías disponibles: ' + (error.message || 'Error desconocido');
-        this.toastr.error(this.errorMessage, 'Error de Carga de Categorías');
-        console.error('Error en loadCategories:', error);
-        return of([]);
-      }),
-      finalize(() => {
-        this.loadingCategories = false;
-        console.log('Carga de categorías finalizada. loadingCategories:', this.loadingCategories);
-        this.checkAllDataLoaded(id);
-      })
-    ).subscribe(categorias => {
-      this.categoriasDisponibles = categorias;
-      console.log('Categorías disponibles cargadas:', this.categoriasDisponibles.length);
-    });
+      if (tipoOferta === 'producto' && productos && productos.length === 0) {
+        return { productosRequired: true };
+      }
+      if (tipoOferta === 'categoria' && categorias && categorias.length === 0) {
+        return { categoriasRequired: true };
+      }
+      return null;
+    };
   }
 
-  /**
-   * Verifica si ambos (productos y categorías) han terminado de cargar y luego carga la oferta.
-   */
-  private checkAllDataLoaded(ofertaId: string): void {
-    console.log('checkAllDataLoaded: Products loaded:', !this.loadingProducts, 'Categories loaded:', !this.loadingCategories);
-    if (!this.loadingProducts && !this.loadingCategories) {
-      console.log('Todos los datos auxiliares cargados. Iniciando carga de detalles de oferta.');
-      this.loadOfertaDetails(ofertaId);
-    }
-  }
-
-  /**
-   * Carga los detalles de la oferta existente y rellena el formulario.
-   * @param id El ID de la oferta a cargar.
-   */
-  loadOfertaDetails(id: string): void {
-    console.log('Iniciando loadOfertaDetails para ID:', id);
-    this.loadingOferta = true;
-    this.ofertaService.getOfertaById(id).pipe(
-      tap(oferta => {
-        console.log('Oferta recibida del servicio:', oferta);
-        if (oferta) {
-          this.ofertaForm.patchValue({
-            nombre: oferta.nombre,
-            descripcion: oferta.descripcion,
-            descuento: oferta.descuento,
-            fechaInicio: this.formatDate(new Date(oferta.fechaInicio)),
-            fechaFin: this.formatDate(new Date(oferta.fechaFin))
-          });
-
-          // Rellenar el FormArray de productosAplicables
-          this.productosAplicablesArray.clear();
-          oferta.productosAplicables.forEach(prod => {
-            this.productosAplicablesArray.push(this.fb.control(typeof prod === 'string' ? prod : prod._id!));
-          });
-          console.log('Productos aplicables en el formulario:', this.productosAplicablesArray.value);
-
-          // Rellenar el FormArray de categoriasAplicables
-          this.categoriasAplicablesArray.clear();
-          oferta.categoriasAplicables.forEach(cat => {
-            this.categoriasAplicablesArray.push(this.fb.control(typeof cat === 'string' ? cat : cat._id!));
-          });
-          console.log('Categorías aplicables en el formulario:', this.categoriasAplicablesArray.value);
-
-          this.ofertaForm.markAsPristine();
-          this.ofertaForm.markAsUntouched();
-        } else {
-          this.errorMessage = 'No se encontraron detalles para la oferta con ID: ' + id;
-          this.toastr.error(this.errorMessage, 'Error de Carga');
-          this.router.navigate(['/admin/ofertas']);
-        }
-      }),
-      catchError(error => {
-        this.errorMessage = 'Error al cargar los detalles de la oferta: ' + (error.message || 'Error desconocido');
-        this.toastr.error(this.errorMessage, 'Error de Carga de Oferta');
-        console.error('Error en loadOfertaDetails:', error);
-        this.router.navigate(['/admin/ofertas']);
-        return of(null);
-      }),
-      finalize(() => {
-        this.loadingOferta = false;
-        console.log('Carga de oferta finalizada. loadingOferta:', this.loadingOferta);
-      })
-    ).subscribe();
-  }
-
-  /**
-   * Formatea una fecha a 'YYYY-MM-DD' para el input type="date'.
-   */
-  private formatDate(date: Date): string {
+  private formatDate(date: Date | string): string {
     const d = new Date(date);
     let month = '' + (d.getMonth() + 1);
     let day = '' + d.getDate();
@@ -226,6 +130,86 @@ export class EditOfertaComponent implements OnInit {
     return [year, month, day].join('-');
   }
 
+  loadOferta(): void {
+    this.loadingOferta = true;
+    this.ofertaService.getOfertaById(this.ofertaId).pipe(
+      catchError(error => {
+        this.errorMessage = 'Error al cargar la oferta: ' + (error.message || 'Error desconocido');
+        this.toastr.error(this.errorMessage, 'Error de Carga');
+        return of(null);
+      }),
+      finalize(() => this.loadingOferta = false)
+    ).subscribe(oferta => {
+      if (oferta) {
+        this.ofertaOriginal = oferta;
+        this.populateForm(oferta);
+      } else {
+        this.router.navigate(['/admin/ofertas']);
+      }
+    });
+  }
+
+  populateForm(oferta: IOfertaPopulated): void {
+    this.selectedTipoOferta = oferta.tipoOferta;
+    
+    // Limpiar arrays antes de poblar
+    this.productosAplicablesArray.clear();
+    this.categoriasAplicablesArray.clear();
+
+    // Poblar productos aplicables
+    if (oferta.productosAplicables && oferta.productosAplicables.length > 0) {
+      oferta.productosAplicables.forEach(producto => {
+        this.productosAplicablesArray.push(new FormControl(producto._id));
+      });
+    }
+
+    // Poblar categorías aplicables
+    if (oferta.categoriasAplicables && oferta.categoriasAplicables.length > 0) {
+      oferta.categoriasAplicables.forEach(categoria => {
+        this.categoriasAplicablesArray.push(new FormControl(categoria._id));
+      });
+    }
+
+    this.ofertaForm.patchValue({
+      nombre: oferta.nombre,
+      descripcion: oferta.descripcion || '',
+      porcentajeDescuento: oferta.porcentajeDescuento,
+      fechaInicio: this.formatDate(oferta.fechaInicio),
+      fechaFin: this.formatDate(oferta.fechaFin),
+      tipoOferta: oferta.tipoOferta
+    });
+
+    this.updateValidation();
+  }
+
+  loadProductos(): void {
+    this.loadingProducts = true;
+    this.productoService.getProducts().pipe(
+      catchError(error => {
+        this.errorMessage = 'Error al cargar los productos disponibles: ' + (error.message || 'Error desconocido');
+        this.toastr.error(this.errorMessage, 'Error de Carga');
+        return of([]);
+      }),
+      finalize(() => this.loadingProducts = false)
+    ).subscribe(productos => {
+      this.productosDisponibles = productos.filter(p => p.disponible && p.stock > 0);
+    });
+  }
+
+  loadCategorias(): void {
+    this.loadingCategories = true;
+    this.categoriaService.getCategorias().pipe(
+      catchError(error => {
+        this.errorMessage = 'Error al cargar las categorías disponibles: ' + (error.message || 'Error desconocido');
+        this.toastr.error(this.errorMessage, 'Error de Carga');
+        return of([]);
+      }),
+      finalize(() => this.loadingCategories = false)
+    ).subscribe(categorias => {
+      this.categoriasDisponibles = categorias;
+    });
+  }
+
   get productosAplicablesArray(): FormArray {
     return this.ofertaForm.get('productosAplicables') as FormArray;
   }
@@ -234,9 +218,6 @@ export class EditOfertaComponent implements OnInit {
     return this.ofertaForm.get('categoriasAplicables') as FormArray;
   }
 
-  /**
-   * Maneja el cambio de selección de un producto (checkbox).
-   */
   onProductoChange(event: Event, productoId: string): void {
     const isChecked = (event.target as HTMLInputElement).checked;
     if (isChecked) {
@@ -251,9 +232,6 @@ export class EditOfertaComponent implements OnInit {
     this.productosAplicablesArray.markAsTouched();
   }
 
-  /**
-   * Maneja el cambio de selección de una categoría (checkbox).
-   */
   onCategoriaChange(event: Event, categoriaId: string): void {
     const isChecked = (event.target as HTMLInputElement).checked;
     if (isChecked) {
@@ -268,16 +246,10 @@ export class EditOfertaComponent implements OnInit {
     this.categoriasAplicablesArray.markAsTouched();
   }
 
-  /**
-   * Verifica si un producto está seleccionado en el formulario.
-   */
   isProductoSelected(productoId: string): boolean {
     return this.productosAplicablesArray.controls.some(control => control.value === productoId);
   }
 
-  /**
-   * Verifica si una categoría está seleccionada en el formulario.
-   */
   isCategoriaSelected(categoriaId: string): boolean {
     return this.categoriasAplicablesArray.controls.some(control => control.value === categoriaId);
   }
@@ -310,17 +282,10 @@ export class EditOfertaComponent implements OnInit {
       fechaFin: new Date(this.ofertaForm.value.fechaFin),
     };
 
-    if (!this.ofertaId) {
-      this.errorMessage = 'ID de oferta no disponible para la actualización.';
-      this.toastr.error(this.errorMessage, 'Error');
-      this.loading = false;
-      return;
-    }
-
     this.ofertaService.updateOferta(this.ofertaId, ofertaData).pipe(
       catchError(error => {
         this.errorMessage = error.message || 'Error al actualizar la oferta.';
-        this.toastr.error(this.errorMessage ?? 'Error al actualizar la oferta.', 'Error de Actualización');
+        this.toastr.error(this.errorMessage || 'Error al actualizar la oferta.', 'Error de Actualización');
         console.error('Error al actualizar la oferta:', error);
         return of(null);
       }),
@@ -358,10 +323,32 @@ export class EditOfertaComponent implements OnInit {
         return 'La fecha de fin no puede ser anterior a la fecha de inicio.';
       }
     }
-    if (this.ofertaForm.errors?.['atLeastOneApplicable'] &&
-        (this.productosAplicablesArray.touched || this.categoriasAplicablesArray.touched)) {
-        return 'Debe seleccionar al menos un producto o una categoría para la oferta.';
+    
+    // Validaciones específicas para arrays
+    if (field === 'productosAplicables' && this.ofertaForm.errors?.['productosRequired'] && this.productosAplicablesArray.touched) {
+      return 'Debe seleccionar al menos un producto para la oferta.';
     }
+    if (field === 'categoriasAplicables' && this.ofertaForm.errors?.['categoriasRequired'] && this.categoriasAplicablesArray.touched) {
+      return 'Debe seleccionar al menos una categoría para la oferta.';
+    }
+    
     return null;
+  }
+
+  isFieldInvalid(field: string): boolean {
+    const control = this.ofertaForm.get(field);
+    return !!(control && control.invalid && (control.touched || control.dirty));
+  }
+
+  // Filtrar productos por búsqueda
+  get productosFiltrados(): IProducto[] {
+    if (!this.searchTerm.trim()) {
+      return this.productosDisponibles;
+    }
+    const searchLower = this.searchTerm.toLowerCase();
+    return this.productosDisponibles.filter(producto =>
+      producto.nombre.toLowerCase().includes(searchLower) ||
+      producto.descripcion?.toLowerCase().includes(searchLower)
+    );
   }
 }

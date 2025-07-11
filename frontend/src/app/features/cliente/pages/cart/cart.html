@@ -1,0 +1,102 @@
+<div class="cart-container">
+  <div class="cart-header">
+    <h1 class="cart-title">🛒 Carrito de Compras</h1>
+    <p class="cart-subtitle">Gestiona tus productos seleccionados</p>
+  </div>
+
+  <!-- Carrito vacío -->
+  <div *ngIf="isCartEmpty()" class="empty-cart">
+    <div class="empty-cart-icon">🛒</div>
+    <h2>Tu carrito está vacío</h2>
+    <p>No tienes productos en tu carrito de compras.</p>
+    <button class="btn-primary" (click)="continueShopping()">
+      Continuar Comprando
+    </button>
+  </div>
+
+  <!-- Carrito con productos -->
+  <div *ngIf="!isCartEmpty()" class="cart-content">
+    <!-- Lista de productos -->
+    <div class="cart-items">
+      <div class="cart-item" *ngFor="let item of cartItems; trackBy: trackByProductId">
+        <div class="item-image">
+          <img [src]="item.product.imagen || 'assets/images/default-product.jpg'" 
+               [alt]="item.product.nombre" 
+               class="product-image">
+        </div>
+        
+        <div class="item-details">
+          <h3 class="item-name">{{ item.product.nombre }}</h3>
+          <p class="item-description" *ngIf="item.product.descripcion">
+            {{ item.product.descripcion }}
+          </p>
+          <div class="item-price">
+            <span class="price">${{ getProductPrice(item.product) | number:'1.2-2' }}</span>
+            <span class="price-unit">por unidad</span>
+          </div>
+        </div>
+
+        <div class="item-quantity">
+          <div class="quantity-controls">
+            <button class="quantity-btn" 
+                    (click)="updateQuantity(item.product._id, item.quantity - 1)"
+                    [disabled]="item.quantity <= 1">
+              -
+            </button>
+            <span class="quantity-display">{{ item.quantity }}</span>
+            <button class="quantity-btn" 
+                    (click)="updateQuantity(item.product._id, item.quantity + 1)">
+              +
+            </button>
+          </div>
+        </div>
+
+        <div class="item-total">
+          <span class="total-price">${{ getItemTotal(item) | number:'1.2-2' }}</span>
+        </div>
+
+        <div class="item-actions">
+          <button class="remove-btn" 
+                  (click)="removeItem(item.product._id)"
+                  title="Eliminar del carrito">
+            🗑️
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen del carrito -->
+    <div class="cart-summary">
+      <div class="summary-header">
+        <h3>Resumen del Pedido</h3>
+      </div>
+      
+      <div class="summary-details">
+        <div class="summary-row">
+          <span>Productos:</span>
+          <span>{{ totalItems }} items</span>
+        </div>
+        <div class="summary-row">
+          <span>Subtotal:</span>
+          <span>${{ cartTotal | number:'1.2-2' }}</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total:</span>
+          <span>${{ cartTotal | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <div class="summary-actions">
+        <button class="btn-secondary" (click)="clearCart()">
+          Vaciar Carrito
+        </button>
+        <button class="btn-primary" (click)="continueShopping()">
+          Continuar Comprando
+        </button>
+        <button class="btn-checkout" (click)="proceedToCheckout()">
+          Proceder al Pedido
+        </button>
+      </div>
+    </div>
+  </div>
+</div> 

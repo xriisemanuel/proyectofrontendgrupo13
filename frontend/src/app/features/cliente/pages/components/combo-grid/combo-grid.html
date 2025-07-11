@@ -1,0 +1,27 @@
+<div class="combo-grid-container">
+  <!-- Estado de carga -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Cargando combos...</p>
+  </div>
+
+  <!-- Grid de combos -->
+  <div *ngIf="!loading && combos.length > 0" class="combo-grid">
+    <app-combo-card 
+      *ngFor="let combo of combos" 
+      [combo]="combo"
+      (comboClick)="onComboClick($event)"
+      (addToCart)="onAddToCart($event)"
+      (buyNow)="onBuyNow($event)">
+    </app-combo-card>
+  </div>
+
+  <!-- Estado vacío -->
+  <div *ngIf="!loading && combos.length === 0" class="empty-state">
+    <div class="empty-content">
+      <div class="empty-icon">🍔</div>
+      <h3 class="empty-title">{{ emptyMessage }}</h3>
+      <p class="empty-description">Por el momento no tenemos combos para mostrar.</p>
+    </div>
+  </div>
+</div> 

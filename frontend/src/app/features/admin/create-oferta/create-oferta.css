@@ -61,6 +61,7 @@ p {
 .form-group input[type="number"],
 .form-group input[type="date"],
 .form-group input[type="url"],
+.form-group select,
 .form-group textarea {
     width: calc(100% - 24px);
     /* Ancho completo menos padding */
@@ -78,6 +79,7 @@ p {
 }
 
 .form-group input:focus,
+.form-group select:focus,
 .form-group textarea:focus {
     border-color: #50fa7b;
     /* Color de foco */
@@ -95,6 +97,22 @@ p {
 .form-group textarea {
     resize: vertical;
     min-height: 80px;
+}
+
+/* Estilos para la sección de precios */
+.pricing-section {
+    background-color: rgba(68, 71, 90, 0.3);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(80, 250, 123, 0.2);
+}
+
+.pricing-section h3 {
+    color: #50fa7b;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+    text-align: center;
 }
 
 /* Estilos para la selección de productos/categorías */

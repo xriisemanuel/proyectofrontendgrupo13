@@ -1,9 +1,6 @@
 <div class="admin-dashboard-container">
   <div class="dashboard-header">
     <h2>Bienvenido, Administrador {{ currentUser?.usuario?.username }}!</h2>
-    <button (click)="onLogout()" class="btn-logout interactive-card">
-      <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-    </button>
   </div>
   <div class="main-management-section">
     <div class="management-category-row create-section">
@@ -69,82 +66,37 @@
     </div>
   </div>
 
-  <div class="dashboard-panel summary-panel interactive-card">
-    <h3><i class="fas fa-chart-bar"></i> Estadísticas Rápidas</h3>
-    <div class="summary-cards-grid">
-      <div class="summary-card interactive-card">
-        <h3>Pedidos Pendientes</h3>
-        <p class="metric">{{ summaryData.pedidosPendientes }}</p>
-        <span class="description">En espera de preparación o envío.</span>
-      </div>
-      <div class="summary-card interactive-card">
-        <h3>Pedidos Completados Hoy</h3>
-        <p class="metric">{{ summaryData.pedidosCompletadosHoy }}</p>
-        <span class="description">Pedidos finalizados en el día.</span>
-      </div>
-      <div class="summary-card interactive-card">
-        <h3>Nuevos Usuarios (Semana)</h3>
-        <p class="metric">{{ summaryData.nuevosUsuariosSemana }}</p>
-        <span class="description">Registros de clientes recientes.</span>
-      </div>
-      <div class="summary-card alert-card interactive-card">
-        <h3>Productos Agotados</h3>
-        <p class="metric">{{ summaryData.productosAgotados }}</p>
-        <span class="description">¡Revisar inventario urgentemente!</span>
-      </div>
-      <div class="summary-card interactive-card">
-        <h3>Repartidores Activos</h3>
-        <p class="metric">{{ summaryData.repartidoresActivos }}</p>
-        <span class="description">Actualmente en servicio.</span>
-      </div>
-      <div class="summary-card interactive-card">
-        <h3>Ingresos Hoy</h3>
-        <p class="metric">${{ summaryData.ingresosHoy }}</p>
-        <span class="description">Total de ventas del día.</span>
-      </div>
+
+
+  <div class="dashboard-panel quick-links-panel interactive-card">
+    <h3><i class="fas fa-users"></i> Administrar Personal</h3>
+    <div class="quick-links-grid">
+      <a routerLink="/kitchen/dashboard" class="quick-link-btn interactive-card">
+        <i class="fas fa-utensils"></i> Dashboard de Supervisor de Cocina
+      </a>
+      <a routerLink="/delivery/dashboard" class="quick-link-btn interactive-card">
+        <i class="fas fa-truck"></i> Dashboard de Repartidores
+      </a>
     </div>
   </div>
 
   <div class="dashboard-panel quick-links-panel interactive-card">
     <h3><i class="fas fa-link"></i> Otras Gestiones Rápidas</h3>
     <div class="quick-links-grid">
-      <a routerLink="/admin/pedidos" class="quick-link-btn interactive-card">
-        <i class="fas fa-clipboard-list"></i> Gestión de Pedidos
-      </a>
       <a routerLink="/admin/clientes/manage" class="quick-link-btn interactive-card">
         <i class="fas fa-user-friends"></i> Gestión de Clientes
-      </a>
-      <a routerLink="/admin/reportes" class="quick-link-btn interactive-card">
-        <i class="fas fa-chart-line"></i> Reportes
-      </a>
-      <a routerLink="/admin/configuracion" class="quick-link-btn interactive-card">
-        <i class="fas fa-cogs"></i> Configuración
       </a>
       <a routerLink="/admin/roles/manage" class="quick-link-btn interactive-card">
         <i class="fas fa-users-cog"></i> Gestión de Roles
       </a>
-      <a routerLink="/admin/repartidores/manage" class="quick-link-btn interactive-card">
-        <i class="fas fa-motorcycle"></i> Gestión de Repartidores
-      </a>
       <a routerLink="/admin/supervisores-cocina/manage" class="quick-link-btn interactive-card">
         <i class="fas fa-utensils"></i> Gestión Supervisores Cocina
       </a>
-      <a routerLink="/admin/supervisores-ventas/manage" class="quick-link-btn interactive-card">
-        <i class="fas fa-chart-line"></i> Gestión Supervisores Ventas
+      <a routerLink="/admin/repartidores/manage" class="quick-link-btn interactive-card">
+        <i class="fas fa-motorcycle"></i> Gestión de Repartidores
       </a>
     </div>
   </div>
 
-  <div class="dashboard-panel recent-activity-panel interactive-card">
-    <h3><i class="fas fa-history"></i> Actividad Reciente</h3>
-    <div class="table-placeholder">
-      <p>Tabla de últimos pedidos pendientes o en curso...</p>
-      <ul>
-        <li>Pedido #1001 - Cliente: Juan Pérez - Estado: En preparación</li>
-        <li>Pedido #1002 - Cliente: María García - Estado: En camino</li>
-        <li>Pedido #1003 - Cliente: Pedro López - Estado: Pendiente</li>
-      </ul>
-      <a routerLink="/admin/pedidos" class="view-all-link interactive-card">Ver todos los pedidos</a>
-    </div>
-  </div>
+
 </div>

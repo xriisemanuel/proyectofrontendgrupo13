@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth';
+import { CartService } from '../../../core/services/cart.service';
 
 @Component({
   selector: 'app-header',
@@ -14,9 +15,12 @@ export class Header implements OnInit {
   isAuthenticated = false;
   userRole: string | null = null;
   userName: string = '';
+  cartItemCount: number = 0;
+  cartTotal: number = 0;
 
   constructor(
     private authService: AuthService,
+    private cartService: CartService,
     private router: Router
   ) {}
 
@@ -32,6 +36,50 @@ export class Header implements OnInit {
         this.userName = '';
       }
     });
+
+    // Suscribirse a cambios en el carrito
+    this.cartService.getCartItems().subscribe(items => {
+      this.cartItemCount = this.cartService.getTotalItems();
+    });
+
+    this.cartService.getCartTotal().subscribe(total => {
+      this.cartTotal = total;
+    });
+  }
+
+  /**
+   * Verifica si el usuario es un cliente
+   */
+  isCliente(): boolean {
+    return this.userRole === 'cliente';
+  }
+
+  /**
+   * Verifica si el usuario es admin, supervisor o repartidor
+   */
+  isStaff(): boolean {
+    return ['admin', 'supervisor_ventas', 'supervisor_cocina', 'repartidor'].includes(this.userRole || '');
+  }
+
+  /**
+   * Verifica si se deben mostrar los botones de navegación principal
+   */
+  showMainNav(): boolean {
+    return !this.isAuthenticated || this.isCliente();
+  }
+
+  /**
+   * Verifica si se debe mostrar el botón de carrito
+   */
+  showCartButton(): boolean {
+    return this.isAuthenticated && this.isCliente();
+  }
+
+  /**
+   * Navega al carrito de compras
+   */
+  onCartClick(): void {
+    this.router.navigate(['/cart']);
   }
 
   onLoginClick(): void {
@@ -46,7 +94,7 @@ export class Header implements OnInit {
           this.router.navigate(['/admin/dashboard']);
           break;
         case 'cliente':
-          this.router.navigate(['/client/dashboard']);
+          this.router.navigate(['/client/profile']);
           break;
         case 'repartidor':
           this.router.navigate(['/delivery/dashboard']);
