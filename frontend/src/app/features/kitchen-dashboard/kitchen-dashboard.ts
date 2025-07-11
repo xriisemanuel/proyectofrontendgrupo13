@@ -35,9 +35,10 @@ export class KitchenDashboard implements OnInit, OnDestroy {
 
   pedidos: IPedido[] = [];
   loading = true; // Para indicar si los datos están cargando
-  selectedEstado: string = 'pendiente'; // Estado inicial del filtro
+  selectedEstado: string = 'todos'; // Estado inicial del filtro - ahora muestra todos
   searchTerm: string = ''; // Término de búsqueda para el filtro
   showEntregados: boolean = false; // Control para mostrar pedidos entregados
+  private searchTimeout: any; // Para debounce del buscador
 
   private pedidosSubscription: Subscription | undefined; // Para manejar la suscripción y evitar fugas de memoria
 
@@ -68,17 +69,32 @@ export class KitchenDashboard implements OnInit, OnDestroy {
     this.successMessage = null; // Limpia cualquier mensaje de éxito anterior
 
     // Determinar qué estados cargar
-    let estadosACargar = [this.selectedEstado];
+    let estadosACargar: string[] = [];
     
-    // Si el estado seleccionado no es 'entregado' y showEntregados está activado, incluir entregados
-    if (this.selectedEstado !== 'entregado' && this.showEntregados) {
-      estadosACargar.push('entregado');
+    if (this.selectedEstado === 'todos') {
+      // Si seleccionamos "todos", cargar todos los estados excepto entregados por defecto
+      estadosACargar = ['pendiente', 'confirmado', 'en_preparacion', 'en_envio', 'cancelado'];
+      if (this.showEntregados) {
+        estadosACargar.push('entregado');
+      }
+    } else {
+      // Si seleccionamos un estado específico
+      estadosACargar = [this.selectedEstado];
+      // Si el estado seleccionado no es 'entregado' y showEntregados está activado, incluir entregados
+      if (this.selectedEstado !== 'entregado' && this.showEntregados) {
+        estadosACargar.push('entregado');
+      }
     }
+
+    console.log('Estados a cargar:', estadosACargar); // Debug
 
     // Llama al servicio de pedidos, pasando los estados como filtro
     this.pedidosSubscription = this.pedidoService.getPedidos(estadosACargar)
       .pipe(
         tap(data => {
+          console.log('Pedidos recibidos del backend:', data.length); // Debug
+          console.log('Estados de pedidos recibidos:', data.map(p => p.estado)); // Debug
+          
           // Si hay un término de búsqueda, filtra los pedidos en el frontend
           if (this.searchTerm) {
             const lowerCaseSearchTerm = this.searchTerm.toLowerCase();
@@ -91,6 +107,8 @@ export class KitchenDashboard implements OnInit, OnDestroy {
           } else {
             this.pedidos = data; // Asigna los pedidos recibidos sin filtrar
           }
+          
+          console.log('Pedidos finales después de filtros:', this.pedidos.length); // Debug
           this.loading = false; // Desactiva el indicador de carga
         }),
         catchError((error: HttpErrorResponse) => {
@@ -163,6 +181,40 @@ export class KitchenDashboard implements OnInit, OnDestroy {
    */
   trackByPedidoId(index: number, pedido: IPedido): string | undefined {
     return pedido._id;
+  }
+
+  /**
+   * Maneja la entrada en el campo de búsqueda con debounce.
+   * Evita hacer demasiadas llamadas al servidor mientras el usuario escribe.
+   */
+  onSearchInput(): void {
+    // Limpiar el timeout anterior si existe
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+    
+    // Establecer un nuevo timeout para ejecutar la búsqueda después de 500ms
+    this.searchTimeout = setTimeout(() => {
+      this.loadPedidos();
+    }, 500);
+  }
+
+  /**
+   * Limpia el campo de búsqueda.
+   */
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.loadPedidos();
+  }
+
+  /**
+   * Limpia todos los filtros y restaura los valores por defecto.
+   */
+  clearAllFilters(): void {
+    this.selectedEstado = 'todos';
+    this.searchTerm = '';
+    this.showEntregados = false;
+    this.loadPedidos();
   }
 
   /**

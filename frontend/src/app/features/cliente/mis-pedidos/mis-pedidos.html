@@ -3,7 +3,11 @@
     <div class="dashboard-header">
         <div class="header-content">
             <h2><i class="fas fa-clipboard-list"></i> Mis Pedidos</h2>
+<<<<<<< HEAD
              <button class="btn-volver" routerLink="/cliente/dashboard">
+=======
+             <button class="btn-volver" (click)="goBackToDashboard()">
+>>>>>>> d7c207de0196f8378463ec594d09071c7f1e91c6
                 <i class="fas fa-arrow-left"></i> Volver al Dashboard
             </button>
         </div>
@@ -53,9 +57,9 @@
                 <button *ngIf="pedido.estado === 'entregado'" class="btn-calificar" (click)="rateOrder(pedido._id!)">
                     <i class="fas fa-star"></i> Calificar
                 </button>
-                <button class="btn-ver-detalles" (click)="viewOrderDetails(pedido._id!)">
+                <!-- <button class="btn-ver-detalles" (click)="viewOrderDetails(pedido._id!)">
                     <i class="fas fa-info-circle"></i> Ver Detalles
-                </button>
+                </button> -->
             </div>
         </div>
     </div>

@@ -54,6 +54,7 @@ export class PedidoService {
 
     if (estados && estados.length > 0) {
       params = params.set('estados', estados.join(','));
+      console.log('Enviando estados al backend:', estados.join(',')); // Debug
     }
     if (repartidorId) {
       params = params.set('repartidorId', repartidorId);
@@ -70,6 +71,8 @@ export class PedidoService {
     if (searchTerm) {
       params = params.set('searchTerm', searchTerm); // Asume que tu backend maneja este filtro
     }
+
+    console.log('URL params enviados:', params.toString()); // Debug
 
     // APLICA LOS ENCABEZADOS DE AUTENTICACIÓN AQUÍ
     return this.http.get<IPedido[]>(PEDIDO_API, { headers: this.getAuthHeaders(), params });

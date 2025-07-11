@@ -1,0 +1,59 @@
+<div class="product-card" (click)="onCardClick()">
+  <div class="card-image-container">
+    <img 
+      [src]="getProductImage()" 
+      [alt]="getProductName()"
+      class="product-image"
+      (error)="onImageError($event)"
+      loading="lazy">
+    
+    <!-- Badge de disponibilidad -->
+    <div class="availability-badge" [class.available]="isProductAvailable()" [class.unavailable]="!isProductAvailable()">
+      <span *ngIf="isProductAvailable()" class="badge-text">Disponible</span>
+      <span *ngIf="!isProductAvailable()" class="badge-text">Agotado</span>
+    </div>
+    
+    <!-- Overlay de hover -->
+    <div class="card-overlay">
+      <div class="overlay-content">
+        <button class="quick-view-btn" (click)="onCardClick()">
+          <span class="btn-icon">👁️</span>
+          <span class="btn-text">Ver Detalles</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="card-content">
+    <div class="product-info">
+      <h3 class="product-name">{{ getProductName() }}</h3>
+      <p class="product-description" *ngIf="getProductDescription()">
+        {{ getProductDescription().length > 80 ? (getProductDescription() | slice:0:80) + '...' : getProductDescription() }}
+      </p>
+      
+      <!-- Información de categoría -->
+      <div class="category-info" *ngIf="product.categoriaId">
+        <span class="category-badge">
+          📂 {{ getCategoryName() }}
+        </span>
+      </div>
+    </div>
+    
+    <div class="card-footer">
+      <div class="price-section">
+        <span class="price">{{ getFormattedPrice() }}</span>
+        <span class="stock-info" *ngIf="getStockInfo()">
+          {{ getStockInfo() }}
+        </span>
+      </div>
+      
+      <button 
+        class="add-to-cart-btn"
+        [disabled]="!isProductAvailable()"
+        (click)="onAddToCart($event)">
+        <span class="btn-icon">🛒</span>
+        <span class="btn-text">{{ isProductAvailable() ? 'Agregar' : 'Agotado' }}</span>
+      </button>
+    </div>
+  </div>
+</div>

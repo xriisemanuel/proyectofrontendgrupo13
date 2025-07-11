@@ -125,7 +125,7 @@ export class ClientProfileEditComponent implements OnInit {
         // Opcional: Recargar los datos del usuario en AuthService si es necesario
         // this.authService.loadUserDataFromToken();
         setTimeout(() => {
-          this.router.navigate(['/client/dashboard']); // Volver al dashboard después de un éxito
+          this.router.navigate(['/cliente/dashboard']); // Volver al dashboard después de un éxito
         }, 2000); // Esperar 2 segundos antes de redirigir
       }
     });
@@ -133,6 +133,6 @@ export class ClientProfileEditComponent implements OnInit {
 
   // Método para volver al dashboard
   goBackToDashboard(): void {
-    this.router.navigate(['cliente/dashboard']);
+    this.router.navigate(['/cliente/dashboard']);
   }
 }

@@ -1,0 +1,103 @@
+<div class="home-container">
+  <!-- Navegación principal -->
+  <app-main-navigation 
+    [buttons]="mainButtons" 
+    [loading]="isLoading"
+    (buttonSelected)="onMainButtonSelected($event)">
+  </app-main-navigation>
+  
+  <!-- Sección de Categorías -->
+  <div *ngIf="isCategoriasActive" class="categorias-section">
+    <app-category-tabs 
+      [categories]="categories" 
+      [loading]="isLoadingCategories"
+      (categorySelected)="onCategorySelected($event)">
+    </app-category-tabs>
+    
+    <app-product-grid 
+      [products]="filteredProducts" 
+      [loading]="isLoadingProducts"
+      (productSelected)="onProductSelected($event)"
+      (addToCart)="onAddToCart($event)">
+    </app-product-grid>
+  </div>
+  
+  <!-- Sección de Combos -->
+  <div *ngIf="isCombosActive" class="combos-section">
+    <div class="section-header">
+      <h2 class="section-title">Combos Especiales</h2>
+      <p class="section-description">Descubre nuestras combinaciones perfectas con descuentos especiales</p>
+    </div>
+    
+    <app-product-grid 
+      [products]="combos" 
+      [loading]="isLoadingCombos"
+      (productSelected)="onProductSelected($event)"
+      (addToCart)="onAddToCart($event)">
+    </app-product-grid>
+  </div>
+  
+  <!-- Sección de Ofertas -->
+  <div *ngIf="isOfertasActive" class="ofertas-section">
+    <div class="section-header">
+      <h2 class="section-title">Ofertas del Día</h2>
+      <p class="section-description">Aprovecha nuestras mejores ofertas por tiempo limitado</p>
+    </div>
+    
+    <app-product-grid 
+      [products]="ofertas" 
+      [loading]="isLoadingOfertas"
+      (productSelected)="onProductSelected($event)"
+      (addToCart)="onAddToCart($event)">
+    </app-product-grid>
+  </div>
+  
+  <!-- Loading global -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p class="loading-text">Cargando...</p>
+    </div>
+  </div>
+  
+  <!-- Error messages -->
+  <div *ngIf="hasError" class="error-container">
+    <div class="error-message">
+      <div class="error-icon">⚠️</div>
+      <h3 class="error-title">Error de Conexión</h3>
+      <p class="error-description">{{ errorMessage }}</p>
+      <button (click)="retry()" class="retry-btn">
+        <span class="retry-icon">🔄</span>
+        Reintentar
+      </button>
+    </div>
+  </div>
+  
+  <!-- Estado vacío para categorías -->
+  <div *ngIf="isCategoriasActive && !isLoadingCategories && categories.length === 0" class="empty-state">
+    <div class="empty-icon">📂</div>
+    <h3 class="empty-title">No hay categorías disponibles</h3>
+    <p class="empty-description">Por el momento no tenemos categorías de productos disponibles.</p>
+  </div>
+  
+  <!-- Estado vacío para productos -->
+  <div *ngIf="isCategoriasActive && !isLoadingProducts && filteredProducts.length === 0 && categories.length > 0" class="empty-state">
+    <div class="empty-icon">🍽️</div>
+    <h3 class="empty-title">No hay productos en esta categoría</h3>
+    <p class="empty-description">Prueba seleccionando otra categoría o vuelve más tarde.</p>
+  </div>
+  
+  <!-- Estado vacío para combos -->
+  <div *ngIf="isCombosActive && !isLoadingCombos && combos.length === 0" class="empty-state">
+    <div class="empty-icon">🎁</div>
+    <h3 class="empty-title">No hay combos disponibles</h3>
+    <p class="empty-description">Por el momento no tenemos combos especiales disponibles.</p>
+  </div>
+  
+  <!-- Estado vacío para ofertas -->
+  <div *ngIf="isOfertasActive && !isLoadingOfertas && ofertas.length === 0" class="empty-state">
+    <div class="empty-icon">🏷️</div>
+    <h3 class="empty-title">No hay ofertas disponibles</h3>
+    <p class="empty-description">Por el momento no tenemos ofertas especiales disponibles.</p>
+  </div>
+</div>
