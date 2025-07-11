@@ -1,7 +1,14 @@
 <div class="oferta-grid-container">
-    <div *ngIf="loading" class="loading-spinner">
-        <i class="fas fa-spinner fa-spin fa-3x"></i>
-        <p>Cargando ofertas...</p>
+    <div *ngIf="loading" class="grid-loading">
+        <div class="skeleton-card" *ngFor="let item of [1,2,3,4,5,6,7,8]">
+            <div class="skeleton-image"></div>
+            <div class="skeleton-content">
+                <div class="skeleton-title"></div>
+                <div class="skeleton-description"></div>
+                <div class="skeleton-price"></div>
+                <div class="skeleton-button"></div>
+            </div>
+        </div>
     </div>
 
     <div *ngIf="errorMessage" class="error-message">
@@ -9,73 +16,54 @@
     </div>
 
     <div *ngIf="!loading && !errorMessage">
-        <div *ngIf="ofertas.length === 0" class="no-data-message">
-            <p><i class="fas fa-info-circle"></i> {{ emptyMessage || 'No hay ofertas disponibles en este momento.' }}</p>
+        <div *ngIf="ofertas.length === 0" class="empty-grid">
+            <div class="empty-icon">🍽️</div>
+            <h3 class="empty-title">{{ emptyMessage }}</h3>
+            <p class="empty-description">Por el momento no hay productos en oferta.</p>
         </div>
-
-        <div *ngIf="ofertas.length > 0" class="ofertas-grid">
-            <div *ngFor="let oferta of ofertas" class="oferta-card">
-                <div class="oferta-header">
-                    <div class="oferta-badge">
-                        <span class="discount-percentage">{{ oferta.porcentajeDescuento }}%</span>
-                        <span class="discount-text">DESCUENTO</span>
+        <div *ngIf="ofertas.length > 0" class="products-container">
+            <div *ngFor="let prod of ofertas" class="product-card" (click)="onOfertaClick(prod)">
+                <div class="card-image-container">
+                    <img [src]="prod.imagen" [alt]="prod.nombre" class="product-image" loading="lazy">
+                    <div class="availability-badge" [class.available]="prod.disponible" [class.unavailable]="!prod.disponible">
+                        <span class="badge-text">{{ prod.disponible ? 'Disponible' : 'Agotado' }}</span>
+                    </div>
+                    <div class="card-overlay">
+                        <div class="overlay-content">
+                            <button class="quick-view-btn" (click)="$event.stopPropagation(); viewOfertaDetails(prod._id)">
+                                <span class="btn-icon">👁️</span>
+                                <span class="btn-text">Ver Detalles</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="discount-badge-oferta">
+                        <span class="discount-percentage">-{{ prod.oferta.porcentajeDescuento }}%</span>
                     </div>
                 </div>
-                
-                <div class="oferta-content">
-                    <h3 class="oferta-title">{{ oferta.nombre }}</h3>
-                    <p *ngIf="oferta.descripcion" class="oferta-description">{{ oferta.descripcion }}</p>
-                    
-                    <div class="oferta-type">
-                        <span class="type-icon">{{ getTipoOfertaIcon(oferta.tipoOferta) }}</span>
-                        <span class="type-text">{{ getTipoOfertaText(oferta.tipoOferta) }}</span>
-                    </div>
-                    
-                    <div class="oferta-applicables">
-                        <div *ngIf="oferta.tipoOferta === 'producto' && oferta.productosAplicables && oferta.productosAplicables.length > 0">
-                            <strong>Aplica a:</strong>
-                            <div class="applicables-list">
-                                <span *ngFor="let prod of oferta.productosAplicables.slice(0, 3); let last = last">
-                                    {{ prod.nombre }}<span *ngIf="!last">, </span>
-                                </span>
-                                <span *ngIf="oferta.productosAplicables.length > 3" class="more-items">
-                                    +{{ oferta.productosAplicables.length - 3 }} más
-                                </span>
-                            </div>
+                <div class="card-content">
+                    <div class="product-info">
+                        <h3 class="product-name">{{ prod.nombre }}</h3>
+                        <p class="product-description" *ngIf="prod.descripcion">
+                            {{ prod.descripcion.length > 80 ? (prod.descripcion | slice:0:80) + '...' : prod.descripcion }}
+                        </p>
+                        <div class="category-info" *ngIf="prod.categoria">
+                            <span class="category-badge">📂 {{ prod.categoria }}</span>
                         </div>
-                        
-                        <div *ngIf="oferta.tipoOferta === 'categoria' && oferta.categoriasAplicables && oferta.categoriasAplicables.length > 0">
-                            <strong>Aplica a categorías:</strong>
-                            <div class="applicables-list">
-                                <span *ngFor="let cat of oferta.categoriasAplicables.slice(0, 3); let last = last">
-                                    {{ cat.nombre }}<span *ngIf="!last">, </span>
-                                </span>
-                                <span *ngIf="oferta.categoriasAplicables.length > 3" class="more-items">
-                                    +{{ oferta.categoriasAplicables.length - 3 }} más
-                                </span>
-                            </div>
+                        <div class="oferta-nombre">
+                            <span class="oferta-label">Oferta:</span> <span class="oferta-nombre-text">{{ prod.oferta.nombre }}</span>
                         </div>
                     </div>
-                    
-                    <div class="oferta-dates">
-                        <div class="date-info">
-                            <small><strong>Válida desde:</strong> {{ formatDateForDisplay(oferta.fechaInicio) }}</small>
-                            <small><strong>Hasta:</strong> {{ formatDateForDisplay(oferta.fechaFin) }}</small>
+                    <div class="card-footer">
+                        <div class="price-section">
+                            <span class="precio-original">${{ prod.precioOriginal | number:'1.2-2' }}</span>
+                            <span class="precio-final">${{ prod.precioFinal | number:'1.2-2' }}</span>
+                            <span class="stock-info" *ngIf="prod.stock !== undefined">Stock: {{ prod.stock }}</span>
                         </div>
+                        <button class="add-to-cart-btn" [disabled]="!prod.disponible" (click)="$event.stopPropagation(); onBuyNow(prod)">
+                            <span class="btn-icon">💳</span>
+                            <span class="btn-text">{{ prod.disponible ? 'Comprar' : 'Agotado' }}</span>
+                        </button>
                     </div>
-                    
-                    <div class="oferta-status">
-                        <span *ngIf="isOfertaVigente(oferta)" class="status-vigente">
-                            <i class="fas fa-check-circle"></i> Vigente
-                        </span>
-                        <span *ngIf="!isOfertaVigente(oferta)" class="status-no-vigente">
-                            <i class="fas fa-clock"></i> No vigente
-                        </span>
-                    </div>
-                    
-                    <button class="view-details-btn" (click)="viewOfertaDetails(oferta._id!)">
-                        <i class="fas fa-eye"></i> Ver Detalles
-                    </button>
                 </div>
             </div>
         </div>

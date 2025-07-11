@@ -95,11 +95,11 @@ export class EditCategoryComponent implements OnInit, OnDestroy {
     this.categoriaService.getCategoriaById(id).pipe(
       tap(category => {
         if (category) {
-                  this.categoryForm.patchValue({
-          nombre: category.nombre,
-          descripcion: category.descripcion,
+          this.categoryForm.patchValue({
+            nombre: category.nombre,
+            descripcion: category.descripcion,
           imagen: category.imagen
-        });
+          });
           this.categoryForm.markAsPristine(); // Marcar como prístino después de cargar
           this.categoryForm.markAsUntouched();
         } else {

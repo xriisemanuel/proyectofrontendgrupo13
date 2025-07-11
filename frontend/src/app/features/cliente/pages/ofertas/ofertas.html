@@ -51,14 +51,14 @@
       </app-category-tabs>
     </div>
 
-    <!-- Grid de ofertas -->
+    <!-- Grid de productos en oferta -->
     <div class="ofertas-grid-section">
       <app-oferta-grid 
-        [ofertas]="filteredOfertas"
+        [ofertas]="filteredProductos"
         [loading]="isLoadingOfertas"
         [errorMessage]="errorMessage"
-        [emptyMessage]="'No se encontraron ofertas'"
-        (ofertaSelected)="onOfertaSelected($event)"
+        [emptyMessage]="'No se encontraron productos en oferta'"
+        (ofertaSelected)="onProductoSelected($event)"
         (addToCart)="onAddToCart($event)"
         (buyNow)="onBuyNow($event)">
       </app-oferta-grid>

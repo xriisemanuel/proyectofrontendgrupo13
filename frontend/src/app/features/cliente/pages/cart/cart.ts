@@ -108,7 +108,7 @@ export class CartComponent implements OnInit, OnDestroy {
       return;
     }
     
-    this.router.navigate(['/realizar-pedido']);
+    this.router.navigate(['/checkout']);
   }
 
   /**

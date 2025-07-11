@@ -1,16 +1,11 @@
 <header class="header">
   <div class="header-container">
-    <!-- Logo/Nombre de la página -->
     <div class="logo">
       <h1 class="logo-text">Subte</h1>
     </div>
 
-    <!-- Navegación principal - Solo visible para usuarios no autenticados y clientes -->
     <nav class="nav-menu" *ngIf="showMainNav()">
       <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
-        Inicio
-      </a>
-      <a routerLink="/home?view=categorias" routerLinkActive="active" class="nav-link">
         Categorías
       </a>
       <a routerLink="/combos" routerLinkActive="active" class="nav-link">
@@ -21,12 +16,9 @@
       </a>
     </nav>
 
-    <!-- Botones de autenticación/perfil -->
     <div class="auth-section">
       <ng-container *ngIf="isAuthenticated; else loginButton">
-        <!-- Usuario autenticado -->
         <div class="user-menu">
-          <!-- Botón de carrito - Solo para clientes -->
           <button *ngIf="showCartButton()" class="cart-btn" (click)="onCartClick()">
             <span class="cart-icon">🛒</span>
             <span class="cart-text">Carrito</span>
@@ -34,7 +26,11 @@
             <span *ngIf="cartTotal > 0" class="cart-total">${{ cartTotal | number:'1.2-2' }}</span>
           </button>
 
-          <!-- Botón de perfil -->
+          <button *ngIf="isCliente()" class="go-profile-btn" (click)="goToClientProfile()">
+            <span class="go-profile-icon">👤</span>
+            <span class="go-profile-text">Ir a tu perfil</span>
+          </button>
+
           <button class="profile-btn" (click)="onProfileClick()">
             <span class="user-name">{{ userName || 'Mi Perfil' }}</span>
             <span class="user-role" *ngIf="userRole">({{ userRole }})</span>
@@ -47,7 +43,6 @@
       </ng-container>
       
       <ng-template #loginButton>
-        <!-- Usuario no autenticado -->
         <button class="login-btn" (click)="onLoginClick()">
           Iniciar Sesión
         </button>
