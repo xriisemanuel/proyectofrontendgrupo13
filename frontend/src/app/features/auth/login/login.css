@@ -266,6 +266,112 @@ body {
   text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
 }
 
+/* Estilos para el botón de Google OAuth */
+.oauth-section {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* Estilos para el contenedor del botón de Google Identity Services */
+#google-signin-button {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+/* Estilos para el botón de respaldo de Google */
+.btn-google-fallback {
+  width: 100%;
+  padding: 12px 20px;
+  background: #fff;
+  color: #757575;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
+
+.btn-google-fallback:hover {
+  background: #f8f9fa;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.btn-google-fallback i {
+  font-size: 18px;
+  color: #4285f4;
+}
+
+/* Estilos para el botón personalizado (mantener por compatibilidad) */
+.btn-google {
+  width: 100%;
+  padding: 12px 20px;
+  background: #fff;
+  color: #757575;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-google:hover:not(:disabled) {
+  background: #f8f9fa;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.btn-google:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-google i {
+  font-size: 18px;
+  color: #4285f4;
+}
+
+.divider {
+  position: relative;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #ddd;
+}
+
+.divider span {
+  background: #fff;
+  padding: 0 15px;
+  color: #666;
+  font-size: 14px;
+  position: relative;
+  z-index: 1;
+}
+
 /* Media Queries para responsividad */
 @media (max-width: 768px) {
   .login-container {

@@ -99,6 +99,39 @@ export class AuthService {
   }
 
   /**
+   * Inicia sesión con Google OAuth
+   * @param idToken Token de ID de Google
+   * @returns Observable con la respuesta del backend
+   */
+  googleLogin(idToken: string): Observable<any> {
+    return this.http.post<any>(AUTH_API + 'google', { idToken })
+      .pipe(map(response => {
+        console.log('AuthService googleLogin: Respuesta del backend:', response);
+        if (this.isBrowser && response && response.token) {
+          // Almacenar solo si el token no está expirado inmediatamente
+          if (!this.isTokenExpired(response.token)) {
+            // --- CAMBIO CLAVE: Usar sessionStorage en lugar de localStorage ---
+            sessionStorage.setItem('user', JSON.stringify(response));
+            this.currentUserSubject.next(response);
+            console.log('AuthService googleLogin: Usuario guardado en sessionStorage y BehaviorSubject.');
+          } else {
+            console.warn('AuthService googleLogin: Token recibido ya expirado. No se guarda la sesión.');
+            this.logout(); // Limpiar por si acaso
+          }
+        }
+        return response;
+      }));
+  }
+
+  /**
+   * Obtiene la URL de autorización de Google OAuth
+   * @returns Observable con la URL de autorización
+   */
+  getGoogleAuthUrl(): Observable<any> {
+    return this.http.get<any>(AUTH_API + 'google/url');
+  }
+
+  /**
    * Decodifica el token JWT y verifica si ha expirado.
    * @param token El token JWT a verificar.
    * @returns True si el token ha expirado o es inválido, false en caso contrario.
