@@ -7,9 +7,11 @@ import { AuthService } from '../../core/auth/auth'; // Asegúrate de que la ruta
 import { ClienteService } from '../../data/services/cliente'; // Asegúrate de que la ruta sea correcta
 import { ProductoService } from '../../data/services/producto'; // Tu servicio de productos
 import { CategoriaService } from '../../data/services/categoria'; // Tu servicio de categorías
+import { PedidoService } from '../../data/services/pedido';
+import { CalificacionService } from '../../data/services/calificacion.service';
 
 // Importa tus modelos de interfaz
-import { ICliente, IUsuario, IProducto, ICategoria } from '../../shared/interfaces'; // Importa todas las interfaces necesarias
+import { ICliente, IUsuario, IProducto, ICategoria, IPedido, ICalificacion, IPedidoPopulado } from '../../shared/interfaces'; // Importa todas las interfaces necesarias
 
 import { Subscription, of, forkJoin } from 'rxjs'; // Importa forkJoin si lo necesitas para cargas paralelas
 import { take, tap, catchError, finalize } from 'rxjs/operators';
@@ -32,12 +34,29 @@ export class ClientDashboard implements OnInit, OnDestroy {
   products: IProducto[] = []; // Para almacenar productos destacados
   categories: ICategoria[] = []; // Para almacenar categorías
 
+  // Propiedades para pedidos y calificaciones
+  pedidos: IPedido[] = [];
+  calificaciones: ICalificacion[] = [];
+  pedidosRecientes: IPedido[] = [];
+  pedidosHistorial: IPedido[] = [];
+
+  // Estados de carga
+  isLoadingPedidos: boolean = false;
+  isLoadingCalificaciones: boolean = false;
+  
+  // Estados para el modal y vista de pedidos
+  showAllPedidos: boolean = false;
+  showPedidoModal: boolean = false;
+  selectedPedido: IPedido | null = null;
+
   // Inyección de servicios a través de `inject`
   private authService = inject(AuthService);
   private clienteService = inject(ClienteService);
   private productoService = inject(ProductoService);
   private categoriaService = inject(CategoriaService);
   private router = inject(Router); // Para la navegación programática
+  private pedidoService = inject(PedidoService);
+  private calificacionService = inject(CalificacionService);
 
   // Gestión de suscripciones para evitar fugas de memoria
   private subscriptions: Subscription[] = [];
@@ -50,6 +69,8 @@ export class ClientDashboard implements OnInit, OnDestroy {
     this.loadClientData();
     this.loadProducts();
     this.loadCategories();
+    this.loadPedidos();
+    this.loadCalificaciones();
   }
 
   /**
@@ -150,6 +171,51 @@ export class ClientDashboard implements OnInit, OnDestroy {
   }
 
   /**
+   * Carga los pedidos del cliente
+   */
+  loadPedidos(): void {
+    this.isLoadingPedidos = true;
+
+    this.subscriptions.push(
+      this.pedidoService.getPedidos().subscribe({
+        next: (data) => {
+          this.pedidos = data;
+          // Separar pedidos recientes (últimos 5) del historial completo
+          this.pedidosRecientes = data.slice(0, 5);
+          this.pedidosHistorial = data;
+          this.isLoadingPedidos = false;
+          console.log('Pedidos cargados:', this.pedidos.length);
+        },
+        error: (err) => {
+          console.error('Error al cargar pedidos:', err);
+          this.isLoadingPedidos = false;
+        }
+      })
+    );
+  }
+
+  /**
+   * Carga las calificaciones del cliente
+   */
+  loadCalificaciones(): void {
+    this.isLoadingCalificaciones = true;
+
+    this.subscriptions.push(
+      this.calificacionService.getCalificaciones().subscribe({
+        next: (data) => {
+          this.calificaciones = data;
+          this.isLoadingCalificaciones = false;
+          console.log('Calificaciones cargadas:', this.calificaciones.length);
+        },
+        error: (err) => {
+          console.error('Error al cargar calificaciones:', err);
+          this.isLoadingCalificaciones = false;
+        }
+      })
+    );
+  }
+
+  /**
    * Obtiene la URL de la imagen de un producto.
    * Proporciona una imagen por defecto si no hay URL válida.
    * @param product El objeto producto.
@@ -180,6 +246,47 @@ export class ClientDashboard implements OnInit, OnDestroy {
   }
 
   /**
+   * Obtiene el estado de un pedido con estilo CSS
+   */
+  getPedidoStatusClass(estado: string): string {
+    return `status-${estado.toLowerCase()}`;
+  }
+
+  /**
+   * Obtiene el promedio de calificaciones del cliente
+   */
+  getAverageRating(): number {
+    if (this.calificaciones.length === 0) return 0;
+
+    const totalComida = this.calificaciones.reduce((sum, cal) => sum + (cal.puntuacionComida || 0), 0);
+    const totalServicio = this.calificaciones.reduce((sum, cal) => sum + (cal.puntuacionServicio || 0), 0);
+    const totalEntrega = this.calificaciones.reduce((sum, cal) => sum + (cal.puntuacionEntrega || 0), 0);
+
+    const promedio = (totalComida + totalServicio + totalEntrega) / (this.calificaciones.length * 3);
+    return Math.round(promedio * 10) / 10; // Redondear a 1 decimal
+  }
+
+  /**
+   * Obtiene el total de pedidos por estado
+   */
+  getPedidosCountByStatus(estado: string): number {
+    return this.pedidos.filter(pedido => pedido.estado === estado).length;
+  }
+  
+  /**
+   * Obtiene el ID del pedido de una calificación, manejando tanto string como objeto populado
+   * @param pedidoId El pedidoId que puede ser string o IPedidoPopulado
+   * @returns El ID del pedido como string
+   */
+  getPedidoId(pedidoId: string | IPedidoPopulado): string {
+    if (typeof pedidoId === 'string') {
+      return pedidoId;
+    } else {
+      return pedidoId._id;
+    }
+  }
+
+  /**
    * Maneja la acción de comprar un producto.
    * @param product El producto a comprar.
    */
@@ -190,10 +297,33 @@ export class ClientDashboard implements OnInit, OnDestroy {
   }
 
   /**
-   * Redirige a la página de calificaciones.
+   * Navega a la página de calificaciones
    */
   goToCalificaciones(): void {
     this.router.navigate(['/calificaciones']);
+  }
+
+  /**
+   * Alterna entre mostrar pedidos recientes o todos los pedidos
+   */
+  toggleShowAllPedidos(): void {
+    this.showAllPedidos = !this.showAllPedidos;
+  }
+  
+  /**
+   * Abre el modal con los detalles de un pedido
+   */
+  openPedidoModal(pedido: IPedido): void {
+    this.selectedPedido = pedido;
+    this.showPedidoModal = true;
+  }
+  
+  /**
+   * Cierra el modal de detalles del pedido
+   */
+  closePedidoModal(): void {
+    this.showPedidoModal = false;
+    this.selectedPedido = null;
   }
 
   /**
@@ -213,6 +343,12 @@ export class ClientDashboard implements OnInit, OnDestroy {
     } else {
       console.warn('No se pudo redirigir a editar perfil: ID de usuario no disponible.');
     }
+  }
+/**
+   * Redirige a la página de 'mis pedidos'.
+   */
+  goToProductos(): void {
+    this.router.navigate(['/mis-productos']);
   }
 
   /**
