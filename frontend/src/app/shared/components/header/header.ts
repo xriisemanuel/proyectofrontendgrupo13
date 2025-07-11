@@ -111,6 +111,10 @@ export class Header implements OnInit {
     }
   }
 
+  goToClientProfile(): void {
+    this.router.navigate(['/client/profile']);
+  }
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/']);

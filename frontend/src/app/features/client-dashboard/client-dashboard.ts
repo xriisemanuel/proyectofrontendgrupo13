@@ -50,7 +50,7 @@ export class ClientDashboard implements OnInit, OnDestroy {
   selectedPedido: IPedido | null = null;
 
   // Inyección de servicios a través de `inject`
-  private authService = inject(AuthService);
+  public authService = inject(AuthService);
   private clienteService = inject(ClienteService);
   private productoService = inject(ProductoService);
   private categoriaService = inject(CategoriaService);
