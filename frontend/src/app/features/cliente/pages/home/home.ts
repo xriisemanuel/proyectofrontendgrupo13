@@ -135,7 +135,12 @@ export class Home implements OnInit, OnDestroy {
     
     try {
       const categories = await firstValueFrom(this.categoriaService.getCategorias(true));
-      this.categories = categories || [];
+      if (Array.isArray(categories)) {
+        this.categories = categories || [];
+      } else {
+        console.error('Categories is not an array:', categories);
+        this.categories = [];
+      }
       this.isLoadingCategories = false;
     } catch (error) {
       this.isLoadingCategories = false;
@@ -168,8 +173,18 @@ export class Home implements OnInit, OnDestroy {
           this.isLoading = false;
         })
       )
-      .subscribe(products => {
-        this.filteredProducts = products.filter(product => product.disponible);
+      .subscribe((response: any) => {
+        // El backend devuelve { mensaje: string, productos: array }
+        let products: any[] = [];
+        if (Array.isArray(response)) {
+          products = response;
+        } else if (response && response.productos && Array.isArray(response.productos)) {
+          products = response.productos;
+        } else {
+          console.error('Invalid products response:', response);
+          products = [];
+        }
+        this.filteredProducts = products.filter((product: any) => product.disponible);
       });
   }
 
@@ -192,8 +207,18 @@ export class Home implements OnInit, OnDestroy {
           this.isLoading = false;
         })
       )
-      .subscribe(combos => {
-        this.combos = combos.filter(combo => combo.activo);
+      .subscribe((response: any) => {
+        // Los combos se devuelven directamente como array
+        let combos: any[] = [];
+        if (Array.isArray(response)) {
+          combos = response;
+        } else if (response && response.combos && Array.isArray(response.combos)) {
+          combos = response.combos;
+        } else {
+          console.error('Invalid combos response:', response);
+          combos = [];
+        }
+        this.combos = combos.filter((combo: any) => combo.activo);
       });
   }
 
@@ -216,8 +241,18 @@ export class Home implements OnInit, OnDestroy {
           this.isLoading = false;
         })
       )
-      .subscribe(ofertas => {
-        this.ofertas = ofertas.filter(oferta => oferta.estado);
+      .subscribe((response: any) => {
+        // Las ofertas se devuelven directamente como array
+        let ofertas: any[] = [];
+        if (Array.isArray(response)) {
+          ofertas = response;
+        } else if (response && response.ofertas && Array.isArray(response.ofertas)) {
+          ofertas = response.ofertas;
+        } else {
+          console.error('Invalid ofertas response:', response);
+          ofertas = [];
+        }
+        this.ofertas = ofertas.filter((oferta: any) => oferta.activa || oferta.estado);
       });
   }
 
