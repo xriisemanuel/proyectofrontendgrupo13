@@ -95,8 +95,4 @@ export class CalificacionService {
     getCalificacionesByRepartidorId(repartidorId: string): Observable<any> {
         return this.http.get<any>(`${CALIFICACION_API}/repartidor/${repartidorId}`, { headers: this.getAuthHeaders() });
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> abcbaf28c3814c5e6734338c0e7d94f379a46092

@@ -37,6 +37,7 @@ export class DeliveryDashboard implements OnInit, OnDestroy {
   pedidosAsignados: IPedido[] = [];
   errorMessage = '';
   successMessage = '';
+  loadingMap: boolean = false;
 
   // === VARIABLES DEL MAPA ===
   map: any;
