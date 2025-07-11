@@ -37,6 +37,13 @@
           📂 {{ getCategoryName() }}
         </span>
       </div>
+
+      <!-- Información de descuento -->
+      <div class="discount-info" *ngIf="getDiscountInfo()">
+        <span class="discount-badge">
+          🎉 {{ getDiscountInfo() }}
+        </span>
+      </div>
     </div>
     
     <div class="card-footer">

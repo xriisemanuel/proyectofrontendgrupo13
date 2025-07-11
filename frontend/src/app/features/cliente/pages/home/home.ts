@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil, catchError, finalize, firstValueFrom } from 'rxjs';
 import { of } from 'rxjs';
 
@@ -50,6 +51,7 @@ export class Home implements OnInit, OnDestroy {
 
   // Navegación
   selectedCategoryId: string | null = null;
+  currentView: 'categorias' | 'combos' | 'ofertas' = 'categorias';
 
   private destroy$ = new Subject<void>();
 
@@ -58,11 +60,24 @@ export class Home implements OnInit, OnDestroy {
     private categoriaService: CategoriaService,
     private comboService: ComboService,
     private ofertaService: OfertaService,
-    private cartService: CartService
+    private cartService: CartService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.loadInitialData();
+    // Suscribirse a cambios en los parámetros de la URL
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        const view = params['view'];
+        if (view && ['categorias', 'combos', 'ofertas'].includes(view)) {
+          this.currentView = view;
+        } else {
+          this.currentView = 'categorias';
+        }
+        this.loadInitialData();
+      });
   }
 
   ngOnDestroy(): void {
@@ -71,31 +86,45 @@ export class Home implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga los datos iniciales de la aplicación
+   * Carga los datos iniciales de la aplicación según la vista actual
    */
   private loadInitialData(): void {
     this.isLoading = true;
     this.hasError = false;
     this.errorMessage = '';
 
-    // Cargar categorías primero
-    this.loadCategories()
-      .then(() => {
-        // Una vez cargadas las categorías, cargar productos de la primera categoría
-        if (this.categories.length > 0) {
-          this.selectedCategoryId = this.categories[0]._id || null;
-          if (this.selectedCategoryId) {
-            this.loadProductsByCategory(this.selectedCategoryId);
-          } else {
-            this.isLoading = false;
-          }
-        } else {
-          this.isLoading = false;
-        }
-      })
-      .catch(error => {
-        this.handleError(error);
-      });
+    switch (this.currentView) {
+      case 'categorias':
+        this.loadCategories()
+          .then(() => {
+            if (this.categories.length > 0) {
+              this.selectedCategoryId = this.categories[0]._id || null;
+              if (this.selectedCategoryId) {
+                this.loadProductsByCategory(this.selectedCategoryId);
+              } else {
+                this.isLoading = false;
+              }
+            } else {
+              this.isLoading = false;
+            }
+          })
+          .catch(error => {
+            this.handleError(error);
+          });
+        break;
+      
+      case 'combos':
+        this.loadCombos();
+        break;
+      
+      case 'ofertas':
+        this.loadOfertas();
+        break;
+      
+      default:
+        this.loadCategories();
+        break;
+    }
   }
 
   /**
@@ -158,7 +187,10 @@ export class Home implements OnInit, OnDestroy {
           this.combos = [];
           return of([]);
         }),
-        finalize(() => this.isLoadingCombos = false)
+        finalize(() => {
+          this.isLoadingCombos = false;
+          this.isLoading = false;
+        })
       )
       .subscribe(combos => {
         this.combos = combos.filter(combo => combo.activo);
@@ -179,7 +211,10 @@ export class Home implements OnInit, OnDestroy {
           this.ofertas = [];
           return of([]);
         }),
-        finalize(() => this.isLoadingOfertas = false)
+        finalize(() => {
+          this.isLoadingOfertas = false;
+          this.isLoading = false;
+        })
       )
       .subscribe(ofertas => {
         this.ofertas = ofertas.filter(oferta => oferta.estado);

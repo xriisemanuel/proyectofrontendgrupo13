@@ -153,6 +153,20 @@
   font-weight: 500;
 }
 
+.discount-info {
+  margin-bottom: 10px;
+}
+
+.discount-badge {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
 /* Footer de la tarjeta */
 .card-footer {
   display: flex;

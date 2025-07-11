@@ -29,7 +29,19 @@ export class ProductCard {
   }
 
   getFormattedPrice(): string {
-    const price = this.product.precio || this.product.precioCombo || this.product.precioFinal || 0;
+    let price = 0;
+    
+    // Manejar diferentes tipos de productos
+    if (this.product.precio) {
+      price = this.product.precio;
+    } else if (this.product.precioCombo) {
+      price = this.product.precioCombo;
+    } else if (this.product.precioFinal) {
+      price = this.product.precioFinal;
+    } else if (this.product.precioOferta) {
+      price = this.product.precioOferta;
+    }
+    
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS'
@@ -49,7 +61,17 @@ export class ProductCard {
   }
 
   isProductAvailable(): boolean {
-    return this.product.disponible !== false && this.product.activo !== false;
+    // Manejar diferentes tipos de disponibilidad
+    if (this.product.disponible !== undefined) {
+      return this.product.disponible !== false;
+    }
+    if (this.product.activo !== undefined) {
+      return this.product.activo !== false;
+    }
+    if (this.product.estado !== undefined) {
+      return this.product.estado !== false;
+    }
+    return true; // Por defecto disponible
   }
 
   getCategoryName(): string {
@@ -66,6 +88,23 @@ export class ProductCard {
   getStockInfo(): string {
     if (this.product.stock !== undefined) {
       return `Stock: ${this.product.stock}`;
+    }
+    return '';
+  }
+
+  getProductType(): string {
+    if (this.product.precioCombo !== undefined) {
+      return 'Combo';
+    }
+    if (this.product.precioOferta !== undefined || this.product.estado !== undefined) {
+      return 'Oferta';
+    }
+    return 'Producto';
+  }
+
+  getDiscountInfo(): string {
+    if (this.product.descuento && this.product.descuento > 0) {
+      return `${this.product.descuento}% OFF`;
     }
     return '';
   }

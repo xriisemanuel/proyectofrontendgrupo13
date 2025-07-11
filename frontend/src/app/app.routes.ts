@@ -12,11 +12,12 @@ export const routes: Routes = [
     redirectTo: 'home',
     pathMatch: 'full'
   },
-  // Ruta Home (pública, accesible sin autenticación)
+  // Ruta home con parámetros de vista
   {
     path: 'home',
     loadComponent: () => import('./features/cliente/pages/home/home').then(m => m.Home)
   },
+
   // Rutas públicas de autenticación (login y register)
   // Ya no usan authRedirectGuard. Serán accesibles directamente.
   {
@@ -200,6 +201,9 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['admin', 'supervisor_ventas'] } // Admin y Supervisor de Ventas pueden editar ofertas
   },
+
+
+
   // --- ¡NUEVA RUTA PARA PERFIL DE REPARTIDOR! ---
   {
     path: 'delivery/dashboard',
