@@ -299,8 +299,12 @@ export class ClientDashboard implements OnInit, OnDestroy {
   /**
    * Navega a la página de calificaciones
    */
-  goToCalificaciones(): void {
-    this.router.navigate(['/calificaciones']);
+  goToCalificaciones(pedidoId?: string): void {
+    if (pedidoId) {
+      this.router.navigate(['/calificaciones'], { queryParams: { pedidoId } });
+    } else {
+      this.router.navigate(['/calificaciones']);
+    }
   }
 
   /**
@@ -308,6 +312,13 @@ export class ClientDashboard implements OnInit, OnDestroy {
    */
   toggleShowAllPedidos(): void {
     this.showAllPedidos = !this.showAllPedidos;
+    if (this.showAllPedidos) {
+      // Filtrar solo entregados y cancelados
+      this.pedidosHistorial = this.pedidos.filter(p => p.estado === 'entregado' || p.estado === 'cancelado');
+    } else {
+      // Restaurar a todos los pedidos
+      this.pedidosHistorial = this.pedidos;
+    }
   }
   
   /**

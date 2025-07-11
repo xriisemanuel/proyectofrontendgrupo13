@@ -12,6 +12,7 @@ import { IRegisterUserPayload, IRegisterSuccessResponse } from './auth.interface
 // Importar jwt-decode
 import { jwtDecode } from 'jwt-decode';
 import { IUsuario } from '../../shared/interfaces'; // Asegúrate de que esta ruta sea correcta
+import { CartService } from '../services/cart.service';
 
 const AUTH_API = API_BASE_URL + '/auth/';
 
@@ -25,7 +26,8 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private cartService: CartService // Inyectar CartService
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
 
@@ -80,6 +82,7 @@ export class AuthService {
             sessionStorage.setItem('user', JSON.stringify(response));
             this.currentUserSubject.next(response);
             console.log('AuthService login: Usuario guardado en sessionStorage y BehaviorSubject.');
+            this.cartService.clearCart(); // Limpiar carrito al hacer login
           } else {
             console.warn('AuthService login: Token recibido ya expirado. No se guarda la sesión.');
             this.logout(); // Limpiar por si acaso
@@ -94,6 +97,7 @@ export class AuthService {
       // --- CAMBIO CLAVE: Usar sessionStorage en lugar de localStorage ---
       sessionStorage.removeItem('user');
       console.log('AuthService logout: Usuario eliminado de sessionStorage.');
+      this.cartService.clearCart(); // Limpiar carrito al hacer logout
     }
     this.currentUserSubject.next(null);
   }
