@@ -1,256 +1,124 @@
-/* Estilos para ProductGrid */
+/* Animación para el efecto de brillo del esqueleto */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
 
+/* Animación de entrada para el grid */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* --- Contenedor Principal de la Cuadrícula --- */
 .product-grid {
-  width: 100%;
+  padding: 20px 0;
 }
 
-.products-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 25px;
-  padding: 10px;
-}
-
-/* Loading skeleton */
+/* --- Estado de Carga (Skeleton) --- */
 .grid-loading {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 25px;
-  padding: 10px;
 }
 
 .skeleton-card {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 15px;
+  border-radius: 12px;
+  background-color: rgba(30, 29, 40, 0.7);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), 0 0 10px rgba(224, 208, 184, 0.05);
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  animation: skeletonPulse 1.5s ease-in-out infinite;
 }
 
 .skeleton-image {
-  width: 100%;
   height: 200px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-color: rgba(17, 16, 18, 0.7);
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    rgba(224, 208, 184, 0.05),
+    transparent
+  );
   background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  animation: shimmer 2s infinite;
 }
 
 .skeleton-content {
-  padding: 20px;
+  padding: 15px;
+}
+
+.skeleton-title,
+.skeleton-description,
+.skeleton-price,
+.skeleton-button {
+  height: 15px;
+  background-color: rgba(17, 16, 18, 0.7);
+  border-radius: 4px;
+  margin-bottom: 10px;
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    rgba(224, 208, 184, 0.05),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
 }
 
 .skeleton-title {
-  width: 80%;
-  height: 20px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-  border-radius: 4px;
-  margin-bottom: 10px;
+  width: 70%;
 }
 
 .skeleton-description {
-  width: 100%;
-  height: 16px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-  border-radius: 4px;
-  margin-bottom: 8px;
-}
-
-.skeleton-description:nth-child(3) {
-  width: 60%;
+  width: 90%;
 }
 
 .skeleton-price {
   width: 40%;
-  height: 24px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-  border-radius: 4px;
-  margin-bottom: 15px;
 }
 
 .skeleton-button {
-  width: 100%;
+  width: 50%;
   height: 40px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-  border-radius: 20px;
+  margin-top: 20px;
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+/* --- Grid Real de Productos --- */
+.products-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 25px;
+  animation: fadeIn 0.8s ease-in-out;
 }
 
-@keyframes skeletonPulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.8;
-  }
-}
-
-/* Empty state */
+/* --- Estado Vacío --- */
 .empty-grid {
   text-align: center;
-  padding: 60px 20px;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 20px;
-  margin: 40px auto;
-  max-width: 500px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 50px 20px;
+  background-color: rgba(30, 29, 40, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(224, 208, 184, 0.15);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4),
+              0 0 10px rgba(224, 208, 184, 0.05);
 }
 
 .empty-icon {
-  font-size: 4rem;
-  margin-bottom: 20px;
-  opacity: 0.7;
+  font-size: 3rem;
+  color: #b3b7b4;
+  margin-bottom: 10px;
+  animation: fadeIn 0.6s ease-in;
 }
 
 .empty-title {
+  color: #b3b7b4;
   font-size: 1.5rem;
-  color: #2c3e50;
-  margin-bottom: 15px;
-  font-weight: 600;
+  margin-bottom: 5px;
 }
 
 .empty-description {
-  color: #7f8c8d;
-  font-size: 1rem;
-  line-height: 1.5;
-  margin: 0;
-}
-
-/* Responsive design */
-@media (max-width: 1200px) {
-  .products-container,
-  .grid-loading {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-  }
-}
-
-@media (max-width: 768px) {
-  .products-container,
-  .grid-loading {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 15px;
-    padding: 5px;
-  }
-  
-  .skeleton-card {
-    border-radius: 12px;
-  }
-  
-  .skeleton-image {
-    height: 180px;
-  }
-  
-  .skeleton-content {
-    padding: 15px;
-  }
-  
-  .empty-grid {
-    padding: 40px 20px;
-    margin: 20px;
-  }
-  
-  .empty-icon {
-    font-size: 3rem;
-  }
-  
-  .empty-title {
-    font-size: 1.3rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .products-container,
-  .grid-loading {
-    grid-template-columns: 1fr;
-    gap: 15px;
-  }
-  
-  .skeleton-image {
-    height: 160px;
-  }
-  
-  .skeleton-content {
-    padding: 12px;
-  }
-  
-  .empty-grid {
-    padding: 30px 15px;
-  }
-  
-  .empty-icon {
-    font-size: 2.5rem;
-  }
-  
-  .empty-title {
-    font-size: 1.2rem;
-  }
-}
-
-/* Modo oscuro */
-@media (prefers-color-scheme: dark) {
-  .skeleton-card {
-    background: rgba(52, 73, 94, 0.9);
-  }
-  
-  .skeleton-image,
-  .skeleton-title,
-  .skeleton-description,
-  .skeleton-price,
-  .skeleton-button {
-    background: linear-gradient(90deg, #34495e 25%, #2c3e50 50%, #34495e 75%);
-  }
-  
-  .empty-grid {
-    background: rgba(52, 73, 94, 0.9);
-  }
-  
-  .empty-title {
-    color: #ecf0f1;
-  }
-  
-  .empty-description {
-    color: #bdc3c7;
-  }
-}
-
-/* Animaciones de entrada */
-.products-container {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Optimizaciones de rendimiento */
-.products-container {
-  will-change: transform;
-  contain: layout style paint;
-}
-
-.skeleton-card {
-  contain: layout style paint;
+  color: #b3b7b4;
+  font-weight: normal;
 }

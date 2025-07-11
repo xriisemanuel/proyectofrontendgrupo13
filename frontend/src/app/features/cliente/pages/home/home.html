@@ -1,66 +1,42 @@
 <div class="home-container">
-  <!-- Contenido principal -->
   <main class="main-content">
-    <!-- Vista de Categorías -->
-    <div *ngIf="currentView === 'categorias'" class="categorias-section">
+    <div *ngIf="currentView === 'categorias'" class="categorias-section main-card">
       <div class="section-header">
         <h2 class="section-title">Explora nuestros productos por Categorías</h2>
       </div>
-      
-      <!-- Pestañas de categorías -->
-      <app-category-tabs 
-        [categories]="categories"
-        [loading]="isLoadingCategories"
-        [selectedCategoryId]="selectedCategoryId"
-        (categorySelected)="onCategorySelected($event)">
+
+      <app-category-tabs [categories]="categories" [loading]="isLoadingCategories"
+        [selectedCategoryId]="selectedCategoryId" (categorySelected)="onCategorySelected($event)">
       </app-category-tabs>
-      
-      <!-- Grid de productos -->
-      <app-product-grid 
-        [products]="filteredProducts" 
-        [loading]="isLoadingProducts"
-        (productSelected)="onProductSelected($event)"
-        (addToCart)="onAddToCart($event)"
-        (buyNow)="onBuyNow($event)">
+
+      <app-product-grid [products]="filteredProducts" [loading]="isLoadingProducts"
+        (productSelected)="onProductSelected($event)" (addToCart)="onAddToCart($event)" (buyNow)="onBuyNow($event)">
       </app-product-grid>
     </div>
 
-    <!-- Vista de Combos -->
-    <div *ngIf="currentView === 'combos'" class="combos-section">
+    <div *ngIf="currentView === 'combos'" class="combos-section main-card">
       <div class="section-header">
         <h2 class="section-title">Nuestros Combos</h2>
         <p class="section-description">Aprovecha nuestras ofertas especiales en combos</p>
       </div>
-      
-      <!-- Grid de combos -->
-      <app-product-grid 
-        [products]="combos" 
-        [loading]="isLoadingCombos"
-        (productSelected)="onProductSelected($event)"
-        (addToCart)="onAddToCart($event)"
-        (buyNow)="onBuyNow($event)">
+
+      <app-product-grid [products]="combos" [loading]="isLoadingCombos" (productSelected)="onProductSelected($event)"
+        (addToCart)="onAddToCart($event)" (buyNow)="onBuyNow($event)">
       </app-product-grid>
     </div>
 
-    <!-- Vista de Ofertas -->
-    <div *ngIf="currentView === 'ofertas'" class="ofertas-section">
+    <div *ngIf="currentView === 'ofertas'" class="ofertas-section main-card">
       <div class="section-header">
         <h2 class="section-title">Ofertas Especiales</h2>
         <p class="section-description">No te pierdas nuestras promociones y descuentos</p>
       </div>
-      
-      <!-- Grid de ofertas -->
-      <app-product-grid 
-        [products]="ofertas" 
-        [loading]="isLoadingOfertas"
-        (productSelected)="onProductSelected($event)"
-        (addToCart)="onAddToCart($event)"
-        (buyNow)="onBuyNow($event)">
+
+      <app-product-grid [products]="ofertas" [loading]="isLoadingOfertas" (productSelected)="onProductSelected($event)"
+        (addToCart)="onAddToCart($event)" (buyNow)="onBuyNow($event)">
       </app-product-grid>
     </div>
   </main>
 
-  <!-- Overlay de carga -->
   <div *ngIf="isLoading" class="loading-overlay">
     <div class="loading-content">
       <div class="loading-spinner"></div>
@@ -68,20 +44,18 @@
     </div>
   </div>
 
-  <!-- Contenedor de error -->
-  <div *ngIf="hasError" class="error-container">
+  <div *ngIf="hasError" class="error-container main-card">
     <div class="error-content">
       <div class="error-icon">⚠️</div>
       <h3 class="error-title">Error al cargar</h3>
       <p class="error-description">{{ errorMessage }}</p>
-      <button (click)="retry()" class="retry-btn">
+      <button (click)="retry()" class="retry-btn btn-primary">
         Intentar de nuevo
       </button>
     </div>
   </div>
 
-  <!-- Estados vacíos -->
-  <div *ngIf="!isLoadingCategories && categories.length === 0" class="empty-state">
+  <div *ngIf="!isLoadingCategories && categories.length === 0" class="empty-state main-card">
     <div class="empty-content">
       <div class="empty-icon">📂</div>
       <h3 class="empty-title">No hay categorías disponibles</h3>
@@ -89,7 +63,8 @@
     </div>
   </div>
 
-  <div *ngIf="!isLoadingProducts && filteredProducts.length === 0 && categories.length > 0" class="empty-state">
+  <div *ngIf="!isLoadingProducts && filteredProducts.length === 0 && categories.length > 0"
+    class="empty-state main-card">
     <div class="empty-content">
       <div class="empty-icon">🍽️</div>
       <h3 class="empty-title">No hay productos en esta categoría</h3>

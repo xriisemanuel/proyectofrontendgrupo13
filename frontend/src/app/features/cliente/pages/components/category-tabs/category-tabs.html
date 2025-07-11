@@ -1,30 +1,23 @@
 <div class="category-tabs">
-  <!-- Loading skeleton -->
   <div *ngIf="loading" class="tabs-loading">
     <div class="skeleton-tab" *ngFor="let item of [1,2,3,4]"></div>
   </div>
-  
-  <!-- Tabs reales -->
+
   <div *ngIf="!loading" class="tabs-container">
-    <button 
-      *ngFor="let category of categories" 
-      class="category-tab"
-      [class.active]="isCategoryActive(category._id)"
-      [disabled]="loading"
-      (click)="onCategoryClick(category._id)">
-      
+    <button *ngFor="let category of categories" class="category-tab" [class.active]="isCategoryActive(category._id)"
+      [disabled]="loading" (click)="onCategoryClick(category._id)">
+
       <div class="tab-content">
-        <span class="tab-icon">📂</span>
+        <span class="tab-icon">🍽️</span>
         <span class="tab-name">{{ category.nombre }}</span>
       </div>
-      
+
       <div *ngIf="isCategoryActive(category._id)" class="active-indicator"></div>
     </button>
   </div>
-  
-  <!-- Estado vacío -->
+
   <div *ngIf="!loading && categories.length === 0" class="empty-tabs">
-    <div class="empty-icon">📂</div>
+    <div class="empty-icon">🍽️</div>
     <p class="empty-text">No hay categorías disponibles</p>
   </div>
 </div>

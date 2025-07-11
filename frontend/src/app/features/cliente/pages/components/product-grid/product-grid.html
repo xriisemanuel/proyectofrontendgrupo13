@@ -1,5 +1,4 @@
 <div class="product-grid">
-  <!-- Loading skeleton -->
   <div *ngIf="loading" class="grid-loading">
     <div class="skeleton-card" *ngFor="let item of [1,2,3,4,5,6,7,8]">
       <div class="skeleton-image"></div>
@@ -11,19 +10,13 @@
       </div>
     </div>
   </div>
-  
-  <!-- Grid real de productos -->
+
   <div *ngIf="!loading" class="products-container">
-    <app-product-card 
-      *ngFor="let product of products" 
-      [product]="product"
-      (productClick)="onProductClick($event)"
-      (addToCart)="onAddToCart($event)"
-      (buyNow)="onBuyNow($event)">
+    <app-product-card *ngFor="let product of products" [product]="product" (productClick)="onProductClick($event)"
+      (addToCart)="onAddToCart($event)" (buyNow)="onBuyNow($event)">
     </app-product-card>
   </div>
-  
-  <!-- Estado vacío -->
+
   <div *ngIf="!loading && products.length === 0" class="empty-grid">
     <div class="empty-icon">🍽️</div>
     <h3 class="empty-title">{{ emptyMessage }}</h3>
