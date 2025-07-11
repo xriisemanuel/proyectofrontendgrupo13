@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil, catchError, finalize } from 'rxjs';
 import { of } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router'; // Asegúrate de importar Router
 
 // Importar servicios
 import { OfertaService } from '../../../../data/services/oferta';
@@ -52,7 +53,8 @@ export class OfertasComponent implements OnInit, OnDestroy {
     private categoriaService: CategoriaService,
     private cartService: CartService,
     private authService: AuthService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private router: Router // Agregar Router al constructor
   ) {}
 
   ngOnInit(): void {
@@ -172,7 +174,9 @@ export class OfertasComponent implements OnInit, OnDestroy {
       this.toastr.error('Solo los clientes pueden realizar compras', 'Acceso denegado');
       return;
     }
-    // Aquí podrías implementar la lógica de compra directa
+    // Agregar la oferta al carrito y navegar al carrito
+    this.cartService.addToCart(producto, 1);
+    this.router.navigate(['/cart']);
   }
 
   retry(): void {
