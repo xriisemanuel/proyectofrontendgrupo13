@@ -86,4 +86,13 @@ export class CalificacionService {
     getCalificacionesByClienteId(clienteId: string): Observable<ICalificacion[]> {
         return this.http.get<ICalificacion[]>(`${CALIFICACION_API}/cliente/${clienteId}`, { headers: this.getAuthHeaders() });
     }
+
+    /**
+     * Obtiene las calificaciones de entrega para un repartidor específico.
+     * @param repartidorId El ID del repartidor.
+     * @returns Observable con las calificaciones del repartidor.
+     */
+    getCalificacionesByRepartidorId(repartidorId: string): Observable<any> {
+        return this.http.get<any>(`${CALIFICACION_API}/repartidor/${repartidorId}`, { headers: this.getAuthHeaders() });
+    }
 }

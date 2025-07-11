@@ -211,6 +211,13 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['repartidor'] } // Solo los repartidores pueden acceder a este dashboard
   },
+  // --- ¡NUEVA RUTA PARA EDITAR PERFIL DE REPARTIDOR! ---
+  {
+    path: 'delivery/profile/edit',
+    loadComponent: () => import('./features/delivery-profile-edit/delivery-profile-edit').then(m => m.DeliveryProfileEditComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['repartidor'] } // Solo los repartidores pueden editar su perfil
+  },
   // --- ¡NUEVA RUTA PARA DASHBOARD DE COCINA! ---
   {
     path: 'kitchen/dashboard',

@@ -1,0 +1,99 @@
+<div class="delivery-dashboard-container">
+  <div class="profile-card">
+    <div class="card-header">
+      <h1><i class="fas fa-user-edit"></i> Editar Perfil de Repartidor</h1>
+      <p>Actualiza tu información personal y de trabajo</p>
+    </div>
+
+    <!-- Loading spinner -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Cargando datos del perfil...</p>
+    </div>
+
+    <!-- Error message -->
+    <div *ngIf="errorMessage" class="error-message">
+      <i class="fas fa-exclamation-triangle"></i>
+      {{ errorMessage }}
+    </div>
+
+    <!-- Success message -->
+    <div *ngIf="successMessage" class="success-message">
+      <i class="fas fa-check-circle"></i>
+      {{ successMessage }}
+    </div>
+
+    <!-- Form -->
+    <form *ngIf="!loading" [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+      <!-- Datos del Usuario -->
+      <div class="form-section">
+        <h3><i class="fas fa-id-card"></i> Datos Personales</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nombre"><i class="fas fa-user"></i> Nombre *</label>
+            <input type="text" id="nombre" formControlName="nombre" [class.error]="profileForm.get('nombre')?.invalid && profileForm.get('nombre')?.touched" placeholder="Tu nombre">
+            <span *ngIf="profileForm.get('nombre')?.invalid && profileForm.get('nombre')?.touched" class="error-text">{{ getErrorMessage('nombre') }}</span>
+          </div>
+          <div class="form-group">
+            <label for="apellido"><i class="fas fa-user"></i> Apellido *</label>
+            <input type="text" id="apellido" formControlName="apellido" [class.error]="profileForm.get('apellido')?.invalid && profileForm.get('apellido')?.touched" placeholder="Tu apellido">
+            <span *ngIf="profileForm.get('apellido')?.invalid && profileForm.get('apellido')?.touched" class="error-text">{{ getErrorMessage('apellido') }}</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="username"><i class="fas fa-at"></i> Nombre de Usuario *</label>
+            <input type="text" id="username" formControlName="username" [class.error]="profileForm.get('username')?.invalid && profileForm.get('username')?.touched" placeholder="Tu nombre de usuario">
+            <span *ngIf="profileForm.get('username')?.invalid && profileForm.get('username')?.touched" class="error-text">{{ getErrorMessage('username') }}</span>
+          </div>
+          <div class="form-group">
+            <label for="email"><i class="fas fa-envelope"></i> Email *</label>
+            <input type="email" id="email" formControlName="email" [class.error]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched" placeholder="tu@email.com">
+            <span *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched" class="error-text">{{ getErrorMessage('email') }}</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="telefono"><i class="fas fa-phone"></i> Teléfono *</label>
+          <input type="tel" id="telefono" formControlName="telefono" [class.error]="profileForm.get('telefono')?.invalid && profileForm.get('telefono')?.touched" placeholder="+54 9 11 1234-5678">
+          <span *ngIf="profileForm.get('telefono')?.invalid && profileForm.get('telefono')?.touched" class="error-text">{{ getErrorMessage('telefono') }}</span>
+        </div>
+      </div>
+      <!-- Datos del Repartidor -->
+      <div class="form-section">
+        <h3><i class="fas fa-motorcycle"></i> Datos de Trabajo</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="vehiculo"><i class="fas fa-motorcycle"></i> Vehículo *</label>
+            <input type="text" id="vehiculo" formControlName="vehiculo" [class.error]="profileForm.get('vehiculo')?.invalid && profileForm.get('vehiculo')?.touched" placeholder="Ej: Moto Honda CG 150, Auto Toyota Corolla">
+            <span *ngIf="profileForm.get('vehiculo')?.invalid && profileForm.get('vehiculo')?.touched" class="error-text">{{ getErrorMessage('vehiculo') }}</span>
+          </div>
+          <div class="form-group">
+            <label for="numeroLicencia"><i class="fas fa-id-card"></i> Número de Licencia *</label>
+            <input type="text" id="numeroLicencia" formControlName="numeroLicencia" [class.error]="profileForm.get('numeroLicencia')?.invalid && profileForm.get('numeroLicencia')?.touched" placeholder="Número de licencia de conducir">
+            <span *ngIf="profileForm.get('numeroLicencia')?.invalid && profileForm.get('numeroLicencia')?.touched" class="error-text">{{ getErrorMessage('numeroLicencia') }}</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="estado"><i class="fas fa-toggle-on"></i> Estado de Disponibilidad *</label>
+          <select id="estado" formControlName="estado" [class.error]="profileForm.get('estado')?.invalid && profileForm.get('estado')?.touched">
+            <option value="disponible">Disponible</option>
+            <option value="en_entrega">En Entrega</option>
+            <option value="fuera_de_servicio">Fuera de Servicio</option>
+          </select>
+          <span *ngIf="profileForm.get('estado')?.invalid && profileForm.get('estado')?.touched" class="error-text">{{ getErrorMessage('estado') }}</span>
+        </div>
+      </div>
+      <!-- Botones -->
+      <div class="form-actions">
+        <button type="button" class="btn-action btn-edit" (click)="goBackToDashboard()" [disabled]="isSubmitting">
+          <i class="fas fa-arrow-left"></i> Volver al Dashboard
+        </button>
+        <button type="submit" class="btn-action btn-success" [disabled]="profileForm.invalid || isSubmitting">
+          <i *ngIf="isSubmitting" class="fas fa-spinner fa-spin"></i>
+          <i *ngIf="!isSubmitting" class="fas fa-save"></i>
+          {{ isSubmitting ? 'Guardando...' : 'Guardar Cambios' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div> 

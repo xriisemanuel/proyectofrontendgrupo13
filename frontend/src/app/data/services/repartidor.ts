@@ -83,6 +83,25 @@ export class RepartidorService {
     return this.http.patch<any>(`${REPARTIDOR_API}/${repartidorId}/registrar-entrega`, entregaData, { headers: this.getAuthHeaders() });
   }
 
+  /**
+   * Actualiza el perfil completo del repartidor (datos del usuario y repartidor).
+   * @param repartidorId El ID del perfil de repartidor.
+   * @param updateData Los datos actualizados del repartidor y usuario asociado.
+   * @returns Observable de la respuesta del backend.
+   */
+  updateRepartidor(repartidorId: string, updateData: {
+    vehiculo?: string;
+    numeroLicencia?: string;
+    estado?: string;
+    username?: string;
+    email?: string;
+    telefono?: string;
+    nombre?: string;
+    apellido?: string;
+  }): Observable<any> {
+    return this.http.put<any>(`${REPARTIDOR_API}/${repartidorId}/profile`, updateData, { headers: this.getAuthHeaders() });
+  }
+
   // Si en el futuro quieres usar el endpoint por ID de repartidor:
   // getRepartidorById(repartidorId: string): Observable<IRepartidor> {
   //   return this.http.get<IRepartidor>(`${REPARTIDOR_API}/${repartidorId}`, { headers: this.getAuthHeaders() });
