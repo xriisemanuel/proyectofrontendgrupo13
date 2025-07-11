@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router'; // Importa Router
+import { DatePipe, CurrencyPipe, TitleCasePipe } from '@angular/common';
 
 // Importaciones de servicios e interfaces
 import { AuthService } from '../../core/auth/auth'; // Asegúrate de que la ruta sea correcta
@@ -19,7 +20,13 @@ import { take, tap, catchError, finalize } from 'rxjs/operators';
 @Component({
   selector: 'app-client-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink], // Módulos necesarios para el template
+  imports: [
+    CommonModule,
+    RouterLink,
+    DatePipe,
+    CurrencyPipe,
+    TitleCasePipe
+  ], // Módulos necesarios para el template
   templateUrl: './client-dashboard.html', // Ruta al archivo HTML
   styleUrls: ['./client-dashboard.css'] // Ruta al archivo CSS
 })
