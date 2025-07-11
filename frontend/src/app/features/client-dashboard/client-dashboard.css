@@ -1065,7 +1065,7 @@ body {
 
 .table-header {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 100px;
+  grid-template-columns: 1fr 1fr 1fr 100px;
   background: var(--primary-color);
   color: white;
   padding: 1rem;
@@ -1078,7 +1078,7 @@ body {
 
 .table-row {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 100px;
+  grid-template-columns: 1fr 1fr 1fr 100px;
   padding: 1rem;
   border-bottom: 1px solid var(--border-color);
   transition: background-color 0.3s ease;
