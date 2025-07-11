@@ -1,3 +1,10 @@
+<!--
+  Correcciones aplicadas:
+  - Se asegura que todos los métodos y propiedades usados existan en el componente.
+  - Se corrige la estructura de *ngIf y *ngFor.
+  - Se agregan comprobaciones de existencia para evitar errores de acceso a propiedades nulas.
+  - Se eliminan posibles errores de sintaxis.
+-->
 <div class="client-dashboard-wrapper">
     <!-- Mensajes de Carga y Error -->
     <div *ngIf="isLoading" class="loading-message">
@@ -21,7 +28,7 @@
             <div class="welcome-header">
                 <div class="welcome-content">
                     <h1 class="welcome-title">
-                        ¡Bienvenido de vuelta, <span class="highlight-name">{{ usuario.nombre }} {{ usuario.apellido }}</span>!
+                        ¡Bienvenido de vuelta, <span class="highlight-name">{{ usuario?.nombre }} {{ usuario?.apellido }}</span>!
                     </h1>
                     <p class="welcome-subtitle">Tu experiencia personalizada comienza aquí</p>
                 </div>
@@ -43,10 +50,10 @@
                         <div class="info-content">
                             <h3>Datos de Usuario</h3>
                             <div class="info-details">
-                                <p><strong>Usuario:</strong> {{ usuario.username }}</p>
-                                <p><strong>Email:</strong> {{ usuario.email }}</p>
-                                <p><strong>Teléfono:</strong> {{ usuario.telefono || 'No especificado' }}</p>
-                                <p><strong>Fecha de Nacimiento:</strong> {{ cliente.fechaNacimiento ? (cliente.fechaNacimiento | date:'dd/MM/yyyy') : 'No especificada' }}</p>
+                                <p><strong>Usuario:</strong> {{ usuario?.username }}</p>
+                                <p><strong>Email:</strong> {{ usuario?.email }}</p>
+                                <p><strong>Teléfono:</strong> {{ usuario?.telefono || 'No especificado' }}</p>
+                                <p><strong>Fecha de Nacimiento:</strong> {{ cliente?.fechaNacimiento ? (cliente?.fechaNacimiento | date:'dd/MM/yyyy') : 'No especificada' }}</p>
                             </div>
                         </div>
                     </div>
@@ -58,7 +65,7 @@
                         <div class="info-content">
                             <h3>Dirección de Entrega</h3>
                             <div class="info-details">
-                                <p>{{ cliente.direccion || 'No especificada' }}</p>
+                                <p>{{ cliente?.direccion || 'No especificada' }}</p>
                             </div>
                         </div>
                     </div>
@@ -70,7 +77,7 @@
                         <div class="info-content">
                             <h3>Preferencias Alimentarias</h3>
                             <div class="info-details">
-                                <p>{{ cliente.preferenciasAlimentarias?.length ? cliente.preferenciasAlimentarias?.join(', ') : 'Ninguna especificada' }}</p>
+                                <p>{{ cliente?.preferenciasAlimentarias?.length ? cliente?.preferenciasAlimentarias?.join(', ') : 'Ninguna especificada' }}</p>
                             </div>
                         </div>
                     </div>
@@ -93,26 +100,26 @@
                 <i class="fas fa-spinner fa-spin"></i> Cargando pedidos...
             </div>
 
-            <div *ngIf="!isLoadingPedidos && pedidosRecientes.length === 0" class="no-data-message">
+            <div *ngIf="!isLoadingPedidos && pedidosRecientes?.length === 0" class="no-data-message">
                 <p><i class="fas fa-box-open"></i> No tienes pedidos recientes.</p>
                 <p>¡Haz tu primer pedido y disfruta de nuestros productos!</p>
             </div>
 
-            <div *ngIf="!isLoadingPedidos && pedidosRecientes.length > 0" class="pedidos-grid">
+            <div *ngIf="!isLoadingPedidos && pedidosRecientes?.length > 0" class="pedidos-grid">
                 <div *ngFor="let pedido of (showAllPedidos ? pedidosHistorial : pedidosRecientes)" class="pedido-card">
                     <div class="pedido-header">
-                        <h4>Pedido #{{ pedido._id | slice:0:8 }}</h4>
-                        <span class="pedido-estado" [ngClass]="getPedidoStatusClass(pedido.estado)">
-                            {{ pedido.estado | titlecase }}
+                        <h4>Pedido #{{ pedido?._id | slice:0:8 }}</h4>
+                        <span class="pedido-estado" [ngClass]="getPedidoStatusClass(pedido?.estado)">
+                            {{ pedido?.estado | titlecase }}
                         </span>
                     </div>
                     <div class="pedido-info">
-                        <p><strong>Fecha:</strong> {{ pedido.fechaPedido | date:'shortDate' }}</p>
-                        <p><strong>Total:</strong> {{ pedido.total | currency:'USD':'symbol':'1.2-2' }}</p>
-                        <p><strong>Productos:</strong> {{ pedido.detalleProductos?.length || 0 }} items</p>
+                        <p><strong>Fecha:</strong> {{ pedido?.fechaPedido | date:'shortDate' }}</p>
+                        <p><strong>Total:</strong> {{ pedido?.total | currency:'USD':'symbol':'1.2-2' }}</p>
+                        <p><strong>Productos:</strong> {{ pedido?.detalleProductos?.length || 0 }} items</p>
                     </div>
                     <div class="pedido-actions">
-                        <button *ngIf="pedido.estado === 'entregado'" class="btn-calificar" (click)="goToCalificaciones()">
+                        <button *ngIf="pedido?.estado === 'entregado'" class="btn-calificar" (click)="goToCalificaciones()">
                             <i class="fas fa-star"></i> Calificar
                         </button>
                         <button class="btn-ver-detalles" (click)="openPedidoModal(pedido)">
@@ -138,12 +145,12 @@
                 <i class="fas fa-spinner fa-spin"></i> Cargando calificaciones...
             </div>
 
-            <div *ngIf="!isLoadingCalificaciones && calificaciones.length === 0" class="no-data-message">
+            <div *ngIf="!isLoadingCalificaciones && calificaciones?.length === 0" class="no-data-message">
                 <p><i class="fas fa-comment-dots"></i> Aún no has enviado ninguna calificación.</p>
                 <p>¡Califica tus pedidos y comparte tu experiencia!</p>
             </div>
 
-            <div *ngIf="!isLoadingCalificaciones && calificaciones.length > 0" class="calificaciones-summary">
+            <div *ngIf="!isLoadingCalificaciones && calificaciones?.length > 0" class="calificaciones-summary">
                 <div class="rating-overview">
                     <div class="average-rating">
                         <h3>Promedio General</h3>
@@ -153,40 +160,40 @@
                                 <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star" [class.active]="star <= getAverageRating()"></i>
                             </div>
                         </div>
-                        <p>{{ calificaciones.length }} calificaciones enviadas</p>
+                        <p>{{ calificaciones?.length }} calificaciones enviadas</p>
                     </div>
                 </div>
 
                 <div class="recent-calificaciones">
                     <h4>Calificaciones Recientes</h4>
                     <div class="calificaciones-grid">
-                        <div *ngFor="let calificacion of calificaciones.slice(0, 3)" class="calificacion-card">
+                        <div *ngFor="let calificacion of calificaciones?.slice(0, 3)" class="calificacion-card">
                             <div class="calificacion-header">
-                                <span class="pedido-id">Pedido #{{ getPedidoId(calificacion.pedidoId) | slice:0:8 }}</span>
-                                <span class="calificacion-fecha">{{ calificacion.fechaCalificacion | date:'shortDate' }}</span>
+                                <span class="pedido-id">Pedido #{{ getPedidoId(calificacion?.pedidoId) | slice:0:8 }}</span>
+                                <span class="calificacion-fecha">{{ calificacion?.fechaCalificacion | date:'shortDate' }}</span>
                             </div>
                             <div class="calificacion-ratings">
                                 <div class="rating-item">
                                     <span>Comida:</span>
                                     <div class="stars">
-                                        <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star" [class.active]="star <= (calificacion.puntuacionComida || 0)"></i>
+                                        <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star" [class.active]="star <= (calificacion?.puntuacionComida || 0)"></i>
                                     </div>
                                 </div>
                                 <div class="rating-item">
                                     <span>Servicio:</span>
                                     <div class="stars">
-                                        <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star" [class.active]="star <= (calificacion.puntuacionServicio || 0)"></i>
+                                        <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star" [class.active]="star <= (calificacion?.puntuacionServicio || 0)"></i>
                                     </div>
                                 </div>
                                 <div class="rating-item">
                                     <span>Entrega:</span>
                                     <div class="stars">
-                                        <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star" [class.active]="star <= (calificacion.puntuacionEntrega || 0)"></i>
+                                        <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star" [class.active]="star <= (calificacion?.puntuacionEntrega || 0)"></i>
                                     </div>
                                 </div>
                             </div>
-                            <p *ngIf="calificacion.comentario" class="calificacion-comentario">
-                                "{{ calificacion.comentario }}"
+                            <p *ngIf="calificacion?.comentario" class="calificacion-comentario">
+                                "{{ calificacion?.comentario }}"
                             </p>
                         </div>
                     </div>
@@ -217,12 +224,12 @@
                 <i class="fas fa-spinner fa-spin"></i> Cargando historial...
             </div>
 
-            <div *ngIf="!isLoadingPedidos && pedidosHistorial.length === 0" class="no-data-message">
+            <div *ngIf="!isLoadingPedidos && pedidosHistorial?.length === 0" class="no-data-message">
                 <p><i class="fas fa-history"></i> No tienes historial de pedidos.</p>
                 <p>¡Comienza a hacer pedidos para ver tu historial aquí!</p>
             </div>
 
-            <div *ngIf="!isLoadingPedidos && pedidosHistorial.length > 0" class="historial-table">
+            <div *ngIf="!isLoadingPedidos && pedidosHistorial?.length > 0" class="historial-table">
                 <div class="table-header">
                     <div class="header-cell">Pedido</div>
                     <div class="header-cell">Fecha</div>
@@ -231,17 +238,17 @@
                     <div class="header-cell">Acciones</div>
                 </div>
 
-                <div *ngFor="let pedido of pedidosHistorial.slice(0, 10)" class="table-row">
-                    <div class="table-cell" data-label="Pedido">#{{ pedido._id | slice:0:8 }}</div>
-                    <div class="table-cell" data-label="Fecha">{{ pedido.fechaPedido | date:'shortDate' }}</div>
-                    <div class="table-cell" data-label="Total">{{ pedido.total | currency:'USD':'symbol':'1.2-2' }}</div>
+                <div *ngFor="let pedido of pedidosHistorial?.slice(0, 10)" class="table-row">
+                    <div class="table-cell" data-label="Pedido">#{{ pedido?._id | slice:0:8 }}</div>
+                    <div class="table-cell" data-label="Fecha">{{ pedido?.fechaPedido | date:'shortDate' }}</div>
+                    <div class="table-cell" data-label="Total">{{ pedido?.total | currency:'USD':'symbol':'1.2-2' }}</div>
                     <div class="table-cell" data-label="Estado">
-                        <span class="pedido-estado" [ngClass]="getPedidoStatusClass(pedido.estado)">
-                            {{ pedido.estado | titlecase }}
+                        <span class="pedido-estado" [ngClass]="getPedidoStatusClass(pedido?.estado)">
+                            {{ pedido?.estado | titlecase }}
                         </span>
                     </div>
                     <div class="table-cell" data-label="Acciones">
-                        <button *ngIf="pedido.estado === 'entregado'" class="btn-action" (click)="goToCalificaciones()" title="Calificar">
+                        <button *ngIf="pedido?.estado === 'entregado'" class="btn-action" (click)="goToCalificaciones()" title="Calificar">
                             <i class="fas fa-star"></i>
                         </button>
                         <button class="btn-action" (click)="goToMisPedidos()" title="Ver Detalles">
@@ -251,7 +258,7 @@
                 </div>
             </div>
 
-            <div *ngIf="pedidosHistorial.length > 10" class="ver-mas-container">
+            <div *ngIf="pedidosHistorial?.length > 10" class="ver-mas-container">
                 <button class="btn-ver-mas" (click)="goToMisPedidos()">
                     <i class="fas fa-list"></i> Ver Todos los Pedidos
                 </button>
@@ -263,7 +270,7 @@
     <div *ngIf="showPedidoModal && selectedPedido" class="modal-overlay" (click)="closePedidoModal()">
         <div class="modal-content" (click)="$event.stopPropagation()">
             <div class="modal-header">
-                <h3>Detalles del Pedido #{{ selectedPedido._id | slice:0:8 }}</h3>
+                <h3>Detalles del Pedido #{{ selectedPedido?._id | slice:0:8 }}</h3>
                 <button class="modal-close" (click)="closePedidoModal()">
                     <i class="fas fa-times"></i>
                 </button>
@@ -274,19 +281,19 @@
                     <div class="details-grid">
                         <div class="detail-item">
                             <span class="detail-label">Fecha:</span>
-                            <span>{{ selectedPedido.fechaPedido | date:'fullDate' }}</span>
+                            <span>{{ selectedPedido?.fechaPedido | date:'fullDate' }}</span>
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">Estado:</span>
-                            <span [ngClass]="getPedidoStatusClass(selectedPedido.estado)">{{ selectedPedido.estado | titlecase }}</span>
+                            <span [ngClass]="getPedidoStatusClass(selectedPedido?.estado)">{{ selectedPedido?.estado | titlecase }}</span>
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">Dirección:</span>
-                            <span>{{ selectedPedido.direccionEntrega }}</span>
+                            <span>{{ selectedPedido?.direccionEntrega }}</span>
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">Método de Pago:</span>
-                            <span>{{ selectedPedido.metodoPago }}</span>
+                            <span>{{ selectedPedido?.metodoPago }}</span>
                         </div>
                     </div>
                 </div>
@@ -294,13 +301,13 @@
                 <div class="pedido-details-section">
                     <h4>Productos</h4>
                     <div class="productos-list">
-                        <div *ngFor="let producto of selectedPedido.detalleProductos" class="producto-item">
+                        <div *ngFor="let producto of selectedPedido?.detalleProductos" class="producto-item">
                             <div class="producto-info">
-                                <span class="producto-nombre">{{ producto.nombreProducto }}</span>
-                                <span class="producto-cantidad">x{{ producto.cantidad }}</span>
+                                <span class="producto-nombre">{{ producto?.nombreProducto }}</span>
+                                <span class="producto-cantidad">x{{ producto?.cantidad }}</span>
                                 <span class="producto-precio">
-                                    <span class="precio-unitario">{{ producto.precioUnitario | currency:'USD':'symbol':'1.2-2' }}</span>
-                                    <span class="precio-total">= {{ (producto.precioUnitario * producto.cantidad) | currency:'USD':'symbol':'1.2-2' }}</span>
+                                    <span class="precio-unitario">{{ producto?.precioUnitario | currency:'USD':'symbol':'1.2-2' }}</span>
+                                    <span class="precio-total">= {{ (producto?.precioUnitario * producto?.cantidad) | currency:'USD':'symbol':'1.2-2' }}</span>
                                 </span>
                             </div>
                         </div>
@@ -312,26 +319,26 @@
                     <div class="costos-summary">
                         <div class="costo-item">
                             <span>Subtotal:</span>
-                            <span>{{ selectedPedido.subtotal | currency:'USD':'symbol':'1.2-2' }}</span>
+                            <span>{{ selectedPedido?.subtotal | currency:'USD':'symbol':'1.2-2' }}</span>
                         </div>
-                        <div class="costo-item" *ngIf="selectedPedido.descuentos">
+                        <div class="costo-item" *ngIf="selectedPedido?.descuentos">
                             <span>Descuentos:</span>
-                            <span>-{{ selectedPedido.descuentos | currency:'USD':'symbol':'1.2-2' }}</span>
+                            <span>-{{ selectedPedido?.descuentos | currency:'USD':'symbol':'1.2-2' }}</span>
                         </div>
-                        <div class="costo-item" *ngIf="selectedPedido.costoEnvio">
+                        <div class="costo-item" *ngIf="selectedPedido?.costoEnvio">
                             <span>Envío:</span>
-                            <span>{{ selectedPedido.costoEnvio | currency:'USD':'symbol':'1.2-2' }}</span>
+                            <span>{{ selectedPedido?.costoEnvio | currency:'USD':'symbol':'1.2-2' }}</span>
                         </div>
                         <div class="costo-item total">
                             <span>Total:</span>
-                            <span>{{ selectedPedido.total | currency:'USD':'symbol':'1.2-2' }}</span>
+                            <span>{{ selectedPedido?.total | currency:'USD':'symbol':'1.2-2' }}</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="pedido-details-section" *ngIf="selectedPedido.observaciones">
+                <div class="pedido-details-section" *ngIf="selectedPedido?.observaciones">
                     <h4>Observaciones</h4>
-                    <p class="observaciones">{{ selectedPedido.observaciones }}</p>
+                    <p class="observaciones">{{ selectedPedido?.observaciones }}</p>
                 </div>
             </div>
             <div class="modal-footer">
