@@ -93,4 +93,13 @@ export class ClienteService {
   getClienteByUsuarioId(usuarioId: string): Observable<ICliente> {
     return this.http.get<ICliente>(`${CLIENTE_API}/by-usuario/${usuarioId}`, { headers: this.getAuthHeaders() });
   }
+
+  /**
+   * Cambia la contraseña del usuario asociado a un cliente.
+   * @param clienteId El ID del cliente
+   * @param payload { currentPassword, newPassword, confirmPassword }
+   */
+  cambiarPassword(clienteId: string, payload: { currentPassword: string, newPassword: string, confirmPassword: string }): Observable<any> {
+    return this.http.post<any>(`${CLIENTE_API}/${clienteId}/cambiar-password`, payload, { headers: this.getAuthHeaders() });
+  }
 }

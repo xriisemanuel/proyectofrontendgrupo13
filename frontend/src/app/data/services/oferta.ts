@@ -85,6 +85,13 @@ export class OfertaService {
     );
   }
 
+  // Obtener productos en oferta
+  getProductosEnOferta(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/productos-en-oferta`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   // Calcular precio con descuento aplicando ofertas
   calcularPrecioConDescuento(precioOriginal: number, ofertas: IOfertaPopulated[]): number {
     if (!ofertas || ofertas.length === 0) {

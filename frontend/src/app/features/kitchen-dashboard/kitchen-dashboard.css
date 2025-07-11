@@ -1,611 +1,353 @@
-/* src/app/components/kitchen-dashboard/kitchen-dashboard.css */
+/* src/app/components/kitchen-dashboard/kitchen-dashboard.component.css */
 
-/* Fondo oscuro para toda la página */
-body {
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 25%, #0f0f23 50%, #1a1a2e 75%, #0f0f23 100%);
-  margin: 0;
-  padding: 0;
-  font-family: 'Inter', sans-serif;
-  color: #e0e0e0;
+/* --- General Structure and Typography --- */
+
+:host {
+  display: block;
+  font-family: 'Arial', sans-serif;
+  background-color: #131214;
+  color: #d3c1a5;
   min-height: 100vh;
+  margin: 0;
+  box-sizing: border-box;
+  font-size: 16px;
 }
 
 .kitchen-dashboard-container {
-  padding: 30px;
-  max-width: 1200px;
-  margin: 40px auto;
-  background: #1a1a2e;
-  border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-}
-
-
-
-/* Estilos para la cabecera del dashboard (título y botón de logout) */
-.dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  /* Alinea el título a la izquierda y el botón a la derecha */
-  align-items: center;
-  margin-bottom: 30px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid rgba(139, 233, 253, 0.2);
-  /* Borde inferior sutil */
+  padding: 20px;
+  border-radius: 15px;
+  /* Bordes redondeados para el contenedor principal */
+  font-weight: bold;
+  /* Todo el texto en negrita */
 }
 
 h1,
 h2 {
-  color: #8be9fd;
+  color: #c66c43;
+  margin-bottom: 15px;
   text-align: center;
-  margin-bottom: 0;
-  font-weight: 700;
-  text-shadow: 0 2px 5px rgba(0, 255, 255, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  position: relative;
+  font-size: 2.5rem;
+  font-weight: bold;
 }
 
-
-
-h3 {
-  color: #6272a4;
-  /* Azul grisáceo para subtítulos */
-  margin-top: 25px;
-  margin-bottom: 15px;
-  font-weight: 600;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 10px;
+h2 {
+  font-size: 1.8rem;
 }
 
 p {
-  font-size: 1em;
-  line-height: 1.6;
-  margin-bottom: 10px;
-  color: #c0c0c0;
-  /* Texto más claro para la legibilidad */
-  text-align: center;
-}
-
-strong {
-  color: #f8f8f2;
-  /* Color más blanco para las etiquetas fuertes */
-}
-
-.loading-message,
-.error-message,
-.success-message,
-.no-data-message {
-  padding: 15px;
-  border-radius: 10px;
   margin-bottom: 20px;
   text-align: center;
-  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+/* --- Dashboard Header and Logout Button --- */
+
+.dashboard-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  color: #f8f8f2;
-  /* Texto claro */
+  padding-bottom: 20px;
+  border-bottom: 1px solid #573a30;
+}
+
+.dashboard-header h1 {
+  margin-bottom: 15px;
+}
+
+.logout-button {
+  background-color: #c44a3e;
+  color: #131214;
+  border: none;
+  padding: 12px 24px;
+  cursor: pointer;
+  border-radius: 9px;
+  transition: all 0.3s ease-in-out;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.logout-button:hover {
+  color: #131214;
+  background: linear-gradient(to right, #c66c43, #d3c1a5);
+  transform: scale(1.05);
+}
+
+/* --- Message Sections (Loading, Error, Success) --- */
+
+.message-section div {
+  padding: 15px;
+  border-radius: 15px;
+  /* Bordes redondeados en las tarjetas de mensaje */
+  margin-bottom: 15px;
+  font-weight: bold;
+  text-align: center;
+  font-size: 1.1rem;
 }
 
 .loading-message {
-  background-color: rgba(139, 233, 253, 0.15);
-  /* Cian semi-transparente */
-  border: 1px solid #8be9fd;
+  background-color: rgba(211, 193, 165, 0.1);
+  color: #d3c1a5;
 }
 
 .error-message {
-  background-color: rgba(255, 85, 85, 0.15);
-  /* Rojo semi-transparente */
-  color: #ff5555;
-  border: 1px solid #ff5555;
+  background-color: rgba(196, 74, 62, 0.1);
+  color: #c44a3e;
 }
 
 .success-message {
-  background-color: rgba(80, 250, 123, 0.15);
-  /* Verde semi-transparente */
-  color: #50fa7b;
-  border: 1px solid #50fa7b;
+  background-color: rgba(100, 103, 94, 0.1);
+  color: #a6ada3;
 }
 
-.no-data-message {
-  background-color: rgba(98, 114, 164, 0.1);
-  /* Gris azulado semi-transparente */
-  color: #bd93f9;
-  /* Púrpura claro */
-  border: 1px solid #6272a4;
-}
+/* --- Filter Controls --- */
 
-/* Filtros */
 .filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
   justify-content: center;
-  margin-bottom: 30px;
+  gap: 20px;
+  background-color: #21212c;
   padding: 25px;
-  background: #2a2a3e;
   border-radius: 15px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-  border: 2px solid rgba(139, 233, 253, 0.2);
+  /* Bordes redondeados para la tarjeta de filtros */
+  margin-bottom: 30px;
 }
-
-
 
 .filter-group {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
 }
 
 .filters label {
-  color: #8be9fd;
-  font-weight: 600;
-  font-size: 1.1em;
-  display: flex;
-  align-items: center;
-  gap: 5px;
+  color: #a6ada3;
+  margin-bottom: 8px;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: bold;
 }
 
 .filters select,
 .filters input[type="text"] {
-  padding: 10px 15px;
-  border-radius: 8px;
-  border: 1px solid #6272a4;
-  background-color: rgba(40, 42, 54, 0.8);
-  color: #f8f8f2;
-  font-size: 1em;
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background-color: #383e38;
+  border: 1px solid #d3c1a5;
+  color: #d3c1a5;
+  padding: 10px 12px;
+  border-radius: 9px;
+  font-size: 1rem;
+  font-weight: bold;
 }
 
-/* Estilos para el grupo de búsqueda con botón de limpiar */
-.filter-group {
-  position: relative;
-}
-
-.clear-search-btn {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: #ff5555;
+.filters button {
+  padding: 12px 16px;
   border: none;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: 9px;
   cursor: pointer;
-  color: white;
-  font-size: 10px;
-  transition: all 0.3s ease;
+  margin-top: 5px;
+  transition: all 0.3s ease-in-out;
+  color: #131214;
+  font-size: 1rem;
+  font-weight: bold;
 }
 
-.clear-search-btn:hover {
-  background: #e04c4c;
-  transform: translateY(-50%) scale(1.1);
-}
-
-/* Estilos para botones específicos */
 .refresh-btn {
-  background: #8be9fd;
-  border-color: #8be9fd;
-  color: #282a36;
+  background-color: #c66c43;
 }
 
-.refresh-btn:hover:not([disabled]) {
-  background: #72c7e0;
-  border-color: #72c7e0;
+.refresh-btn:hover {
+  background: linear-gradient(to right, #cc925d, #a6ada3);
+  transform: scale(1.05);
 }
 
 .clear-filters-btn {
-  background: #ffb86c;
-  border-color: #ffb86c;
-  color: #282a36;
+  background-color: #573a30;
+  color: #d3c1a5;
 }
 
-.clear-filters-btn:hover:not([disabled]) {
-  background: #e09d5a;
-  border-color: #e09d5a;
+.clear-filters-btn:hover {
+  background: linear-gradient(to right, #a6ada3, #64675e);
+  color: #131214;
+  transform: scale(1.05);
 }
 
-.filters select:focus,
-.filters input[type="text"]:focus {
-  border-color: #bd93f9;
-  /* Borde púrpura al enfocar */
-  box-shadow: 0 0 0 3px rgba(189, 147, 249, 0.3);
-  /* Sombra de enfoque */
-  outline: none;
+.clear-search-btn {
+  background: none;
+  color: #c66c43;
+  font-weight: bold;
+  margin-left: 5px;
+  padding: 0;
+  border-radius: 0;
+  font-size: 1.2rem;
 }
 
-/* Estilos base para todos los botones */
-button {
-  background: #50fa7b;
-  color: #282a36;
-  border: 2px solid #50fa7b;
-  padding: 12px 25px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 600;
-  font-size: 1em;
-  box-shadow: 0 4px 15px rgba(80, 250, 123, 0.4);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+/* --- Orders Table --- */
 
-
-
-button:hover:not([disabled]) {
-  background-color: #44c76d;
-  /* Verde un poco más oscuro al pasar el ratón */
-  border-color: #44c76d;
-  transform: translateY(-2px);
-  /* Ligero levantamiento */
-  box-shadow: 0 6px 15px rgba(80, 250, 123, 0.5);
-  /* Sombra más intensa */
-}
-
-button:disabled {
-  background-color: #6272a4;
-  /* Gris azulado para deshabilitado */
-  border-color: #6272a4;
-  cursor: not-allowed;
-  opacity: 0.6;
-  box-shadow: none;
-}
-
-/* Estilo específico para el botón de cerrar sesión */
-.logout-button {
-  background-color: #ff5555;
-  /* Rojo vibrante */
-  border-color: #ff5555;
-  color: #f8f8f2;
-  /* Texto claro */
-  font-size: 0.9em;
-  padding: 8px 18px;
-  box-shadow: 0 4px 10px rgba(255, 85, 85, 0.3);
-}
-
-.logout-button:hover:not([disabled]) {
-  background-color: #e04c4c;
-  border-color: #e04c4c;
-  box-shadow: 0 6px 15px rgba(255, 85, 85, 0.5);
-}
-
-
-/* Tabla de Pedidos */
 .orders-table-container {
-  background: #2a2a3e;
-  border: 2px solid rgba(80, 250, 123, 0.3);
-  border-radius: 15px;
-  padding: 30px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
   overflow-x: auto;
+  text-align: center;
+  border-radius: 15px;
+  /* Bordes redondeados en la tarjeta de la tabla */
 }
 
+.no-data-message {
+  padding: 20px;
+  text-align: center;
+  color: #a6ada3;
+  background-color: #21212c;
+  border-radius: 15px;
+  /* Bordes redondeados en el mensaje de no hay datos */
+  font-size: 1.2rem;
+  font-weight: bold;
+}
 
-
-.orders-table-container table {
+table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
+  margin: 20px auto;
+  background-color: #1b1b24;
+  border-radius: 15px;
+  /* Bordes redondeados en la tabla */
+  overflow: hidden;
+  font-size: 1rem;
+  font-weight: bold;
 }
 
-.orders-table-container th,
-.orders-table-container td {
-  padding: 12px 15px;
+th,
+td {
+  padding: 15px 18px;
   text-align: left;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  color: #f8f8f2;
-  /* Texto claro en la tabla */
+  border-bottom: 1px solid #383e38;
 }
 
-.orders-table-container th {
-  background: #3a3a4e;
-  font-weight: 700;
-  color: #8be9fd;
-  text-transform: uppercase;
-  font-size: 0.9em;
-  letter-spacing: 0.5px;
-  border-bottom: 2px solid rgba(139, 233, 253, 0.2);
+td {
+  font-size: 1.1rem;
 }
 
+thead th {
+  background-color: #573a30;
+  color: #d3c1a5;
+  font-weight: bold;
+}
 
+tbody tr {
+  transition: all 0.3s ease-in-out;
+}
 
-.orders-table-container tr:hover {
-  background: #3a3a4e;
+tbody tr:nth-child(even) {
+  background-color: #241d1c;
+}
+
+tbody tr:hover {
+  background-color: #21212c;
   transform: scale(1.01);
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
-.orders-table-container tbody tr:last-child td {
-  border-bottom: none;
-  /* Eliminar el borde inferior de la última fila */
+/* --- Status Badges --- */
+
+.status-pendiente {
+  color: #c66c43;
+  font-weight: bold;
 }
 
-/* Detalle de Productos en la tabla */
-.orders-table-container ul {
+.status-confirmado {
+  color: #a6ada3;
+  font-weight: bold;
+}
+
+.status-en-preparacion {
+  color: #d3c1a5;
+  font-weight: bold;
+}
+
+.status-en-envio {
+  color: #5b3b75;
+  font-weight: bold;
+}
+
+.status-entregado {
+  color: #383e38;
+  font-weight: bold;
+}
+
+.status-cancelado {
+  color: #c44a3e;
+  font-weight: bold;
+}
+
+/* --- Product Detail List --- */
+
+td ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.orders-table-container ul li {
-  background: #3a3a4e;
-  border-left: 3px solid #bd93f9;
-  padding: 8px 12px;
+td li {
   margin-bottom: 5px;
-  border-radius: 6px;
-  font-size: 0.85em;
-  color: #f8f8f2;
-  transition: all 0.3s ease;
+  font-size: 1rem;
+  color: #a6ada3;
 }
 
-.orders-table-container ul li:hover {
-  background: #4a4a5e;
-  transform: translateX(5px);
-  box-shadow: 0 2px 8px rgba(189, 147, 249, 0.3);
-}
+/* --- Action Buttons --- */
 
-/* Botones de acción en la tabla */
-.orders-table-container td button {
-  background-color: #bd93f9;
-  /* Púrpura por defecto para acciones */
-  border-color: #bd93f9;
-  color: #282a36;
-  padding: 8px 15px;
-  border-radius: 8px;
-  font-size: 0.9em;
-  font-weight: 500;
-  box-shadow: 0 2px 8px rgba(189, 147, 249, 0.2);
-  margin-right: 8px;
-  /* Espacio entre botones */
-  margin-bottom: 8px;
-  /* Espacio para envolver en móvil */
-  white-space: nowrap;
-  /* Evita que el texto del botón se rompa */
-}
-
-.orders-table-container td button:hover:not([disabled]) {
-  background-color: #a47ae8;
-  border-color: #a47ae8;
-  box-shadow: 0 4px 12px rgba(189, 147, 249, 0.4);
-  transform: translateY(-1px);
-}
-
-/* Colores específicos para los botones de estado */
-.orders-table-container td button:nth-of-type(1) {
-  /* Confirmar */
-  background-color: #50fa7b;
-  /* Verde */
-  border-color: #50fa7b;
-  box-shadow: 0 2px 8px rgba(80, 250, 123, 0.2);
-}
-
-.orders-table-container td button:nth-of-type(1):hover:not([disabled]) {
-  background-color: #44c76d;
-  border-color: #44c76d;
-  box-shadow: 0 4px 12px rgba(80, 250, 123, 0.4);
-}
-
-.orders-table-container td button:nth-of-type(2) {
-  /* En Preparación */
-  background-color: #ffb86c;
-  /* Naranja */
-  border-color: #ffb86c;
-  box-shadow: 0 2px 8px rgba(255, 184, 108, 0.2);
-}
-
-.orders-table-container td button:nth-of-type(2):hover:not([disabled]) {
-  background-color: #e09d5a;
-  border-color: #e09d5a;
-  box-shadow: 0 4px 12px rgba(255, 184, 108, 0.4);
-}
-
-.orders-table-container td button:nth-of-type(3) {
-  /* Listo para Envío */
-  background-color: #8be9fd;
-  /* Cian */
-  border-color: #8be9fd;
-  box-shadow: 0 2px 8px rgba(139, 233, 253, 0.2);
-}
-
-.orders-table-container td button:nth-of-type(3):hover:not([disabled]) {
-  background-color: #72c7e0;
-  border-color: #72c7e0;
-  box-shadow: 0 4px 12px rgba(139, 233, 253, 0.4);
-}
-
-.orders-table-container td button.cancel-button {
-  /* Cancelar */
-  background-color: #ff5555;
-  /* Rojo */
-  border-color: #ff5555;
-  box-shadow: 0 2px 8px rgba(255, 85, 85, 0.2);
-}
-
-.orders-table-container td button.cancel-button:hover:not([disabled]) {
-  background-color: #e04c4c;
-  border-color: #e04c4c;
-  box-shadow: 0 4px 12px rgba(255, 85, 85, 0.4);
-}
-
-/* Estilos para los spans de estado en la tabla */
-.status-pendiente {
-  color: #ffb86c;
+td button {
+  padding: 10px 14px;
+  margin-right: 5px;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+  background-color: #c66c43;
+  color: #131214;
+  transition: all 0.3s ease-in-out;
+  font-size: 1rem;
   font-weight: bold;
 }
 
-/* Naranja */
-.status-confirmado {
-  color: #bd93f9;
-  font-weight: bold;
+td button:hover {
+  background: linear-gradient(to right, #cc925d, #a6ada3);
+  color: #131214;
 }
 
-/* Púrpura */
-.status-en-preparacion {
-  color: #f1fa8c;
-  font-weight: bold;
+.cancel-button {
+  background-color: #c44a3e;
 }
 
-/* Amarillo */
-.status-en-envio {
-  color: #8be9fd;
-  font-weight: bold;
+.cancel-button:hover {
+  background: linear-gradient(to right, #c44a40, #573a30);
+  color: #d3c1a5;
 }
 
-/* Cian */
-.status-entregado {
-  color: #50fa7b;
-  font-weight: bold;
-}
+/* --- Responsive Design --- */
 
-/* Verde */
-.status-cancelado {
-  color: #ff5555;
-  font-weight: bold;
-}
-
-/* Rojo */
-
-/* Indicador de búsqueda en el título */
-.search-indicator {
-  color: #ffb86c;
-  font-style: italic;
-  font-size: 0.9em;
-  margin-left: 10px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 992px) {
-  .kitchen-dashboard-container {
-    padding: 25px;
-    margin: 30px auto;
+@media (max-width: 1024px) {
+  .filters {
+    flex-direction: column;
   }
+}
 
+@media (max-width: 600px) {
   .dashboard-header {
     flex-direction: column;
-    gap: 15px;
-    text-align: center;
+    align-items: center;
+  }
+
+  .dashboard-header h1 {
+    font-size: 2rem;
+  }
+
+  .logout-button {
+    margin-top: 15px;
   }
 
   .filters {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .filter-group {
-    flex-direction: column;
-    align-items: flex-start;
-    width: 100%;
-  }
-
-  .filters select,
-  .filters input[type="text"],
-  .filters button {
-    width: 100%;
-    margin-top: 5px;
+    padding: 15px;
   }
 
   .orders-table-container {
-    padding: 15px;
+    overflow-x: auto;
   }
 
-  .orders-table-container th,
-  .orders-table-container td {
-    padding: 10px;
-    font-size: 0.9em;
+  td {
+    word-break: break-word;
   }
-
-  .orders-table-container td button {
-    width: calc(50% - 4px);
-    /* Dos botones por fila */
-    margin-right: 4px;
-    margin-bottom: 8px;
-  }
-
-  .orders-table-container td button:nth-child(2n) {
-    /* Ajuste para el segundo botón en cada par */
-    margin-right: 0;
-  }
-}
-
-@media (max-width: 768px) {
-  .kitchen-dashboard-container {
-    padding: 20px;
-    margin: 20px auto;
-  }
-
-  h1 {
-    font-size: 2em;
-  }
-
-  h2 {
-    font-size: 1.8em;
-  }
-
-  .orders-table-container td button {
-    width: 100%;
-    /* Un botón por fila en pantallas muy pequeñas */
-    margin-right: 0;
-  }
-}
-
-@media (max-width: 480px) {
-  .kitchen-dashboard-container {
-    padding: 15px;
-  }
-
-  h1 {
-    font-size: 1.8em;
-    flex-direction: column;
-  }
-
-  h2 {
-    font-size: 1.6em;
-  }
-
-  .filters {
-    gap: 15px;
-  }
-}
-
-/* Estilos para el checkbox de mostrar entregados */
-.filter-group input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  margin-right: 8px;
-  accent-color: #50fa7b;
-  cursor: pointer;
-}
-
-.filter-group input[type="checkbox"]:checked {
-  background-color: #50fa7b;
-  border-color: #50fa7b;
-}
-
-.filter-group label[for="showEntregados"] {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  color: #8be9fd;
-  font-weight: 600;
-  font-size: 1.1em;
-  gap: 5px;
-}
-
-.filter-group label[for="showEntregados"]:hover {
-  color: #50fa7b;
-  transition: color 0.3s ease;
 }

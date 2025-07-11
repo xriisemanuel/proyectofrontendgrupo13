@@ -31,6 +31,9 @@
           <button class="btn-edit-profile" (click)="goToEditProfile()">
             <i class="fas fa-user-edit"></i> Editar Perfil
           </button>
+          <button *ngIf="usuario && authService.getRole() === 'cliente'" class="btn-go-profile" (click)="goToEditProfile()">
+            <i class="fas fa-user"></i> Ir a tu perfil
+          </button>
         </div>
       </div>
 

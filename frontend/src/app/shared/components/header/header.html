@@ -34,6 +34,12 @@
             <span *ngIf="cartTotal > 0" class="cart-total">${{ cartTotal | number:'1.2-2' }}</span>
           </button>
 
+          <!-- Botón personalizado solo para clientes -->
+          <button *ngIf="isCliente()" class="go-profile-btn" (click)="goToClientProfile()">
+            <span class="go-profile-icon">👤</span>
+            <span class="go-profile-text">Ir a tu perfil</span>
+          </button>
+
           <!-- Botón de perfil -->
           <button class="profile-btn" (click)="onProfileClick()">
             <span class="user-name">{{ userName || 'Mi Perfil' }}</span>

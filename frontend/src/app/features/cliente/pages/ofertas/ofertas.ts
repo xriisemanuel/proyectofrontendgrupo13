@@ -34,8 +34,8 @@ export class OfertasComponent implements OnInit, OnDestroy {
 
   // Datos
   categories: ICategoria[] = [];
-  allOfertas: IOfertaPopulated[] = [];
-  filteredOfertas: IOfertaPopulated[] = [];
+  productosEnOferta: any[] = [];
+  filteredProductos: any[] = [];
   
   // Filtros
   selectedCategoryId: string | null = null;
@@ -56,7 +56,6 @@ export class OfertasComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    console.log('🎯 Iniciando página de ofertas...');
     this.loadInitialData();
   }
 
@@ -65,31 +64,20 @@ export class OfertasComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  /**
-   * Carga los datos iniciales
-   */
   private loadInitialData(): void {
     this.isLoading = true;
     this.hasError = false;
     this.errorMessage = '';
-
-    // Cargar categorías y ofertas en paralelo
     this.loadCategories();
-    this.loadAllOfertas();
+    this.loadProductosEnOferta();
   }
 
-  /**
-   * Carga todas las categorías activas
-   */
   private loadCategories(): void {
-    console.log('📂 Cargando categorías...');
     this.isLoadingCategories = true;
-    
     this.categoriaService.getCategorias(true)
       .pipe(
         takeUntil(this.destroy$),
         catchError(error => {
-          console.error('❌ Error loading categories:', error);
           this.categories = [];
           return of([]);
         }),
@@ -98,27 +86,20 @@ export class OfertasComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe((categories: ICategoria[]) => {
-        console.log('✅ Categorías cargadas:', categories.length);
         this.categories = categories;
       });
   }
 
-  /**
-   * Carga todas las ofertas activas
-   */
-  private loadAllOfertas(): void {
-    console.log('🏷️ Cargando todas las ofertas...');
+  private loadProductosEnOferta(): void {
     this.isLoadingOfertas = true;
-    
-    this.ofertaService.getOfertas()
+    this.ofertaService.getProductosEnOferta()
       .pipe(
         takeUntil(this.destroy$),
         catchError(error => {
-          console.error('❌ Error loading ofertas:', error);
-          this.allOfertas = [];
-          this.filteredOfertas = [];
+          this.productosEnOferta = [];
+          this.filteredProductos = [];
           this.hasError = true;
-          this.errorMessage = 'Error al cargar las ofertas. Por favor, intenta de nuevo.';
+          this.errorMessage = 'Error al cargar los productos en oferta. Por favor, intenta de nuevo.';
           return of([]);
         }),
         finalize(() => {
@@ -126,140 +107,75 @@ export class OfertasComponent implements OnInit, OnDestroy {
           this.isLoading = false;
         })
       )
-      .subscribe((ofertas: IOfertaPopulated[]) => {
-        console.log('📦 Ofertas recibidas:', ofertas.length);
-        
-        // Filtrar solo ofertas activas
-        const ofertasActivas = ofertas.filter(oferta => oferta.activa);
-        console.log('✅ Ofertas activas:', ofertasActivas.length);
-        
-        this.allOfertas = ofertasActivas;
-        this.filteredOfertas = [...this.allOfertas];
+      .subscribe((productos: any[]) => {
+        this.productosEnOferta = productos;
+        this.filteredProductos = [...this.productosEnOferta];
         this.applyFilters();
       });
   }
 
-  /**
-   * Aplica los filtros actuales
-   */
   private applyFilters(): void {
-    let filtered = [...this.allOfertas];
-
-    // Filtrar por categoría
+    let filtered = [...this.productosEnOferta];
     if (this.selectedCategoryId) {
-      filtered = filtered.filter(oferta => {
-        // Verificar si la oferta tiene categorías aplicables
-        if (oferta.categoriasAplicables && Array.isArray(oferta.categoriasAplicables)) {
-          return oferta.categoriasAplicables.some((cat: any) => 
-            (typeof cat === 'string' && cat === this.selectedCategoryId) ||
-            (typeof cat === 'object' && cat._id === this.selectedCategoryId)
-          );
-        }
-        return false;
-      });
+      filtered = filtered.filter(prod => prod.categoriaId === this.selectedCategoryId);
     }
-
-    // Filtrar por búsqueda
     if (this.searchTerm.trim()) {
       const searchLower = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(oferta => 
-        oferta.nombre.toLowerCase().includes(searchLower) ||
-        (oferta.descripcion && oferta.descripcion.toLowerCase().includes(searchLower))
+      filtered = filtered.filter(prod =>
+        prod.nombre.toLowerCase().includes(searchLower) ||
+        (prod.descripcion && prod.descripcion.toLowerCase().includes(searchLower))
       );
     }
-
-    this.filteredOfertas = filtered;
-    console.log('🔍 Ofertas filtradas:', this.filteredOfertas.length);
+    this.filteredProductos = filtered;
   }
 
-  /**
-   * Maneja la selección de categoría
-   */
   onCategorySelected(categoryId: string): void {
-    console.log('📂 Categoría seleccionada:', categoryId);
     this.selectedCategoryId = categoryId;
     this.applyFilters();
   }
 
-  /**
-   * Maneja la búsqueda
-   */
   onSearchInput(): void {
     this.applyFilters();
   }
 
-  /**
-   * Limpia la búsqueda
-   */
   clearSearch(): void {
     this.searchTerm = '';
     this.applyFilters();
   }
 
-  /**
-   * Limpia el filtro de categoría
-   */
   clearCategoryFilter(): void {
     this.selectedCategoryId = null;
     this.applyFilters();
   }
 
-  /**
-   * Limpia todos los filtros
-   */
   clearAllFilters(): void {
     this.searchTerm = '';
     this.selectedCategoryId = null;
     this.applyFilters();
   }
 
-  /**
-   * Maneja la selección de oferta
-   */
-  onOfertaSelected(oferta: IOfertaPopulated): void {
-    console.log('🏷️ Oferta seleccionada:', oferta);
-    // Aquí puedes implementar la lógica para mostrar detalles de la oferta
-    this.toastr.info(`Oferta: ${oferta.nombre} - ${oferta.porcentajeDescuento}% de descuento`, 'Detalles de Oferta');
+  onProductoSelected(producto: any): void {
+    this.toastr.info(`Oferta: ${producto.oferta.nombre} - ${producto.oferta.porcentajeDescuento}% de descuento`, 'Detalles de Oferta');
   }
 
-  /**
-   * Maneja la adición de oferta al carrito
-   */
-  onAddToCart(oferta: IOfertaPopulated): void {
-    // Las ofertas no se pueden agregar directamente al carrito
-    // Se aplican como descuentos a los productos
+  onAddToCart(producto: any): void {
     this.toastr.info('Las ofertas se aplican automáticamente como descuentos a los productos', 'Información');
   }
 
-  /**
-   * Maneja la compra directa de una oferta
-   */
-  onBuyNow(oferta: IOfertaPopulated): void {
-    // Verificar si el usuario está autenticado
+  onBuyNow(producto: any): void {
     if (!this.authService.isAuthenticated()) {
       this.toastr.warning('Debes iniciar sesión para realizar una compra', 'Autenticación requerida');
-      // Aquí podrías redirigir al login con returnUrl
       return;
     }
-
-    // Verificar si el usuario tiene rol de cliente
     const userRole = this.authService.getRole();
     if (userRole !== 'cliente') {
       this.toastr.error('Solo los clientes pueden realizar compras', 'Acceso denegado');
       return;
     }
-
-    // Redirigir a la página de productos para aplicar la oferta
-    this.toastr.success('Redirigiendo a productos para aplicar la oferta', 'Aplicando Oferta');
-    // Aquí podrías redirigir a productos con filtro de oferta
+    // Aquí podrías implementar la lógica de compra directa
   }
 
-  /**
-   * Reintenta cargar los datos
-   */
   retry(): void {
-    this.hasError = false;
-    this.errorMessage = '';
     this.loadInitialData();
   }
 } 
