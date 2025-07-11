@@ -19,6 +19,7 @@ export class ClientProfileEditComponent implements OnInit {
   userId: string | null = null;
   clientId: string | null = null; // Necesitaremos el ID del documento de Cliente para la actualización
   loading: boolean = true;
+  isSubmitting: boolean = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
 
@@ -28,17 +29,16 @@ export class ClientProfileEditComponent implements OnInit {
     private clientService: ClienteService,
     private router: Router
   ) {
-    // Inicializar el formulario con campos vacíos o valores por defecto
+    // Inicializar el formulario con validaciones mejoradas
     this.profileForm = this.fb.group({
-      username: ['', Validators.required],
+      username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
       email: ['', [Validators.required, Validators.email]],
-      telefono: ['', Validators.required],
-      nombre: ['', Validators.required],
-      apellido: ['', Validators.required],
-      direccion: ['', Validators.required],
-      fechaNacimiento: ['', Validators.required], // Usaremos tipo 'date' en HTML
+      telefono: ['', [Validators.required, Validators.pattern(/^[\+]?[1-9][\d]{0,15}$/)]],
+      nombre: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
+      apellido: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
+      direccion: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(200)]],
+      fechaNacimiento: ['', Validators.required],
       preferenciasAlimentarias: ['', Validators.required],
-      // No incluimos 'puntos' aquí ya que no debería ser editable por el cliente
     });
   }
 
@@ -75,8 +75,11 @@ export class ClientProfileEditComponent implements OnInit {
           apellido: cliente.usuarioId.apellido,
           direccion: cliente.direccion,
           fechaNacimiento: fechaNacimientoFormatted,
-          preferenciasAlimentarias: cliente.preferenciasAlimentarias,
+          preferenciasAlimentarias: cliente.preferenciasAlimentarias || '',
         });
+        this.loading = false;
+      } else {
+        this.errorMessage = 'No se encontraron datos del cliente.';
         this.loading = false;
       }
     });
@@ -97,6 +100,7 @@ export class ClientProfileEditComponent implements OnInit {
       return;
     }
 
+    this.isSubmitting = true;
     const formData = this.profileForm.value;
 
     // Crear el objeto de datos a enviar al backend
@@ -113,17 +117,21 @@ export class ClientProfileEditComponent implements OnInit {
       apellido: formData.apellido,
     };
 
+    console.log('Enviando datos de actualización:', updateData);
+
     this.clientService.updateCliente(this.clientId, updateData).pipe(
       catchError(error => {
         console.error('Error al actualizar el perfil:', error);
         this.errorMessage = error.error?.mensaje || 'Error al actualizar el perfil. Inténtalo de nuevo.';
+        this.isSubmitting = false;
         return of(null);
       })
     ).subscribe(response => {
+      this.isSubmitting = false;
       if (response) {
-        this.successMessage = '¡Perfil actualizado exitosamente!';
-        // Opcional: Recargar los datos del usuario en AuthService si es necesario
-        // this.authService.loadUserDataFromToken();
+        console.log('Respuesta del servidor:', response);
+        this.successMessage = '¡Perfil actualizado exitosamente! Los cambios se reflejarán en tu próximo inicio de sesión.';
+        
         setTimeout(() => {
           this.router.navigate(['/cliente/dashboard']); // Volver al dashboard después de un éxito
         }, 2000); // Esperar 2 segundos antes de redirigir
@@ -134,5 +142,28 @@ export class ClientProfileEditComponent implements OnInit {
   // Método para volver al dashboard
   goBackToDashboard(): void {
     this.router.navigate(['/cliente/dashboard']);
+  }
+
+  // Método para obtener el mensaje de error de un campo específico
+  getErrorMessage(controlName: string): string {
+    const control = this.profileForm.get(controlName);
+    if (control?.errors) {
+      if (control.errors['required']) {
+        return 'Este campo es requerido.';
+      }
+      if (control.errors['email']) {
+        return 'Por favor, introduce un email válido.';
+      }
+      if (control.errors['minlength']) {
+        return `Mínimo ${control.errors['minlength'].requiredLength} caracteres.`;
+      }
+      if (control.errors['maxlength']) {
+        return `Máximo ${control.errors['maxlength'].requiredLength} caracteres.`;
+      }
+      if (control.errors['pattern']) {
+        return 'Formato inválido.';
+      }
+    }
+    return '';
   }
 }

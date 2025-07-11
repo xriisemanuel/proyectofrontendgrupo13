@@ -26,18 +26,6 @@
             ¡Bienvenido de vuelta, <span class="highlight-name">{{ usuario.nombre }} {{ usuario.apellido }}</span>!
           </h1>
           <p class="welcome-subtitle">Tu experiencia personalizada comienza aquí</p>
-          <div class="welcome-stats">
-            <div class="stat-item">
-              <i class="fas fa-star"></i>
-              <span class="stat-value">{{ cliente.puntos || 0 }}</span>
-              <span class="stat-label">Puntos de Lealtad</span>
-            </div>
-            <div class="stat-item">
-              <i class="fas fa-map-marker-alt"></i>
-              <span class="stat-value">{{ cliente.direccion ? 'Configurada' : 'Pendiente' }}</span>
-              <span class="stat-label">Dirección</span>
-            </div>
-          </div>
         </div>
         <div class="welcome-actions">
           <button class="btn-edit-profile" (click)="goToEditProfile()">
@@ -250,6 +238,7 @@
         
         <div *ngIf="!isLoadingPedidos && pedidosHistorial.length > 0" class="historial-table">
           <div class="table-header">
+            <div class="header-cell">Pedido</div>
             <div class="header-cell">Fecha</div>
             <div class="header-cell">Total</div>
             <div class="header-cell">Estado</div>
@@ -257,6 +246,7 @@
           </div>
           
           <div *ngFor="let pedido of pedidosHistorial.slice(0, 10)" class="table-row">
+            <div class="table-cell" data-label="Pedido">#{{ pedido._id | slice:0:8 }}</div>
             <div class="table-cell" data-label="Fecha">{{ pedido.fechaPedido | date:'shortDate' }}</div>
             <div class="table-cell" data-label="Total">{{ pedido.total | currency:'USD':'symbol':'1.2-2' }}</div>
             <div class="table-cell" data-label="Estado">
@@ -268,7 +258,7 @@
               <button *ngIf="pedido.estado === 'entregado'" class="btn-action" (click)="goToCalificaciones()" title="Calificar">
                 <i class="fas fa-star"></i>
               </button>
-              <button class="btn-action" (click)="openPedidoModal(pedido)" title="Ver Detalles">
+              <button class="btn-action" (click)="goToMisPedidos()" title="Ver Detalles">
                 <i class="fas fa-eye"></i>
               </button>
             </div>

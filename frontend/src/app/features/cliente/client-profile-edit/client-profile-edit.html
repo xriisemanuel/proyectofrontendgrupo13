@@ -1,11 +1,13 @@
 <!-- src/app/components/client-profile-edit/client-profile-edit.component.html -->
 <div class="profile-edit-container">
   <div class="header-section">
-    <h1>Editar Perfil</h1>
-    <p>Actualiza tu información personal y de contacto.</p>
-     <button class="btn-volver" (click)="goBackToDashboard()">
-        <i class="fas fa-arrow-left"></i> Volver al Dashboard
-     </button>
+    <div class="header-content">
+      <h1><i class="fas fa-user-edit"></i> Editar Perfil</h1>
+      <p>Actualiza tu información personal y de contacto.</p>
+    </div>
+    <button class="btn-volver" (click)="goBackToDashboard()">
+      <i class="fas fa-arrow-left"></i> Volver a mi Perfil
+    </button>
   </div>
 
   <div *ngIf="loading" class="loading-indicator">
@@ -22,90 +24,109 @@
   </div>
 
   <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" *ngIf="!loading" class="profile-form interactive-card">
-    <div class="form-grid">
-      <!-- Campos de Usuario -->
-      <div class="form-group">
-        <label for="username">Nombre de Usuario:</label>
-        <input type="text" id="username" formControlName="username"
-          [class.is-invalid]="profileForm.get('username')?.invalid && profileForm.get('username')?.touched">
-        <div *ngIf="profileForm.get('username')?.invalid && profileForm.get('username')?.touched"
-          class="validation-error">
-          El nombre de usuario es requerido.
+    
+    <!-- Sección de Información Personal -->
+    <div class="form-section">
+      <h3><i class="fas fa-user"></i> Información Personal</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="nombre">Nombre *</label>
+          <input type="text" id="nombre" formControlName="nombre" placeholder="Tu nombre"
+            [class.is-invalid]="profileForm.get('nombre')?.invalid && profileForm.get('nombre')?.touched">
+          <div *ngIf="profileForm.get('nombre')?.invalid && profileForm.get('nombre')?.touched" class="validation-error">
+            <i class="fas fa-exclamation-circle"></i> El nombre es requerido.
+          </div>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label for="email">Email:</label>
-        <input type="email" id="email" formControlName="email"
-          [class.is-invalid]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
-        <div *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched" class="validation-error">
-          Por favor, introduce un email válido.
+        <div class="form-group">
+          <label for="apellido">Apellido *</label>
+          <input type="text" id="apellido" formControlName="apellido" placeholder="Tu apellido"
+            [class.is-invalid]="profileForm.get('apellido')?.invalid && profileForm.get('apellido')?.touched">
+          <div *ngIf="profileForm.get('apellido')?.invalid && profileForm.get('apellido')?.touched" class="validation-error">
+            <i class="fas fa-exclamation-circle"></i> El apellido es requerido.
+          </div>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label for="nombre">Nombre:</label>
-        <input type="text" id="nombre" formControlName="nombre"
-          [class.is-invalid]="profileForm.get('nombre')?.invalid && profileForm.get('nombre')?.touched">
-        <div *ngIf="profileForm.get('nombre')?.invalid && profileForm.get('nombre')?.touched" class="validation-error">
-          El nombre es requerido.
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="apellido">Apellido:</label>
-        <input type="text" id="apellido" formControlName="apellido"
-          [class.is-invalid]="profileForm.get('apellido')?.invalid && profileForm.get('apellido')?.touched">
-        <div *ngIf="profileForm.get('apellido')?.invalid && profileForm.get('apellido')?.touched"
-          class="validation-error">
-          El apellido es requerido.
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="telefono">Teléfono:</label>
-        <input type="text" id="telefono" formControlName="telefono"
-          [class.is-invalid]="profileForm.get('telefono')?.invalid && profileForm.get('telefono')?.touched">
-        <div *ngIf="profileForm.get('telefono')?.invalid && profileForm.get('telefono')?.touched"
-          class="validation-error">
-          El teléfono es requerido.
-        </div>
-      </div>
-
-      <!-- Campos de Cliente -->
-      <div class="form-group">
-        <label for="direccion">Dirección Principal:</label>
-        <input type="text" id="direccion" formControlName="direccion"
-          [class.is-invalid]="profileForm.get('direccion')?.invalid && profileForm.get('direccion')?.touched">
-        <div *ngIf="profileForm.get('direccion')?.invalid && profileForm.get('direccion')?.touched"
-          class="validation-error">
-          La dirección es requerida.
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="preferenciasAlimentarias">Preferencias Alimentarias:</label>
-        <select id="preferenciasAlimentarias" formControlName="preferenciasAlimentarias"
-          [class.is-invalid]="profileForm.get('preferenciasAlimentarias')?.invalid && profileForm.get('preferenciasAlimentarias')?.touched">
-          <option value="" disabled>Selecciona una preferencia</option>
-          <option value="Ninguna">Ninguna</option>
-          <option value="Vegetariano">Vegetariano</option>
-          <option value="Vegano">Vegano</option>
-          <option value="Sin Gluten">Sin Gluten</option>
-          <option value="Sin Lactosa">Sin Lactosa</option>
-          <option value="Otros">Otros</option>
-        </select>
-        <div
-          *ngIf="profileForm.get('preferenciasAlimentarias')?.invalid && profileForm.get('preferenciasAlimentarias')?.touched"
-          class="validation-error">
-          Las preferencias alimentarias son requeridas.
+        <div class="form-group">
+          <label for="fechaNacimiento">Fecha de Nacimiento *</label>
+          <input type="date" id="fechaNacimiento" formControlName="fechaNacimiento"
+            [class.is-invalid]="profileForm.get('fechaNacimiento')?.invalid && profileForm.get('fechaNacimiento')?.touched">
+          <div *ngIf="profileForm.get('fechaNacimiento')?.invalid && profileForm.get('fechaNacimiento')?.touched" class="validation-error">
+            <i class="fas fa-exclamation-circle"></i> La fecha de nacimiento es requerida.
+          </div>
         </div>
       </div>
     </div>
 
+    <!-- Sección de Información de Contacto -->
+    <div class="form-section">
+      <h3><i class="fas fa-envelope"></i> Información de Contacto</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="username">Nombre de Usuario *</label>
+          <input type="text" id="username" formControlName="username" placeholder="Tu nombre de usuario"
+            [class.is-invalid]="profileForm.get('username')?.invalid && profileForm.get('username')?.touched">
+          <div *ngIf="profileForm.get('username')?.invalid && profileForm.get('username')?.touched" class="validation-error">
+            <i class="fas fa-exclamation-circle"></i> El nombre de usuario es requerido.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input type="email" id="email" formControlName="email" placeholder="tu@email.com"
+            [class.is-invalid]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
+          <div *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched" class="validation-error">
+            <i class="fas fa-exclamation-circle"></i> Por favor, introduce un email válido.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="telefono">Teléfono *</label>
+          <input type="tel" id="telefono" formControlName="telefono" placeholder="+1 234 567 8900"
+            [class.is-invalid]="profileForm.get('telefono')?.invalid && profileForm.get('telefono')?.touched">
+          <div *ngIf="profileForm.get('telefono')?.invalid && profileForm.get('telefono')?.touched" class="validation-error">
+            <i class="fas fa-exclamation-circle"></i> El teléfono es requerido.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección de Dirección y Preferencias -->
+    <div class="form-section">
+      <h3><i class="fas fa-home"></i> Dirección y Preferencias</h3>
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label for="direccion">Dirección Principal *</label>
+          <textarea id="direccion" formControlName="direccion" rows="3" placeholder="Ingresa tu dirección completa"
+            [class.is-invalid]="profileForm.get('direccion')?.invalid && profileForm.get('direccion')?.touched"></textarea>
+          <div *ngIf="profileForm.get('direccion')?.invalid && profileForm.get('direccion')?.touched" class="validation-error">
+            <i class="fas fa-exclamation-circle"></i> La dirección es requerida.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="preferenciasAlimentarias">Preferencias Alimentarias</label>
+          <select id="preferenciasAlimentarias" formControlName="preferenciasAlimentarias">
+            <option value="">Selecciona una preferencia</option>
+            <option value="Ninguna">Ninguna</option>
+            <option value="Vegetariano">Vegetariano</option>
+            <option value="Vegano">Vegano</option>
+            <option value="Sin Gluten">Sin Gluten</option>
+            <option value="Sin Lactosa">Sin Lactosa</option>
+            <option value="Bajo en Sodio">Bajo en Sodio</option>
+            <option value="Bajo en Grasas">Bajo en Grasas</option>
+            <option value="Otros">Otros</option>
+          </select>
+          <small class="form-help">Ayúdanos a personalizar tu experiencia</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de Acción -->
     <div class="form-actions">
-      <button type="submit" class="btn-save-changes" [disabled]="profileForm.invalid">
-        <i class="fas fa-save"></i> Guardar Cambios
+      <button type="submit" class="btn-save-changes" [disabled]="profileForm.invalid || isSubmitting">
+        <i class="fas fa-save"></i> 
+        {{ isSubmitting ? 'Guardando...' : 'Guardar Cambios' }}
       </button>
       <button type="button" class="btn-cancel" (click)="goBackToDashboard()">
         <i class="fas fa-times"></i> Cancelar

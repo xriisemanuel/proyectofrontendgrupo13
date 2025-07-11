@@ -57,10 +57,20 @@ export class ClienteService {
    * @description Actualiza un cliente existente.
    * Corresponde a PUT /api/cliente/:id
    * @param id El ID del cliente a actualizar.
-   * @param cliente Los datos actualizados del cliente.
+   * @param cliente Los datos actualizados del cliente y usuario asociado.
    * @returns Un Observable con la respuesta del backend.
    */
-  updateCliente(id: string, cliente: { direccion?: string, fechaNacimiento?: Date, preferenciasAlimentarias?: string[], puntos?: number }): Observable<any> {
+  updateCliente(id: string, cliente: { 
+    direccion?: string, 
+    fechaNacimiento?: Date, 
+    preferenciasAlimentarias?: string[], 
+    puntos?: number,
+    username?: string,
+    email?: string,
+    telefono?: string,
+    nombre?: string,
+    apellido?: string
+  }): Observable<any> {
     return this.http.put<any>(`${CLIENTE_API}/${id}`, cliente, { headers: this.getAuthHeaders() });
   }
 
