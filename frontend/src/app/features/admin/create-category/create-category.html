@@ -91,13 +91,13 @@
                     
                     <!-- Campo de URL de Cloudinary (readonly) -->
                     <div *ngIf="!useManualUrl" class="cloudinary-url-section">
-                        <input id="imagen" type="url" formControlName="imagen" readonly
-                            placeholder="La URL de la imagen final aparecerá aquí">
-                        <div *ngIf="isProcessingCloudinary" class="loading-message-small">
-                            <i class="fas fa-spinner fa-spin"></i> Procesando imagen con Cloudinary...
-                        </div>
-                        <div *ngIf="processingCloudinaryError" class="error-message-small">
-                            <i class="fas fa-exclamation-triangle"></i> {{ processingCloudinaryError }}
+                <input id="imagen" type="url" formControlName="imagen" readonly
+                    placeholder="La URL de la imagen final aparecerá aquí">
+                <div *ngIf="isProcessingCloudinary" class="loading-message-small">
+                    <i class="fas fa-spinner fa-spin"></i> Procesando imagen con Cloudinary...
+                </div>
+                <div *ngIf="processingCloudinaryError" class="error-message-small">
+                    <i class="fas fa-exclamation-triangle"></i> {{ processingCloudinaryError }}
                         </div>
                     </div>
                 </div>
@@ -110,7 +110,7 @@
                     <div *ngIf="!f['imagen'].value" class="no-image-placeholder">
                         <i class="fas fa-image"></i>
                         <span>Sin imagen</span>
-                    </div>
+                </div>
                 </div>
             </div>
 

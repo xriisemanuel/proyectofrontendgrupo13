@@ -387,6 +387,26 @@
 
 /* Rojo para estado off */
 
+.back-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.back-button:hover {
+  background: linear-gradient(135deg, #5a5ae6 0%, #5a3ba2 100%);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+}
+
 /* Responsive design */
 @media (max-width: 1200px) {
 
