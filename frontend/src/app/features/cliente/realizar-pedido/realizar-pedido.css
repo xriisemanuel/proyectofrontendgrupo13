@@ -183,6 +183,9 @@ body {
 /* Sección de Selección de Productos */
 .product-selection-panel {
     /* Hereda de dashboard-panel */
+    /* Estilos específicos se heredan de .dashboard-panel */
+    /* Placeholder para futuros estilos específicos */
+    display: block;
 }
 
 /* Filtros de Productos */
@@ -519,6 +522,7 @@ body {
     /* Para mantener consistencia de altura */
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     /* Limita a 2 líneas */
     -webkit-box-orient: vertical;
     overflow: hidden;
@@ -565,6 +569,9 @@ body {
 /* Sección de Carrito de Compras */
 .cart-panel {
     /* Hereda de dashboard-panel */
+    /* Estilos específicos se heredan de .dashboard-panel */
+    /* Placeholder para futuros estilos específicos */
+    display: block;
 }
 
 .empty-cart {
@@ -698,6 +705,9 @@ body {
 /* Sección de Detalles del Pedido (Formulario) */
 .order-details-panel {
     /* Hereda de dashboard-panel */
+    /* Estilos específicos se heredan de .dashboard-panel */
+    /* Placeholder para futuros estilos específicos */
+    display: block;
 }
 
 .order-details-panel form {
