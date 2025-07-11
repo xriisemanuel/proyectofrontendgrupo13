@@ -93,12 +93,14 @@ export class Home implements OnInit, OnDestroy {
    * Carga los datos iniciales de la aplicación según la vista actual
    */
   private loadInitialData(): void {
+    console.log('🎯 Cargando datos para vista:', this.currentView);
     this.isLoading = true;
     this.hasError = false;
     this.errorMessage = '';
 
     switch (this.currentView) {
       case 'categorias':
+        console.log('📂 Cargando categorías...');
         this.loadCategories()
           .then(() => {
             if (this.categories.length > 0) {
@@ -118,14 +120,17 @@ export class Home implements OnInit, OnDestroy {
         break;
       
       case 'combos':
+        console.log('🍔 Cargando combos...');
         this.loadCombos();
         break;
       
       case 'ofertas':
+        console.log('🏷️ Cargando ofertas...');
         this.loadOfertas();
         break;
       
       default:
+        console.log('📂 Vista por defecto: cargando categorías...');
         this.loadCategories();
         break;
     }
@@ -196,33 +201,41 @@ export class Home implements OnInit, OnDestroy {
    * Carga todos los combos activos
    */
   private loadCombos(): void {
+    console.log('🔄 Iniciando carga de combos...');
     this.isLoadingCombos = true;
     
     this.comboService.getCombos()
       .pipe(
         takeUntil(this.destroy$),
         catchError(error => {
-          console.error('Error loading combos:', error);
+          console.error('❌ Error loading combos:', error);
           this.combos = [];
           return of([]);
         }),
         finalize(() => {
+          console.log('✅ Finalizada carga de combos');
           this.isLoadingCombos = false;
           this.isLoading = false;
         })
       )
       .subscribe((response: any) => {
+        console.log('📦 Respuesta del servicio de combos:', response);
         // Los combos se devuelven directamente como array
         let combos: any[] = [];
         if (Array.isArray(response)) {
           combos = response;
+          console.log('✅ Combos recibidos como array:', combos.length);
         } else if (response && response.combos && Array.isArray(response.combos)) {
           combos = response.combos;
+          console.log('✅ Combos recibidos en propiedad combos:', combos.length);
         } else {
-          console.error('Invalid combos response:', response);
+          console.error('❌ Invalid combos response:', response);
           combos = [];
         }
-        this.combos = combos.filter((combo: any) => combo.activo);
+        
+        const combosActivos = combos.filter((combo: any) => combo.activo);
+        console.log('🎯 Combos activos filtrados:', combosActivos.length);
+        this.combos = combosActivos;
       });
   }
 
@@ -230,33 +243,41 @@ export class Home implements OnInit, OnDestroy {
    * Carga todas las ofertas activas
    */
   private loadOfertas(): void {
+    console.log('🔄 Iniciando carga de ofertas...');
     this.isLoadingOfertas = true;
     
     this.ofertaService.getOfertas()
       .pipe(
         takeUntil(this.destroy$),
         catchError(error => {
-          console.error('Error loading ofertas:', error);
+          console.error('❌ Error loading ofertas:', error);
           this.ofertas = [];
           return of([]);
         }),
         finalize(() => {
+          console.log('✅ Finalizada carga de ofertas');
           this.isLoadingOfertas = false;
           this.isLoading = false;
         })
       )
       .subscribe((response: any) => {
+        console.log('📦 Respuesta del servicio de ofertas:', response);
         // Las ofertas se devuelven directamente como array
         let ofertas: any[] = [];
         if (Array.isArray(response)) {
           ofertas = response;
+          console.log('✅ Ofertas recibidas como array:', ofertas.length);
         } else if (response && response.ofertas && Array.isArray(response.ofertas)) {
           ofertas = response.ofertas;
+          console.log('✅ Ofertas recibidas en propiedad ofertas:', ofertas.length);
         } else {
-          console.error('Invalid ofertas response:', response);
+          console.error('❌ Invalid ofertas response:', response);
           ofertas = [];
         }
-        this.ofertas = ofertas.filter((oferta: any) => oferta.activa || oferta.estado);
+        
+        const ofertasActivas = ofertas.filter((oferta: any) => oferta.activa || oferta.estado);
+        console.log('🎯 Ofertas activas filtradas:', ofertasActivas.length);
+        this.ofertas = ofertasActivas;
       });
   }
 

@@ -21,8 +21,15 @@
             <span>{{ oferta.descripcion || 'No proporcionada' }}</span>
         </div>
         <div class="detail-item">
-            <strong>Descuento:</strong>
-            <span class="highlight">{{ oferta.descuento }}%</span>
+            <strong>Tipo de Oferta:</strong>
+            <span class="highlight">
+                <span class="tipo-icon">{{ getTipoOfertaIcon(oferta.tipoOferta) }}</span>
+                {{ getTipoOfertaText(oferta.tipoOferta) }}
+            </span>
+        </div>
+        <div class="detail-item">
+            <strong>Porcentaje de Descuento:</strong>
+            <span class="highlight discount-badge">{{ oferta.porcentajeDescuento }}%</span>
         </div>
         <div class="detail-item">
             <strong>Fecha de Inicio:</strong>
@@ -34,8 +41,8 @@
         </div>
         <div class="detail-item">
             <strong>Estado:</strong>
-            <span [ngClass]="{'status-active': oferta.estado, 'status-inactive': !oferta.estado}">
-                {{ oferta.estado ? 'Activa' : 'Inactiva' }}
+            <span [ngClass]="{'status-active': oferta.activa, 'status-inactive': !oferta.activa}">
+                {{ oferta.activa ? 'Activa' : 'Inactiva' }}
             </span>
         </div>
         <div class="detail-item">
@@ -44,25 +51,50 @@
                 {{ isOfertaVigente(oferta) ? 'Vigente' : 'No Vigente' }}
             </span>
         </div>
-        <div class="detail-item full-width">
+        
+        <!-- Productos Aplicables -->
+        <div class="detail-item full-width" *ngIf="oferta.tipoOferta === 'producto'">
             <strong>Productos Aplicables:</strong>
-            <span *ngIf="oferta.productosAplicables && oferta.productosAplicables.length > 0">
-                <span *ngFor="let prod of oferta.productosAplicables; let last = last">
-                    {{ prod.nombre }} ({{ prod.precio | currency:'USD':'symbol':'1.2-2' }})<span *ngIf="!last">, </span>
+            <div class="applicables-list">
+                <span *ngIf="oferta.productosAplicables && oferta.productosAplicables.length > 0">
+                    <span *ngFor="let prod of oferta.productosAplicables; let last = last">
+                        {{ prod.nombre }} ({{ prod.precio | currency:'USD':'symbol':'1.2-2' }})<span *ngIf="!last">, </span>
+                    </span>
                 </span>
-            </span>
-            <span *ngIf="!oferta.productosAplicables || oferta.productosAplicables.length === 0"
-                class="no-data">Ninguno</span>
+                <span *ngIf="!oferta.productosAplicables || oferta.productosAplicables.length === 0"
+                    class="no-data">Ninguno</span>
+            </div>
         </div>
-        <div class="detail-item full-width">
+        
+        <!-- Categorías Aplicables -->
+        <div class="detail-item full-width" *ngIf="oferta.tipoOferta === 'categoria'">
             <strong>Categorías Aplicables:</strong>
-            <span *ngIf="oferta.categoriasAplicables && oferta.categoriasAplicables.length > 0">
-                <span *ngFor="let cat of oferta.categoriasAplicables; let last = last">
-                    {{ cat.nombre }}<span *ngIf="!last">, </span>
+            <div class="applicables-list">
+                <span *ngIf="oferta.categoriasAplicables && oferta.categoriasAplicables.length > 0">
+                    <span *ngFor="let cat of oferta.categoriasAplicables; let last = last">
+                        {{ cat.nombre }}<span *ngIf="!last">, </span>
+                    </span>
                 </span>
-            </span>
-            <span *ngIf="!oferta.categoriasAplicables || oferta.categoriasAplicables.length === 0"
-                class="no-data">Ninguna</span>
+                <span *ngIf="!oferta.categoriasAplicables || oferta.categoriasAplicables.length === 0"
+                    class="no-data">Ninguna</span>
+            </div>
+        </div>
+        
+        <!-- Información de aplicación -->
+        <div class="detail-item full-width">
+            <strong>Información de Aplicación:</strong>
+            <div class="application-info">
+                <p *ngIf="oferta.tipoOferta === 'producto'">
+                    Esta oferta aplica un descuento del {{ oferta.porcentajeDescuento }}% directamente a los productos seleccionados.
+                </p>
+                <p *ngIf="oferta.tipoOferta === 'categoria'">
+                    Esta oferta aplica un descuento del {{ oferta.porcentajeDescuento }}% a todos los productos de las categorías seleccionadas.
+                </p>
+                <p class="note">
+                    <i class="fas fa-info-circle"></i>
+                    Los descuentos se aplican automáticamente al precio original de los productos.
+                </p>
+            </div>
         </div>
     </div>
 </mat-dialog-content>

@@ -1,0 +1,77 @@
+<div class="combos-page-container">
+  <!-- Header de la página -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">🍔 Nuestros Combos</h1>
+      <p class="page-description">Descubre nuestras increíbles ofertas en combos especiales</p>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <main class="main-content">
+    <!-- Barra de herramientas -->
+    <div class="toolbar">
+      <!-- Barra de búsqueda -->
+      <div class="search-section">
+        <div class="search-container">
+          <input 
+            type="text" 
+            [(ngModel)]="searchTerm"
+            (input)="onSearchInput()"
+            placeholder="Buscar combos..."
+            class="search-input">
+          <button 
+            *ngIf="searchTerm"
+            (click)="clearSearch()" 
+            class="clear-search-btn">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- Botones de filtros -->
+      <div class="filter-buttons">
+        <button 
+          *ngIf="searchTerm"
+          (click)="clearSearch()" 
+          class="filter-btn clear-all">
+          Limpiar búsqueda
+        </button>
+      </div>
+    </div>
+
+
+
+    <!-- Grid de combos -->
+    <div class="combos-section">
+      <app-combo-grid 
+        [combos]="filteredCombos" 
+        [loading]="isLoadingCombos"
+        [emptyMessage]="'No se encontraron combos'"
+        (comboSelected)="onComboSelected($event)"
+        (addToCart)="onAddToCart($event)"
+        (buyNow)="onBuyNow($event)">
+      </app-combo-grid>
+    </div>
+  </main>
+
+  <!-- Overlay de carga general -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Cargando combos...</p>
+    </div>
+  </div>
+
+  <!-- Contenedor de error -->
+  <div *ngIf="hasError" class="error-container">
+    <div class="error-content">
+      <div class="error-icon">⚠️</div>
+      <h3 class="error-title">Error al cargar</h3>
+      <p class="error-description">{{ errorMessage }}</p>
+      <button (click)="retry()" class="retry-btn">
+        Intentar de nuevo
+      </button>
+    </div>
+  </div>
+</div> 

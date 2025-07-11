@@ -49,7 +49,7 @@ export class OfertaDetailModalComponent implements OnInit {
     this.ofertaService.getOfertaById(id).pipe(
       catchError(error => {
         this.errorMessage = error.message || 'Error al cargar los detalles de la oferta.';
-        this.toastr.error(this.errorMessage ?? 'Error al cargar los detalles de la oferta.', 'Error de Carga');
+        this.toastr.error(this.errorMessage || 'Error al cargar los detalles de la oferta.', 'Error de Carga');
         this.dialogRef.close('closed'); // Cerrar el modal en caso de error
         return of(null);
       }),
@@ -95,10 +95,7 @@ export class OfertaDetailModalComponent implements OnInit {
    * Verifica si la oferta está vigente.
    */
   isOfertaVigente(oferta: IOfertaPopulated): boolean {
-    const now = new Date();
-    const fechaInicio = new Date(oferta.fechaInicio);
-    const fechaFin = new Date(oferta.fechaFin);
-    return oferta.estado && (fechaInicio <= now) && (fechaFin >= now);
+    return this.ofertaService.isOfertaVigente(oferta);
   }
 
   /**
@@ -107,5 +104,19 @@ export class OfertaDetailModalComponent implements OnInit {
   formatDateForDisplay(date: Date | string | undefined): string {
     if (!date) return 'N/A';
     return this.datePipe.transform(date, 'mediumDate') || 'N/A';
+  }
+
+  /**
+   * Obtiene el texto del tipo de oferta.
+   */
+  getTipoOfertaText(tipoOferta: string): string {
+    return tipoOferta === 'producto' ? 'Producto' : 'Categoría';
+  }
+
+  /**
+   * Obtiene el icono del tipo de oferta.
+   */
+  getTipoOfertaIcon(tipoOferta: string): string {
+    return tipoOferta === 'producto' ? '🍕' : '📂';
   }
 }

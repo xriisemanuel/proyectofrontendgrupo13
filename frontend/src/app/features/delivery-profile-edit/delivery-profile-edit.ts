@@ -165,4 +165,8 @@ export class DeliveryProfileEditComponent implements OnInit {
     }
     return '';
   }
+<<<<<<< HEAD
 } 
+=======
+}
+>>>>>>> abcbaf28c3814c5e6734338c0e7d94f379a46092

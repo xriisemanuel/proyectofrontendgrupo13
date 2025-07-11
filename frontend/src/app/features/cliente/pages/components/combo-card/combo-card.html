@@ -1,0 +1,50 @@
+<div class="combo-card" (click)="onCardClick()">
+  <!-- Imagen del combo -->
+  <div class="combo-image-container">
+    <img 
+      [src]="getComboImage()" 
+      [alt]="getComboName()"
+      class="combo-image"
+      (error)="onImageError($event)"
+      loading="lazy">
+    
+    <!-- Badge de descuento -->
+    <div *ngIf="hasDiscount()" class="discount-badge">
+      {{ getDiscountInfo() }}
+    </div>
+    
+    <!-- Badge de tipo -->
+    <div class="type-badge">
+      🍔 Combo
+    </div>
+  </div>
+
+  <!-- Contenido del combo -->
+  <div class="combo-content">
+    <!-- Información del combo -->
+    <div class="combo-info">
+      <h3 class="combo-name">{{ getComboName() }}</h3>
+      <p *ngIf="getComboDescription()" class="combo-description">{{ getComboDescription() }}</p>
+      <p class="product-count">{{ getProductCount() }}</p>
+    </div>
+
+    <!-- Precios -->
+    <div class="price-section">
+      <div class="price-container">
+        <span class="current-price">{{ getFormattedPrice() }}</span>
+        <span *ngIf="hasDiscount()" class="original-price">{{ getOriginalPrice() }}</span>
+      </div>
+    </div>
+
+    <!-- Botón de acción -->
+    <div class="action-section">
+      <button 
+        class="buy-now-btn"
+        [disabled]="!isComboAvailable()"
+        (click)="onBuyNow($event)">
+        <span class="btn-icon">💳</span>
+        <span class="btn-text">{{ isComboAvailable() ? 'Comprar' : 'Agotado' }}</span>
+      </button>
+    </div>
+  </div>
+</div> 

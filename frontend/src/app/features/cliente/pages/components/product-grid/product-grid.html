@@ -26,7 +26,7 @@
   <!-- Estado vacío -->
   <div *ngIf="!loading && products.length === 0" class="empty-grid">
     <div class="empty-icon">🍽️</div>
-    <h3 class="empty-title">No hay productos disponibles</h3>
+    <h3 class="empty-title">{{ emptyMessage }}</h3>
     <p class="empty-description">Por el momento no tenemos productos en esta categoría.</p>
   </div>
 </div>

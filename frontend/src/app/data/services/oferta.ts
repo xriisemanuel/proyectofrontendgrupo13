@@ -1,11 +1,11 @@
 // src/app/data/services/oferta.service.ts
 
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { IOferta, IOfertaPopulated } from '../../shared/oferta.interface'; // Ajusta la ruta
-import { API_BASE_URL } from '../../core/constants/constants'; // Asegúrate de que esta constante exista
+import { catchError, map } from 'rxjs/operators';
+import { API_BASE_URL } from '../../core/constants/constants';
+import { IOferta, IOfertaPopulated } from '../../shared/oferta.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -15,117 +15,119 @@ export class OfertaService {
 
   constructor(private http: HttpClient) { }
 
-  /**
-   * Manejo centralizado de errores HTTP
-   */
-  private handleError(error: HttpErrorResponse): Observable<never> {
-    let errorMessage = 'Ocurrió un error desconocido.';
-    if (error.error instanceof ErrorEvent) {
-      // Error del lado del cliente
-      errorMessage = `Error: ${error.error.message}`;
-    } else {
-      // El backend retornó un código de error
-      console.error(`Código de error del backend: ${error.status}, cuerpo: ${JSON.stringify(error.error)}`);
-      if (error.status === 400) {
-        errorMessage = error.error?.mensaje || 'Datos inválidos proporcionados.';
-      } else if (error.status === 404) {
-        errorMessage = error.error?.mensaje || 'Recurso no encontrado.';
-      } else if (error.status === 409) {
-        errorMessage = error.error?.mensaje || 'Conflicto: el recurso ya existe o no se puede completar la operación.';
-      } else if (error.status === 500) {
-        errorMessage = error.error?.mensaje || 'Error interno del servidor.';
-      } else {
-        errorMessage = `Error del servidor: ${error.status} - ${error.message}`;
-      }
-    }
-    return throwError(() => new Error(errorMessage));
-  }
-
-  /**
-   * Crea una nueva oferta.
-   * @param ofertaData Los datos de la oferta a crear.
-   * @returns Un Observable con la respuesta del servidor.
-   */
-  createOferta(ofertaData: Partial<IOferta>): Observable<any> {
-    return this.http.post<any>(this.apiUrl, ofertaData).pipe(
-      catchError(this.handleError)
-    );
-  }
-
-  /**
-   * Obtiene la lista de todas las ofertas.
-   * @returns Un Observable con un array de ofertas.
-   */
+  // Obtener todas las ofertas
   getOfertas(): Observable<IOfertaPopulated[]> {
     return this.http.get<IOfertaPopulated[]>(this.apiUrl).pipe(
       catchError(this.handleError)
     );
   }
 
-  /**
-   * Obtiene una oferta por su ID, incluyendo los detalles de productos y categorías.
-   * @param id El ID de la oferta.
-   * @returns Un Observable con la oferta y sus productos/categorías.
-   */
+  // Obtener ofertas por categoría
+  getOfertasByCategoria(categoriaId: string): Observable<IOfertaPopulated[]> {
+    return this.http.get<IOfertaPopulated[]>(`${this.apiUrl}?categoria=${categoriaId}&vigente=true`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  // Obtener ofertas vigentes
+  getOfertasVigentes(): Observable<IOfertaPopulated[]> {
+    return this.http.get<IOfertaPopulated[]>(`${this.apiUrl}?vigente=true`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  // Obtener una oferta por ID
   getOfertaById(id: string): Observable<IOfertaPopulated> {
     return this.http.get<IOfertaPopulated>(`${this.apiUrl}/${id}`).pipe(
       catchError(this.handleError)
     );
   }
 
-  /**
-   * Actualiza una oferta existente.
-   * @param id El ID de la oferta a actualizar.
-   * @param updateData Los datos a actualizar de la oferta.
-   * @returns Un Observable con la respuesta del servidor.
-   */
-  updateOferta(id: string, updateData: Partial<IOferta>): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, updateData).pipe(
+  // Crear una nueva oferta
+  createOferta(oferta: Partial<IOferta>): Observable<IOferta> {
+    return this.http.post<IOferta>(this.apiUrl, oferta).pipe(
       catchError(this.handleError)
     );
   }
 
-  /**
-   * Elimina una oferta por su ID.
-   * @param id El ID de la oferta a eliminar.
-   * @returns Un Observable con la respuesta del servidor.
-   */
+  // Actualizar una oferta existente
+  updateOferta(id: string, oferta: Partial<IOferta>): Observable<IOferta> {
+    return this.http.put<IOferta>(`${this.apiUrl}/${id}`, oferta).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  // Eliminar una oferta
   deleteOferta(id: string): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/${id}`).pipe(
+    return this.http.delete(`${this.apiUrl}/${id}`).pipe(
       catchError(this.handleError)
     );
   }
 
-  /**
-   * Activa una oferta por su ID.
-   * @param id El ID de la oferta a activar.
-   * @returns Un Observable con la respuesta del servidor.
-   */
-  activateOferta(id: string): Observable<any> {
-    return this.http.patch<any>(`${this.apiUrl}/${id}/activar`, {}).pipe(
+  // Activar una oferta
+  activateOferta(id: string): Observable<IOferta> {
+    return this.http.patch<IOferta>(`${this.apiUrl}/${id}/activar`, {}).pipe(
       catchError(this.handleError)
     );
   }
 
-  /**
-   * Desactiva una oferta por su ID.
-   * @param id El ID de la oferta a desactivar.
-   * @returns Un Observable con la respuesta del servidor.
-   */
-  deactivateOferta(id: string): Observable<any> {
-    return this.http.patch<any>(`${this.apiUrl}/${id}/desactivar`, {}).pipe(
+  // Desactivar una oferta
+  deactivateOferta(id: string): Observable<IOferta> {
+    return this.http.patch<IOferta>(`${this.apiUrl}/${id}/desactivar`, {}).pipe(
       catchError(this.handleError)
     );
   }
 
-  /**
-   * Obtiene ofertas aplicables a un producto específico.
-   * @param productId El ID del producto.
-   * @returns Un Observable con las ofertas aplicables.
-   */
-  getOfertasByProduct(productId: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/producto/${productId}`).pipe(
+  // Obtener ofertas aplicables a un producto específico
+  getOfertasByProducto(productId: string): Observable<IOfertaPopulated[]> {
+    return this.http.get<IOfertaPopulated[]>(`${this.apiUrl}/producto/${productId}`).pipe(
       catchError(this.handleError)
     );
+  }
+
+  // Calcular precio con descuento aplicando ofertas
+  calcularPrecioConDescuento(precioOriginal: number, ofertas: IOfertaPopulated[]): number {
+    if (!ofertas || ofertas.length === 0) {
+      return precioOriginal;
+    }
+
+    // Aplicar el descuento más alto si hay múltiples ofertas
+    const descuentoMaximo = Math.max(...ofertas.map(oferta => oferta.porcentajeDescuento));
+    return precioOriginal * (1 - (descuentoMaximo / 100));
+  }
+
+  // Obtener descuento máximo aplicable
+  obtenerDescuentoMaximo(ofertas: IOfertaPopulated[]): number {
+    if (!ofertas || ofertas.length === 0) {
+      return 0;
+    }
+    return Math.max(...ofertas.map(oferta => oferta.porcentajeDescuento));
+  }
+
+  // Verificar si una oferta está vigente
+  isOfertaVigente(oferta: IOferta): boolean {
+    const now = new Date();
+    const fechaInicio = new Date(oferta.fechaInicio);
+    const fechaFin = new Date(oferta.fechaFin);
+    return oferta.activa && (fechaInicio <= now) && (fechaFin >= now);
+  }
+
+  private handleError(error: any): Observable<never> {
+    let errorMessage = 'Error desconocido';
+    
+    if (error.error) {
+      if (typeof error.error === 'string') {
+        errorMessage = error.error;
+      } else if (error.error.mensaje) {
+        errorMessage = error.error.mensaje;
+      } else if (error.error.message) {
+        errorMessage = error.error.message;
+      }
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+
+    console.error('Error en OfertaService:', error);
+    return throwError(() => new Error(errorMessage));
   }
 }

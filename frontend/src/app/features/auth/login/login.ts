@@ -1,8 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { AuthService } from '../../../core/auth/auth'; // Asegúrate de que la ruta sea correcta
 import { Router, RouterLink, ActivatedRoute } from '@angular/router'; // Para la redirección
 import { CommonModule } from '@angular/common'; // Necesario para directivas como ngIf, ngFor
 import { FormsModule } from '@angular/forms'; // Necesario para ngModel
+
+// Declaraciones de tipos para Google API
+declare var gapi: any;
+declare var google: any;
 
 @Component({
   selector: 'app-login', // Selector para usar este componente en el HTML
@@ -11,10 +15,13 @@ import { FormsModule } from '@angular/forms'; // Necesario para ngModel
   templateUrl: './login.html', // Archivo HTML asociado
   styleUrls: ['./login.css'] // Archivo CSS asociado
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
   username = ''; // Propiedad para el input de usuario
   password = ''; // Propiedad para el input de contraseña
   errorMessage = ''; // Mensaje de error a mostrar en la UI
+  isLoading = false; // Para mostrar estado de carga
+  googleButtonLoaded = false; // Para controlar si el botón de Google se cargó
+  private initTimeout: any; // Para manejar el timeout de inicialización
 
   // Inyecta el AuthService y el Router en el constructor
   constructor(
@@ -31,6 +38,20 @@ export class LoginComponent implements OnInit {
     } else {
       console.log('LoginComponent ngOnInit: Usuario no autenticado. Mostrar formulario de login.');
     }
+  }
+
+  ngAfterViewInit(): void {
+    // Inicializar Google Identity Services después de que el DOM esté listo
+    this.initializeGoogleIdentityServices();
+  }
+
+  ngOnDestroy(): void {
+    // Limpiar timeout si el componente se destruye
+    if (this.initTimeout) {
+      clearTimeout(this.initTimeout);
+    }
+    // Limpiar estado de carga
+    this.isLoading = false;
   }
 
   // Método que se ejecuta al enviar el formulario de login
@@ -51,6 +72,117 @@ export class LoginComponent implements OnInit {
         this.errorMessage = err.error?.message || 'Error al iniciar sesión. Credenciales incorrectas o problema de conexión.';
         console.log('Mensaje de error mostrado:', this.errorMessage);
       }
+    });
+  }
+
+  // Método para inicializar Google Identity Services (público para el botón de respaldo)
+  initializeGoogleIdentityServices(): void {
+    try {
+      console.log('Inicializando Google Identity Services...');
+      
+      // Verificar si Google Identity Services ya está cargado
+      if (typeof google === 'undefined') {
+        console.log('Cargando Google Identity Services...');
+        this.loadGoogleIdentityServices().then(() => {
+          this.setupGoogleIdentityServices();
+        }).catch((error: any) => {
+          console.error('Error al cargar Google Identity Services:', error);
+          this.errorMessage = 'Error al cargar Google Identity Services. Verifica tu conexión a internet.';
+        });
+      } else {
+        console.log('Google Identity Services ya cargado, configurando...');
+        this.setupGoogleIdentityServices();
+      }
+      
+    } catch (error) {
+      console.error('Error en initializeGoogleIdentityServices:', error);
+      this.errorMessage = 'Error al inicializar Google Identity Services. Verifica tu conexión a internet.';
+    }
+  }
+
+  // Método para configurar Google Identity Services
+  private setupGoogleIdentityServices(): void {
+    try {
+      // Agregar timeout para evitar que se quede cargando indefinidamente
+      this.initTimeout = setTimeout(() => {
+        console.error('Timeout al inicializar Google Identity Services');
+        this.errorMessage = 'Timeout al inicializar Google Identity Services. Inténtalo de nuevo.';
+      }, 10000); // 10 segundos de timeout
+
+      // Inicializar Google Identity Services
+      google.accounts.id.initialize({
+        client_id: '427682572521-5cvcnk79ge40i8hfcfrtulv2n5ljm5qt.apps.googleusercontent.com',
+        callback: (response: any) => {
+          clearTimeout(this.initTimeout);
+          console.log('Google Identity Services callback:', response);
+          
+          if (response.credential) {
+            this.isLoading = true;
+            // Enviar el token al backend
+            this.authService.googleLogin(response.credential).subscribe({
+              next: data => {
+                console.log('Login con Google exitoso:', data);
+                this.isLoading = false;
+                this.redirectToDashboardByRole();
+              },
+              error: err => {
+                console.error('Error en login con Google:', err);
+                this.isLoading = false;
+                this.errorMessage = err.error?.mensaje || 'Error al iniciar sesión con Google. Inténtalo de nuevo.';
+              }
+            });
+          } else {
+            console.error('No se recibió credencial de Google');
+            this.errorMessage = 'No se pudo obtener la credencial de Google. Inténtalo de nuevo.';
+          }
+        }
+      });
+
+      // Renderizar el botón de Google Sign-In
+      google.accounts.id.renderButton(
+        document.getElementById('google-signin-button'), // Elemento donde mostrar el botón
+        { 
+          theme: 'outline', 
+          size: 'large',
+          width: '100%',
+          text: 'continue_with'
+        }
+      );
+
+      // Marcar que el botón se cargó correctamente
+      this.googleButtonLoaded = true;
+      console.log('Google Identity Services configurado correctamente');
+      
+    } catch (error) {
+      clearTimeout(this.initTimeout);
+      console.error('Error en setupGoogleIdentityServices:', error);
+      this.errorMessage = 'Error al configurar Google Identity Services. Verifica tu conexión a internet.';
+    }
+  }
+
+  // Método para cargar Google Identity Services
+  private loadGoogleIdentityServices(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      // Verificar si ya está cargada
+      if (typeof google !== 'undefined') {
+        resolve();
+        return;
+      }
+
+      // Crear el script de Google Identity Services
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        console.log('Google Identity Services cargado exitosamente');
+        resolve();
+      };
+      script.onerror = () => {
+        console.error('Error al cargar Google Identity Services');
+        reject(new Error('Error al cargar Google Identity Services'));
+      };
+      document.head.appendChild(script);
     });
   }
 

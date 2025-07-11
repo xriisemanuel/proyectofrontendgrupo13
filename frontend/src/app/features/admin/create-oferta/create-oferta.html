@@ -1,19 +1,21 @@
+<!-- src/app/features/admin/create-oferta/create-oferta.component.html -->
+
 <div class="create-oferta-container">
     <div class="form-card">
-        <h2><i class="fas fa-percent"></i> Crear Nueva Oferta</h2>
-        <p>Define una nueva oferta con descuentos aplicables a productos o categorías.</p>
+        <h2><i class="fas fa-plus-circle"></i> Crear Nueva Oferta</h2>
+        <p>Define un descuento porcentual que se aplicará a productos o categorías específicas durante un período determinado.</p>
 
-        <div *ngIf="loadingProducts || loadingCategories" class="loading-message">
-            <i class="fas fa-spinner fa-spin"></i> Cargando productos y categorías...
+        <div *ngIf="loading" class="loading-message">
+            <i class="fas fa-spinner fa-spin"></i> Creando oferta...
         </div>
         <div *ngIf="errorMessage" class="error-message">
             <i class="fas fa-exclamation-triangle"></i> {{ errorMessage }}
         </div>
 
-        <form [formGroup]="ofertaForm" (ngSubmit)="onSubmit()" *ngIf="!loadingProducts && !loadingCategories">
+        <form [formGroup]="ofertaForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
             <div class="form-group">
                 <label for="nombre">Nombre de la Oferta <span class="required-star">*</span></label>
-                <input id="nombre" type="text" formControlName="nombre" placeholder="Ej: Oferta Navideña, 2x1 Pizzas">
+                <input id="nombre" type="text" formControlName="nombre" placeholder="Ej: Descuento Navideño, 2x1 Pizzas">
                 <div *ngIf="getFieldError('nombre')" class="error-text">
                     {{ getFieldError('nombre') }}
                 </div>
@@ -29,20 +31,24 @@
             </div>
 
             <div class="form-group">
-                <label for="imagen">URL de la Imagen <span class="required-star">*</span></label>
-                <input id="imagen" type="url" formControlName="imagen" placeholder="https://ejemplo.com/imagen-oferta.jpg">
-                <div *ngIf="getFieldError('imagen')" class="error-text">
-                    {{ getFieldError('imagen') }}
+                <label for="tipoOferta">Tipo de Oferta <span class="required-star">*</span></label>
+                <select id="tipoOferta" formControlName="tipoOferta">
+                    <option value="producto">Oferta por Producto</option>
+                    <option value="categoria">Oferta por Categoría</option>
+                </select>
+                <div *ngIf="getFieldError('tipoOferta')" class="error-text">
+                    {{ getFieldError('tipoOferta') }}
                 </div>
-                <small class="form-help">Ingresa la URL de una imagen para la oferta (debe ser una URL válida)</small>
             </div>
 
             <div class="form-group">
-                <label for="descuento">Descuento (%) <span class="required-star">*</span></label>
-                <input id="descuento" type="number" formControlName="descuento" placeholder="Ej: 15 (para 15%)">
-                <div *ngIf="getFieldError('descuento')" class="error-text">
-                    {{ getFieldError('descuento') }}
+                <label for="porcentajeDescuento">Porcentaje de Descuento <span class="required-star">*</span></label>
+                <input id="porcentajeDescuento" type="number" formControlName="porcentajeDescuento" 
+                       placeholder="Ej: 15 (para 15%)" min="1" max="99" step="1">
+                <div *ngIf="getFieldError('porcentajeDescuento')" class="error-text">
+                    {{ getFieldError('porcentajeDescuento') }}
                 </div>
+                <small class="form-help">Ingresa un porcentaje entre 1% y 99%</small>
             </div>
 
             <div class="form-group">
@@ -61,45 +67,69 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>Productos Aplicables</label>
+            <!-- Productos Aplicables (solo visible si tipoOferta es 'producto') -->
+            <div class="form-group" *ngIf="selectedTipoOferta === 'producto'">
+                <label>Productos Aplicables <span class="required-star">*</span></label>
+                
+                <!-- Barra de búsqueda para productos -->
+                <div class="search-container">
+                    <input 
+                        type="text" 
+                        [(ngModel)]="searchTerm"
+                        placeholder="Buscar productos..."
+                        class="search-input"
+                        [ngModelOptions]="{standalone: true}"
+                    >
+                </div>
+                
                 <div class="selection-grid">
-                    <div *ngFor="let producto of productosDisponibles" class="selection-item">
+                    <div *ngFor="let producto of productosFiltrados" class="selection-item">
                         <input type="checkbox" [id]="'prod-' + producto._id" [value]="producto._id"
-                            (change)="onProductoChange($event, producto._id!)">
+                            (change)="onProductoChange($event, producto._id!)"
+                            [checked]="isProductoSelected(producto._id!)">
                         <label [for]="'prod-' + producto._id">
-                            {{ producto.nombre }} ({{ producto.precio | currency:'USD':'symbol':'1.2-2' }})
+                            <div class="product-info">
+                                <div class="product-name">{{ producto.nombre }}</div>
+                                <div class="product-price">${{ producto.precio | number:'1.2-2' }}</div>
+                                <div class="product-description" *ngIf="producto.descripcion">{{ producto.descripcion }}</div>
+                            </div>
                             <span *ngIf="producto.stock <= 5 && producto.stock > 0" class="low-stock-warning">(Poco
                                 stock: {{producto.stock}})</span>
                             <span *ngIf="producto.stock === 0" class="no-stock-warning">(Sin stock)</span>
                         </label>
                     </div>
                 </div>
-                <div *ngIf="ofertaForm.errors?.['atLeastOneApplicable'] && (productosAplicablesArray.touched || categoriasAplicablesArray.touched)"
-                    class="error-text">
-                    Debe seleccionar al menos un producto o una categoría para la oferta.
+                <div *ngIf="ofertaForm.errors?.['productosRequired'] && productosAplicablesArray.touched" class="error-text">
+                    Debe seleccionar al menos un producto para la oferta.
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>Categorías Aplicables</label>
+            <!-- Categorías Aplicables (solo visible si tipoOferta es 'categoria') -->
+            <div class="form-group" *ngIf="selectedTipoOferta === 'categoria'">
+                <label>Categorías Aplicables <span class="required-star">*</span></label>
                 <div class="selection-grid">
                     <div *ngFor="let categoria of categoriasDisponibles" class="selection-item">
                         <input type="checkbox" [id]="'cat-' + categoria._id" [value]="categoria._id"
-                            (change)="onCategoriaChange($event, categoria._id!)">
+                            (change)="onCategoriaChange($event, categoria._id!)"
+                            [checked]="isCategoriaSelected(categoria._id!)">
                         <label [for]="'cat-' + categoria._id">
-                            {{ categoria.nombre }}
+                            <div class="category-info">
+                                <div class="category-name">{{ categoria.nombre }}</div>
+                                <div class="category-description" *ngIf="categoria.descripcion">{{ categoria.descripcion }}</div>
+                            </div>
                         </label>
                     </div>
                 </div>
+                <div *ngIf="ofertaForm.errors?.['categoriasRequired'] && categoriasAplicablesArray.touched" class="error-text">
+                    Debe seleccionar al menos una categoría para la oferta.
+                </div>
             </div>
-
 
             <div class="form-actions">
                 <button type="submit" [disabled]="ofertaForm.invalid || loading" class="submit-button">
-                    <i class="fas fa-plus-circle"></i> {{ loading ? 'Creando...' : 'Crear Oferta' }}
+                    <i class="fas fa-save"></i> {{ loading ? 'Creando...' : 'Crear Oferta' }}
                 </button>
-                <button type="button" routerLink="/admin/dashboard" class="cancel-button">
+                <button type="button" routerLink="/admin/ofertas" class="cancel-button">
                     <i class="fas fa-times-circle"></i> Cancelar
                 </button>
             </div>

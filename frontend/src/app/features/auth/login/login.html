@@ -1,6 +1,20 @@
 <div class="login-container interactive-card">
   <h2>Iniciar Sesión</h2>
-  <!-- Formulario de login. ngSubmit llama al método onSubmit del componente. -->
+  
+  <!-- Login con Google usando Google Identity Services -->
+  <div class="oauth-section">
+    <div id="google-signin-button"></div>
+    <!-- Botón de respaldo por si Google Identity Services no funciona -->
+    <button type="button" class="btn-google-fallback" (click)="initializeGoogleIdentityServices()" *ngIf="!googleButtonLoaded">
+      <i class="fab fa-google"></i>
+      Continuar con Google
+    </button>
+    <div class="divider">
+      <span>o</span>
+    </div>
+  </div>
+
+  <!-- Formulario de login tradicional -->
   <form (ngSubmit)="onSubmit()">
     <div class="form-group">
       <label for="username">Usuario:</label>
@@ -18,6 +32,7 @@
       {{ errorMessage }}
     </div>
   </form>
+  
   <p>¿No tienes cuenta? <a routerLink="/cliente/register">Regístrate aquí</a></p>
   <button class="btn-salir" routerLink="/home-page">Volver</button>
 </div>

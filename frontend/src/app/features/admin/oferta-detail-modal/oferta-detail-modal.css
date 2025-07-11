@@ -103,6 +103,57 @@ h2.mat-dialog-title {
     font-weight: bold;
 }
 
+.discount-badge {
+    background-color: #ff5555;
+    color: #f8f8f2;
+    padding: 4px 8px;
+    border-radius: 15px;
+    font-weight: 600;
+    font-size: 0.9em;
+    display: inline-block;
+    text-align: center;
+    min-width: 60px;
+}
+
+.tipo-icon {
+    font-size: 1.2em;
+    margin-right: 8px;
+}
+
+.applicables-list {
+    margin-top: 8px;
+    padding: 10px;
+    background-color: rgba(68, 71, 90, 0.3);
+    border-radius: 6px;
+    border: 1px solid rgba(98, 114, 164, 0.2);
+}
+
+.application-info {
+    margin-top: 8px;
+    padding: 12px;
+    background-color: rgba(139, 233, 253, 0.1);
+    border-radius: 6px;
+    border: 1px solid rgba(139, 233, 253, 0.2);
+}
+
+.application-info p {
+    margin: 0 0 8px 0;
+    line-height: 1.4;
+}
+
+.application-info .note {
+    font-size: 0.9em;
+    color: #8be9fd;
+    font-style: italic;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(139, 233, 253, 0.2);
+}
+
+.application-info .note i {
+    margin-right: 5px;
+}
+
 .status-active {
     background-color: #50fa7b;
     /* Verde para activo/vigente */

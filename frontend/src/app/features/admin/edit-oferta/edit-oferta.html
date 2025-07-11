@@ -32,10 +32,54 @@
             </div>
 
             <div class="form-group">
-                <label for="descuento">Descuento (%) <span class="required-star">*</span></label>
-                <input id="descuento" type="number" formControlName="descuento" placeholder="Ej: 15 (para 15%)">
-                <div *ngIf="getFieldError('descuento')" class="error-text">
-                    {{ getFieldError('descuento') }}
+                <label for="imagen">URL de la Imagen <span class="required-star">*</span></label>
+                <input id="imagen" type="url" formControlName="imagen" placeholder="https://ejemplo.com/imagen-oferta.jpg">
+                <div *ngIf="getFieldError('imagen')" class="error-text">
+                    {{ getFieldError('imagen') }}
+                </div>
+                <small class="form-help">Ingresa la URL de una imagen para la oferta (debe ser una URL válida)</small>
+            </div>
+
+            <div class="form-group">
+                <label for="tipoOferta">Tipo de Oferta <span class="required-star">*</span></label>
+                <select id="tipoOferta" formControlName="tipoOferta">
+                    <option value="producto">Oferta por Producto</option>
+                    <option value="categoria">Oferta por Categoría</option>
+                </select>
+                <div *ngIf="getFieldError('tipoOferta')" class="error-text">
+                    {{ getFieldError('tipoOferta') }}
+                </div>
+            </div>
+
+            <div class="pricing-section">
+                <h3>Información de Precios</h3>
+                
+                <div class="form-group">
+                    <label for="precioOriginal">Precio Original <span class="required-star">*</span></label>
+                    <input id="precioOriginal" type="number" formControlName="precioOriginal" 
+                           placeholder="0.00" step="0.01" min="0">
+                    <div *ngIf="getFieldError('precioOriginal')" class="error-text">
+                        {{ getFieldError('precioOriginal') }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="descuento">Descuento (%) <span class="required-star">*</span></label>
+                    <input id="descuento" type="number" formControlName="descuento" 
+                           placeholder="Ej: 15 (para 15%)" min="0" max="100" step="0.01">
+                    <div *ngIf="getFieldError('descuento')" class="error-text">
+                        {{ getFieldError('descuento') }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="precioConDescuento">Precio con Descuento <span class="required-star">*</span></label>
+                    <input id="precioConDescuento" type="number" formControlName="precioConDescuento" 
+                           placeholder="0.00" step="0.01" min="0">
+                    <div *ngIf="getFieldError('precioConDescuento')" class="error-text">
+                        {{ getFieldError('precioConDescuento') }}
+                    </div>
+                    <small class="form-help">Se calcula automáticamente al ingresar precio original y descuento</small>
                 </div>
             </div>
 
@@ -55,8 +99,9 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>Productos Aplicables</label>
+            <!-- Productos Aplicables (solo visible si tipoOferta es 'producto') -->
+            <div class="form-group" *ngIf="selectedTipoOferta === 'producto'">
+                <label>Productos Aplicables <span class="required-star">*</span></label>
                 <div class="selection-grid">
                     <div *ngFor="let producto of productosDisponibles" class="selection-item">
                         <input type="checkbox" [id]="'prod-' + producto._id" [value]="producto._id"
@@ -70,14 +115,14 @@
                         </label>
                     </div>
                 </div>
-                <div *ngIf="ofertaForm.errors?.['atLeastOneApplicable'] && (productosAplicablesArray.touched || categoriasAplicablesArray.touched)"
-                    class="error-text">
-                    Debe seleccionar al menos un producto o una categoría para la oferta.
+                <div *ngIf="ofertaForm.errors?.['productosRequired'] && productosAplicablesArray.touched" class="error-text">
+                    Debe seleccionar al menos un producto para la oferta.
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>Categorías Aplicables</label>
+            <!-- Categorías Aplicables (solo visible si tipoOferta es 'categoria') -->
+            <div class="form-group" *ngIf="selectedTipoOferta === 'categoria'">
+                <label>Categorías Aplicables <span class="required-star">*</span></label>
                 <div class="selection-grid">
                     <div *ngFor="let categoria of categoriasDisponibles" class="selection-item">
                         <input type="checkbox" [id]="'cat-' + categoria._id" [value]="categoria._id"
@@ -87,6 +132,9 @@
                             {{ categoria.nombre }}
                         </label>
                     </div>
+                </div>
+                <div *ngIf="ofertaForm.errors?.['categoriasRequired'] && categoriasAplicablesArray.touched" class="error-text">
+                    Debe seleccionar al menos una categoría para la oferta.
                 </div>
             </div>
 

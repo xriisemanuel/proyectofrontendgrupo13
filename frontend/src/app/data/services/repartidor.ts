@@ -70,7 +70,7 @@ export class RepartidorService {
    * @returns Observable de la respuesta del backend.
    */
   updateUbicacion(repartidorId: string, lat: number, lon: number): Observable<any> {
-    return this.http.patch<any>(`${REPARTIDOR_API}/${repartidorId}/ubicacion`, { lat, lon }, { headers: this.getAuthHeaders() });
+    return this.http.put<any>(`${REPARTIDOR_API}/${repartidorId}/ubicacion`, { lat, lon }, { headers: this.getAuthHeaders() });
   }
 
   /**
@@ -104,6 +104,6 @@ export class RepartidorService {
 
   // Si en el futuro quieres usar el endpoint por ID de repartidor:
   // getRepartidorById(repartidorId: string): Observable<IRepartidor> {
-  //   return this.http.get<IRepartidor>(`${REPARTIDOR_API}/${repartidorId}`, { headers: this.getAuthHeaders() });
+  //   return this.http.get<IRepartidor>(${REPARTIDOR_API}/${repartidorId}, { headers: this.getAuthHeaders() });
   // }
 }
