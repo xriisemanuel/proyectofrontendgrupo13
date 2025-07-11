@@ -22,6 +22,9 @@ export class ClientProfileEditComponent implements OnInit {
   isSubmitting: boolean = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
+  passwordError: string | null = null;
+  passwordSuccess: string | null = null;
+  isChangingPassword: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -39,6 +42,10 @@ export class ClientProfileEditComponent implements OnInit {
       direccion: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(200)]],
       fechaNacimiento: ['', Validators.required],
       preferenciasAlimentarias: ['', Validators.required],
+      // Campos de contraseña para el cambio
+      currentPassword: ['', []],
+      newPassword: ['', []],
+      confirmPassword: ['', []],
     });
   }
 
@@ -135,6 +142,55 @@ export class ClientProfileEditComponent implements OnInit {
         setTimeout(() => {
           this.router.navigate(['/cliente/dashboard']); // Volver al dashboard después de un éxito
         }, 2000); // Esperar 2 segundos antes de redirigir
+      }
+    });
+  }
+
+  // Método para cambiar la contraseña
+  onChangePassword(): void {
+    this.passwordError = null;
+    this.passwordSuccess = null;
+
+    const currentPassword = this.profileForm.get('currentPassword')?.value;
+    const newPassword = this.profileForm.get('newPassword')?.value;
+    const confirmPassword = this.profileForm.get('confirmPassword')?.value;
+
+    // Validaciones frontend
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      this.passwordError = 'Completa todos los campos de contraseña.';
+      return;
+    }
+    if (newPassword.length < 6) {
+      this.passwordError = 'La nueva contraseña debe tener al menos 6 caracteres.';
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      this.passwordError = 'La nueva contraseña y la confirmación no coinciden.';
+      return;
+    }
+    if (!this.clientId) {
+      this.passwordError = 'No se pudo obtener el ID del cliente.';
+      return;
+    }
+
+    this.isChangingPassword = true;
+    this.clientService.cambiarPassword(this.clientId, {
+      currentPassword,
+      newPassword,
+      confirmPassword
+    }).pipe(
+      catchError(error => {
+        this.isChangingPassword = false;
+        this.passwordError = error.error?.mensaje || 'Error al cambiar la contraseña. Inténtalo de nuevo.';
+        return of(null);
+      })
+    ).subscribe(response => {
+      this.isChangingPassword = false;
+      if (response && response.mensaje) {
+        this.passwordSuccess = response.mensaje;
+        // Limpiar los campos de contraseña
+        this.profileForm.patchValue({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        setTimeout(() => { this.passwordSuccess = null; }, 3000);
       }
     });
   }
