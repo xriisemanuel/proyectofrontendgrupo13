@@ -46,7 +46,6 @@
         </div>
       </div>
 
-<<<<<<< HEAD
       <!-- Información Detallada del Cliente -->
       <div class="client-info-section">
         <h2 class="section-title">Tu Información Personal</h2>
@@ -66,44 +65,6 @@
               </div>
             </div>
           </div>
-=======
-    <!-- Sección de Acciones Rápidas -->
-    <section class="quick-actions-section">
-      <h2 class="section-title">Acciones Rápidas</h2>
-      <div class="action-cards-grid">
-        <a (click)="goToMisPedidos()" class="action-card">
-          <i class="fas fa-clipboard-list"></i>
-          <h4>Mis Pedidos</h4>
-          <p>Revisa el estado y el historial de tus pedidos.</p>
-        </a>
-        <a (click)="goToCalificaciones()" class="action-card">
-          <i class="fas fa-star"></i>
-          <h4>Calificar Pedidos</h4>
-          <p>Comparte tu experiencia y califica tus pedidos.</p>
-        </a>
-        <a routerLink="/client/ofertas" class="action-card">
-          <i class="fas fa-tags"></i>
-          <h4>Ver Ofertas</h4>
-          <p>Descubre las últimas promociones y descuentos.</p>
-        </a>
-        <a routerLink="/client/combos" class="action-card">
-          <i class="fas fa-box-open"></i>
-          <h4>Explorar Combos</h4>
-          <p>Encuentra combinaciones especiales a mejor precio.</p>
-        </a>
-        <a (click)="goToRealizarPedido()" class="action-card">
-          <i class="fas fa-utensils"></i>
-          <h4>Ver Productos</h4>
-          <p>Explora todo nuestro catálogo de productos y realiza pedidos.</p>
-        </a>
-        <a routerLink="/client/categories" class="action-card">
-          <i class="fas fa-folder-open"></i>
-          <h4>Explorar Categorías</h4>
-          <p>Navega por nuestras categorías de productos.</p>
-        </a>
-      </div>
-    </section>
->>>>>>> d7c207de0196f8378463ec594d09071c7f1e91c6
 
           <div class="info-card">
             <div class="info-icon">
@@ -131,8 +92,43 @@
           </div>
         </div>
       </div>
-<<<<<<< HEAD
-      <br>
+
+      <!-- Sección de Acciones Rápidas -->
+      <section class="quick-actions-section">
+        <h2 class="section-title">Acciones Rápidas</h2>
+        <div class="action-cards-grid">
+          <a (click)="goToMisPedidos()" class="action-card">
+            <i class="fas fa-clipboard-list"></i>
+            <h4>Mis Pedidos</h4>
+            <p>Revisa el estado y el historial de tus pedidos.</p>
+          </a>
+          <a (click)="goToCalificaciones()" class="action-card">
+            <i class="fas fa-star"></i>
+            <h4>Calificar Pedidos</h4>
+            <p>Comparte tu experiencia y califica tus pedidos.</p>
+          </a>
+          <a routerLink="/client/ofertas" class="action-card">
+            <i class="fas fa-tags"></i>
+            <h4>Ver Ofertas</h4>
+            <p>Descubre las últimas promociones y descuentos.</p>
+          </a>
+          <a routerLink="/client/combos" class="action-card">
+            <i class="fas fa-box-open"></i>
+            <h4>Explorar Combos</h4>
+            <p>Encuentra combinaciones especiales a mejor precio.</p>
+          </a>
+          <a (click)="goToRealizarPedido()" class="action-card">
+            <i class="fas fa-utensils"></i>
+            <h4>Ver Productos</h4>
+            <p>Explora todo nuestro catálogo de productos y realiza pedidos.</p>
+          </a>
+          <a routerLink="/client/categories" class="action-card">
+            <i class="fas fa-folder-open"></i>
+            <h4>Explorar Categorías</h4>
+            <p>Navega por nuestras categorías de productos.</p>
+          </a>
+        </div>
+      </section>
 
       <!-- Sección de Pedidos Recientes -->
       <section class="dashboard-section">
@@ -178,13 +174,6 @@
           </div>
         </div>
       </section>
-=======
-      <!-- <div class="section-footer">
-        <a routerLink="/client/products" class="btn-view-all">
-          Ver Todos los Productos <i class="fas fa-arrow-right"></i>
-        </a>
-      </div> -->
-    </section>
 
     <!-- Sección de Categorías (si existen) -->
     <section *ngIf="categories && categories.length > 0" class="categories-section">
@@ -198,14 +187,7 @@
           </div>
         </a>
       </div>
-   
-      <!--<div class="section-footer">
-        <a routerLink="/client/categories" class="btn-view-all">
-          Ver Todas las Categorías <i class="fas fa-arrow-right"></i>
-        </a>
-      </div>-->
     </section>
->>>>>>> d7c207de0196f8378463ec594d09071c7f1e91c6
 
       <!-- Sección de Calificaciones -->
       <section class="dashboard-section">

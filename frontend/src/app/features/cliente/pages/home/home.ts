@@ -13,10 +13,8 @@ import { CartService } from '../../../../core/services/cart.service';
 // Importar interfaces
 import { IProducto, ICategoria, ICombo } from '../../../../shared/interfaces';
 import { IOfertaPopulated } from '../../../../shared/oferta.interface';
-import { MainButton, HomeState } from './home.interfaces';
 
 // Importar componentes hijos
-import { MainNavigation } from '../components/main-navigation/main-navigation';
 import { CategoryTabs } from '../components/category-tabs/category-tabs';
 import { ProductGrid } from '../components/product-grid/product-grid';
 
@@ -25,7 +23,6 @@ import { ProductGrid } from '../components/product-grid/product-grid';
   standalone: true,
   imports: [
     CommonModule,
-    MainNavigation,
     CategoryTabs,
     ProductGrid
   ],
@@ -52,28 +49,7 @@ export class Home implements OnInit, OnDestroy {
   ofertas: IOfertaPopulated[] = [];
 
   // Navegación
-  activeSection: 'categorias' | 'combos' | 'ofertas' = 'categorias';
   selectedCategoryId: string | null = null;
-
-  // Botones principales
-  mainButtons: MainButton[] = [
-    { name: 'Categorías', active: true, key: 'categorias' },
-    { name: 'Combos', active: false, key: 'combos' },
-    { name: 'Ofertas', active: false, key: 'ofertas' }
-  ];
-
-  // Computed properties
-  get isCategoriasActive(): boolean {
-    return this.activeSection === 'categorias';
-  }
-
-  get isCombosActive(): boolean {
-    return this.activeSection === 'combos';
-  }
-
-  get isOfertasActive(): boolean {
-    return this.activeSection === 'ofertas';
-  }
 
   private destroy$ = new Subject<void>();
 
@@ -211,48 +187,11 @@ export class Home implements OnInit, OnDestroy {
   }
 
   /**
-   * Maneja la selección de botón principal (Categorías, Combos, Ofertas)
-   */
-  onMainButtonSelected(buttonKey: string): void {
-    // Actualizar estado de botones
-    this.mainButtons.forEach(button => {
-      button.active = button.key === buttonKey;
-    });
-
-    // Actualizar sección activa
-    this.activeSection = buttonKey as 'categorias' | 'combos' | 'ofertas';
-
-    // Cargar datos según la sección seleccionada
-    switch (buttonKey) {
-      case 'categorias':
-        if (this.categories.length === 0) {
-          this.loadCategories();
-        }
-        if (this.selectedCategoryId) {
-          this.loadProductsByCategory(this.selectedCategoryId);
-        }
-        break;
-      case 'combos':
-        if (this.combos.length === 0) {
-          this.loadCombos();
-        }
-        break;
-      case 'ofertas':
-        if (this.ofertas.length === 0) {
-          this.loadOfertas();
-        }
-        break;
-    }
-  }
-
-  /**
    * Maneja la selección de categoría
    */
   onCategorySelected(categoryId: string): void {
-    if (categoryId) {
-      this.selectedCategoryId = categoryId;
-      this.loadProductsByCategory(categoryId);
-    }
+    this.selectedCategoryId = categoryId;
+    this.loadProductsByCategory(categoryId);
   }
 
   /**
@@ -274,17 +213,13 @@ export class Home implements OnInit, OnDestroy {
   }
 
   /**
-   * Maneja errores de manera centralizada
+   * Maneja errores de carga
    */
   private handleError(error: any): void {
-    console.error('Error en Home component:', error);
-    this.errorMessage = 'Error al cargar los datos. Por favor, intenta nuevamente.';
-    this.hasError = true;
     this.isLoading = false;
-    this.isLoadingCategories = false;
-    this.isLoadingProducts = false;
-    this.isLoadingCombos = false;
-    this.isLoadingOfertas = false;
+    this.hasError = true;
+    this.errorMessage = error?.message || 'Error al cargar los datos. Por favor, intenta de nuevo.';
+    console.error('Error in home component:', error);
   }
 
   /**
