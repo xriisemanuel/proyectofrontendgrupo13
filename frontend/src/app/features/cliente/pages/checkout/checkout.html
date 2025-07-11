@@ -1,0 +1,39 @@
+<div class="checkout-container">
+  <h1>Finalizar Pedido</h1>
+  <form [formGroup]="checkoutForm" (ngSubmit)="submitPedido()" class="checkout-form">
+    <div class="form-group">
+      <label for="direccionEntrega">Dirección de Entrega</label>
+      <input id="direccionEntrega" formControlName="direccionEntrega" type="text" required />
+      <div *ngIf="checkoutForm.get('direccionEntrega')?.invalid && checkoutForm.get('direccionEntrega')?.touched" class="error">
+        La dirección es obligatoria.
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="metodoPago">Método de Pago</label>
+      <select id="metodoPago" formControlName="metodoPago" required>
+        <option value="" disabled selected>Selecciona un método</option>
+        <option *ngFor="let metodo of metodoPagoOptions" [value]="metodo">{{ metodo }}</option>
+      </select>
+      <div *ngIf="checkoutForm.get('metodoPago')?.invalid && checkoutForm.get('metodoPago')?.touched" class="error">
+        El método de pago es obligatorio.
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="observaciones">Descripción/Observaciones (opcional)</label>
+      <textarea id="observaciones" formControlName="observaciones" rows="2"></textarea>
+    </div>
+    <div class="cart-summary">
+      <h2>Resumen del Carrito</h2>
+      <div *ngFor="let item of cartItems">
+        <span>{{ item.product.nombre }} x{{ item.quantity }}</span>
+        <span>${{ (item.product.precio || item.product.precioCombo || item.product.precioFinal || 0) * item.quantity | number:'1.2-2' }}</span>
+      </div>
+      <div class="total">
+        <strong>Total: ${{ cartTotal | number:'1.2-2' }}</strong>
+      </div>
+    </div>
+    <button type="submit" [disabled]="isSubmitting || checkoutForm.invalid || cartItems.length === 0" class="btn-primary">
+      Confirmar Pedido
+    </button>
+  </form>
+</div> 

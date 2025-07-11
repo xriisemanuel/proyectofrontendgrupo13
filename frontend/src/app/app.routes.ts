@@ -289,5 +289,12 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['repartidor'] } // Solo los repartidores pueden editar su perfil
   },
+  // --- NUEVA RUTA: CHECKOUT ---
+  {
+    path: 'checkout',
+    loadComponent: () => import('./features/cliente/pages/checkout/checkout').then(m => m.CheckoutComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['cliente'] } // Solo los clientes pueden acceder al checkout
+  },
   { path: '**', redirectTo: 'home' }
 ];

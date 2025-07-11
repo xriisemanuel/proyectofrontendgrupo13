@@ -303,8 +303,8 @@ export class Home implements OnInit, OnDestroy {
    */
   onAddToCart(product: any): void {
     this.cartService.addToCart(product, 1);
-    console.log('Producto agregado al carrito:', product.nombre);
-    // Aquí podrías mostrar una notificación de éxito
+    this.toastr.success('Producto agregado al carrito', 'Carrito');
+    // No redirige automáticamente, solo muestra el toast
   }
 
   /**
@@ -313,10 +313,10 @@ export class Home implements OnInit, OnDestroy {
   onBuyNow(product: any): void {
     // Verificar si el usuario está autenticado
     if (!this.authService.isAuthenticated()) {
-      this.toastr.warning('Debes iniciar sesión para realizar una compra', 'Autenticación requerida');
+      this.toastr.warning('Debes iniciar sesión para comprar', 'Autenticación requerida');
       this.router.navigate(['/login'], { 
         queryParams: { 
-          returnUrl: '/cliente/realizar-pedido',
+          returnUrl: '/cart',
           productId: product._id 
         } 
       });
@@ -326,14 +326,14 @@ export class Home implements OnInit, OnDestroy {
     // Verificar si el usuario tiene rol de cliente
     const userRole = this.authService.getRole();
     if (userRole !== 'cliente') {
-      this.toastr.error('Solo los clientes pueden realizar compras', 'Acceso denegado');
+      this.toastr.error('Solo los clientes pueden comprar', 'Acceso denegado');
       return;
     }
 
-    // Agregar el producto al carrito y redirigir a realizar pedido
+    // Agregar el producto al carrito y redirigir al carrito
     this.cartService.addToCart(product, 1);
     this.toastr.success('Producto agregado al carrito', 'Listo para comprar');
-    this.router.navigate(['/cliente/realizar-pedido']);
+    this.router.navigate(['/cart']);
   }
 
   /**

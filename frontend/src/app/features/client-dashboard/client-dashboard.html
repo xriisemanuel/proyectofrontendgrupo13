@@ -118,7 +118,7 @@
               <p><strong>Productos:</strong> {{ pedido.detalleProductos?.length || 0 }} items</p>
             </div>
             <div class="pedido-actions">
-              <button *ngIf="pedido.estado === 'entregado'" class="btn-calificar" (click)="goToCalificaciones()">
+              <button *ngIf="pedido.estado === 'entregado'" class="btn-calificar" (click)="goToCalificaciones(pedido._id)">
                 <i class="fas fa-star"></i> Calificar
               </button>
               <button class="btn-ver-detalles" (click)="openPedidoModal(pedido)">

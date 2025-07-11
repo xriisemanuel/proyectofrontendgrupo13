@@ -90,14 +90,14 @@ export class PedidoService {
 
   /**
    * @description Actualiza el estado de un pedido.
-   * Esta es la función clave para el Supervisor de Cocina.
+   * Esta es la función clave para el Supervisor de Cocina y el Repartidor.
    * @param id El ID del pedido a actualizar.
    * @param nuevoEstado El nuevo estado del pedido.
    * @returns Un Observable con la respuesta del backend.
    */
   updateEstadoPedido(id: string, nuevoEstado: IPedido['estado']): Observable<any> {
     // APLICA LOS ENCABEZADOS DE AUTENTICACIÓN AQUÍ
-    return this.http.patch(`${PEDIDO_API}/${id}/estado`, { nuevoEstado }, { headers: this.getAuthHeaders() });
+    return this.http.patch(`${PEDIDO_API}/${id}/estado`, { estado: nuevoEstado }, { headers: this.getAuthHeaders() });
   }
 
   // --- Métodos adicionales que podrías necesitar más adelante o para otros roles ---
