@@ -1,110 +1,130 @@
-/* src/app/features/auth/register/register.css */
-.register-container {
-  max-width: 500px;
-  margin: 50px auto;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  background-color: #ffffff;
-  font-family: Arial, sans-serif;
+/* src/app/features/auth/register/register.component.css */
+
+/* --- Contenedor Principal y Tipografía --- */
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #111012;
+  /* Fondo principal oscuro */
+  color: #e0d0b8;
+  /* Color de texto claro */
+  font-family: 'Arial', sans-serif;
+  font-weight: bold;
 }
 
-h2 {
+.register-container {
+  background-color: #1e1d28;
+  /* Fondo de la tarjeta */
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  width: 100%;
+  max-width: 500px;
   text-align: center;
-  color: #333;
+  transition: transform 0.3s ease-in-out;
+}
+
+.register-container:hover {
+  transform: translateY(-5px);
+}
+
+h2,
+h3 {
+  color: #d97849;
+  /* Color de acento */
+  text-align: center;
   margin-bottom: 25px;
-  font-size: 2em;
+}
+
+h3 {
+  margin-top: 25px;
+  border-bottom: 1px solid #4e332a;
+  padding-bottom: 10px;
+}
+
+/* --- Formulario y Campos --- */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .form-group {
-  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
 }
 
-.form-group label {
-  display: block;
+label {
   margin-bottom: 8px;
-  color: #555;
-  font-weight: bold;
+  color: #b3b7b4;
+  font-size: 0.95rem;
 }
 
-.form-group input[type="text"],
-.form-group input[type="password"],
-.form-group input[type="email"],
-.form-group input[type="tel"],
-.form-group input[type="date"],
-.form-group input[type="number"] {
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="tel"],
+input[type="date"] {
   width: 100%;
   padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  box-sizing: border-box;
-  /* Asegura que el padding no aumente el ancho total */
-  font-size: 1em;
-}
-
-.form-group input:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  border: 1px solid #4e332a;
+  border-radius: 9px;
+  background-color: #111012;
+  color: #e0d0b8;
   outline: none;
+  transition: all 0.3s ease;
 }
 
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="date"]:focus {
+  border-color: #d97849;
+  box-shadow: 0 0 0 2px rgba(217, 120, 73, 0.5);
+}
+
+/* Campos específicos de Cliente */
 .specific-fields-section {
-  border-top: 1px solid #eee;
-  padding-top: 20px;
-  margin-top: 25px;
-}
-
-.specific-fields-section h3 {
-  text-align: center;
-  color: #007bff;
-  margin-bottom: 20px;
-  font-size: 1.5em;
-}
-
-.btn-primary {
-  width: 100%;
-  padding: 15px;
-  background-color: #28a745;
-  /* Un verde más agradable para el botón principal */
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 1.1em;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  background-color: #111012;
+  padding: 20px;
+  border-radius: 12px;
   margin-top: 20px;
+}
+
+/* --- Botones --- */
+.btn-primary {
+  padding: 15px;
+  border: none;
+  border-radius: 9px;
+  background-color: #d97849;
+  color: #131214;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
 }
 
 .btn-primary:hover {
-  background-color: #218838;
+  background: linear-gradient(to right, #ee8c5d, #e8c69d);
 }
 
-.error-message {
-  color: #dc3545;
-  text-align: center;
-  margin-top: 15px;
-  font-weight: bold;
-}
-
-.success-message {
-  color: #28a745;
-  text-align: center;
-  margin-top: 15px;
-  font-weight: bold;
-}
-
-.register-container p {
-  text-align: center;
+/* --- Enlace a Login --- */
+p {
   margin-top: 20px;
-  font-size: 0.95em;
+  color: #b3b7b4;
 }
 
-.register-container p a {
-  color: #007bff;
+p a {
+  color: #d97849;
   text-decoration: none;
-  font-weight: bold;
+  transition: color 0.3s ease;
 }
 
-.register-container p a:hover {
+p a:hover {
+  color: #e0d0b8;
   text-decoration: underline;
 }

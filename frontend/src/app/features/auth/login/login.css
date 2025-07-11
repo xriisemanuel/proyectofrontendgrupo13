@@ -1,429 +1,263 @@
-/* login.component.css */
+/* src/app/features/auth/login/login.component.css */
 
-/* Estilos para el body/contenedor principal de la aplicación
-   (Asumiendo que este CSS se carga globalmente o un contenedor padre lo hereda) */
-body {
-  margin: 0;
-  padding: 0;
-  background: #0F172A;
-  /* Fondo azul oscuro profundo */
-  font-family: 'Montserrat', sans-serif;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  display: flex;
-  /* Para centrar el contenido del login */
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  /* Asegura que ocupe toda la altura de la ventana */
-  color: #E2E8F0;
-  /* Color de texto principal claro */
+/* Animación para el borde de resplandor */
+@keyframes animate-border-glow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
-:host {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
-
-/* Contenedor principal del formulario de login */
-.login-container {
-  background: #1E293B;
-  /* Fondo de panel ligeramente más claro que el body */
-  padding: 50px;
-  /* Padding generoso */
-  border-radius: 25px;
-  /* Bordes redondeados, a juego con las tarjetas del dashboard */
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
-  /* Sombra profunda */
-  width: 100%;
-  max-width: 480px;
-  /* Ancho máximo para el formulario */
-  text-align: center;
-  box-sizing: border-box;
-  /* Incluir padding en el ancho total */
-  position: relative;
-  /* Necesario para el efecto de "gotita de agua" */
-  overflow: hidden;
-  /* Oculta el pseudo-elemento ::before cuando está fuera de la tarjeta */
-  cursor: pointer;
-  /* Indica interactividad */
-  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    box-shadow 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    border-radius 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  will-change: transform, box-shadow, border-radius;
-}
-
-/* Efecto "Gotita de Agua" al pasar el ratón */
-.login-container::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background: radial-gradient(circle at center, rgba(110, 231, 183, 0.25) 0%, transparent 70%);
-  /* Brillo de acento */
-  border-radius: 50%;
-  opacity: 0;
-  transform: translate(-50%, -50%);
-  /* Centra inicialmente */
-  transition: width 0.7s ease-out, height 0.7s ease-out, opacity 0.7s ease-out;
-  /* Transición lenta y expansiva */
-  z-index: 0;
-  pointer-events: none;
-  /* Asegura que no bloquee el clic */
-}
-
-.login-container:hover {
-  transform: scale(1.03) translateY(-10px);
-  /* Ligeramente más grande y elevado */
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7), 0 0 30px rgba(110, 231, 183, 0.5);
-  /* Sombra más grande con glow de acento */
-  border-radius: 28px;
-  /* Se redondea aún más */
-}
-
-.login-container:hover::before {
-  width: 250%;
-  /* Expande el círculo de brillo */
-  height: 250%;
-  opacity: 1;
-}
-
-/* Asegura que el contenido esté por encima del pseudo-elemento */
-.login-container>*:not(::before) {
-  position: relative;
-  z-index: 1;
-  transition: color 0.3s ease-out, transform 0.3s ease-out;
-}
-
-
-/* Título "Iniciar Sesión" */
-.login-container h2 {
-  font-size: 2.8em;
-  /* Tamaño de título impactante */
-  color: #E2E8F0;
-  /* Color de texto principal */
-  font-weight: 800;
-  /* Extra bold */
-  margin-bottom: 40px;
-  text-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-  letter-spacing: -0.02em;
-  padding-bottom: 25px;
-  /* Similar a los títulos de sección del dashboard */
-  border-bottom: 2px solid rgba(110, 231, 183, 0.15);
-  /* Borde sutil con color de acento */
-}
-
-/* Estilos de los grupos de formulario (etiqueta + input) */
-.form-group {
-  margin-bottom: 25px;
-  text-align: left;
-}
-
-.form-group label {
-  display: block;
-  font-size: 1.15em;
-  color: #E2E8F0;
-  margin-bottom: 10px;
-  font-weight: 600;
-}
-
-/* Estilos de los campos de input (texto y contraseña) */
-.form-group input[type="text"],
-.form-group input[type="password"] {
-  width: 100%;
-  padding: 15px 20px;
-  background-color: #0F172A;
-  /* Fondo oscuro para los inputs */
-  border: 1px solid rgba(110, 231, 183, 0.2);
-  /* Borde sutil de acento */
-  border-radius: 10px;
-  color: #E2E8F0;
-  font-size: 1.1em;
-  font-weight: 400;
-  transition: all 0.3s ease-in-out;
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
-  /* Sombra interna para profundidad */
-  box-sizing: border-box;
-}
-
-.form-group input[type="text"]:focus,
-.form-group input[type="password"]:focus {
-  outline: none;
-  border-color: #6EE7B7;
-  /* Borde de acento vibrante al enfocar */
-  box-shadow: 0 0 15px rgba(110, 231, 183, 0.4), inset 0 2px 8px rgba(0, 0, 0, 0.5);
-  /* Glow y sombra interna más fuerte */
-  background-color: #1A2436;
-  /* Ligeramente más claro al enfocar */
-}
-
-/* Estilo para el botón de "Entrar" */
-.btn-primary {
-  background: linear-gradient(45deg, #6EE7B7 0%, #34B399 100%);
-  /* Degradado de acento */
-  color: #0F172A;
-  /* Texto muy oscuro para contraste */
-  border: none;
-  border-radius: 12px;
-  padding: 18px 35px;
-  font-size: 1.3em;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  width: 100%;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  margin-top: 20px;
-}
-
-.btn-primary:hover {
-  background: linear-gradient(45deg, #34B399 0%, #6EE7B7 100%);
-  /* Invierte el degradado al hover */
-  transform: translateY(-5px) scale(1.02);
-  box-shadow: 0 15px 30px rgba(110, 231, 183, 0.6);
-}
-
-/* Estilo para el botón de "Entrar" */
-.btn-salir {
-  background: linear-gradient(45deg, #ca321e 0%, #410404 100%);
-  /* Degradado de acento */
-  color: #0F172A;
-  /* Texto muy oscuro para contraste */
-  border: none;
-  border-radius: 12px;
-  padding: 18px 35px;
-  font-size: 1.3em;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  width: 100%;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  margin-top: 20px;
-}
-
-.btn-salir:hover {
-  background: linear-gradient(45deg, #ac010c 0%, #552c32 100%);
-  /* Invierte el degradado al hover */
-  transform: translateY(-5px) scale(1.02);
-  box-shadow: 0 15px 30px rgba(63, 4, 13, 0.6);
-}
-/* Mensaje de error */
-.error-message {
-  color: #EF4444;
-  /* Color de alerta vibrante */
-  background-color: rgba(239, 68, 68, 0.15);
-  /* Fondo sutil para el error */
-  border: 1px solid #EF4444;
-  border-radius: 8px;
-  padding: 15px;
-  margin-top: 25px;
-  font-size: 1.1em;
-  font-weight: 600;
-  animation: fadeIn 0.5s ease-out;
-}
-
-/* Animación para el mensaje de error */
-@keyframes fadeIn {
+/* Animación de entrada para el contenedor */
+@keyframes fadeInSlideUp {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(20px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-/* Enlace de registro */
-.login-container p {
-  margin-top: 30px;
-  font-size: 1.1em;
-  color: #94A3B8;
-  /* Color de texto secundario */
-}
-
-.login-container p a {
-  color: #FBBF24;
-  /* Naranja/amarillo para el enlace */
-  text-decoration: none;
-  font-weight: 600;
-  transition: color 0.3s ease-out, text-shadow 0.3s ease-out;
-}
-
-.login-container p a:hover {
-  color: #FFD700;
-  /* Tono más vibrante al hover */
-  text-decoration: underline;
-  text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
-}
-
-/* Estilos para el botón de Google OAuth */
-.oauth-section {
-  margin-bottom: 2rem;
-  text-align: center;
-}
-
-/* Estilos para el contenedor del botón de Google Identity Services */
-#google-signin-button {
-  width: 100%;
+/* --- Contenedor Principal (Frosted Glass y Borde Animado) --- */
+:host {
   display: flex;
   justify-content: center;
-  margin-bottom: 1rem;
-}
-
-/* Estilos para el botón de respaldo de Google */
-.btn-google-fallback {
-  width: 100%;
-  padding: 12px 20px;
-  background: #fff;
-  color: #757575;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1rem;
+  min-height: 100vh;
+  background-color: #111012;
+  color: #e0d0b8;
+  font-family: 'Arial', sans-serif;
+  font-weight: bold;
+  padding: 20px;
+}
+
+.login-container {
+  /* Efecto de cristal esmerilado */
+  background-color: rgba(30, 29, 40, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  position: relative; /* Para el pseudo-elemento del borde */
+  z-index: 1; /* Asegura que el contenido esté por encima */
+
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), 0 10px 30px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+  
+  animation: fadeInSlideUp 0.8s ease-out;
+  transition: transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
+}
+
+/* Borde de resplandor animado */
+.login-container::before {
+  content: '';
+  position: absolute;
+  inset: 0; /* Cubre completamente el contenedor */
+  border-radius: 12px;
+  padding: 2px; /* Grosor del borde */
+  background: linear-gradient(
+    45deg,
+    #d97849,
+    #f29a73,
+    #eed8b8,
+    #d97849,
+    #4e332a,
+    #f29a73
+  );
+  background-size: 400% 400%;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: exclude;
+  animation: animate-border-glow 20s infinite linear;
+  z-index: -1; /* Coloca el borde detrás */
+}
+
+/* Efecto de elevación al pasar el cursor sobre la tarjeta */
+.interactive-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+h2 {
+  color: #d97849;
+  text-align: center;
+  margin-bottom: 30px;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+}
+
+/* --- Sección de OAuth y Divisor --- */
+.oauth-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.btn-google-fallback {
+  padding: 12px;
+  border: none;
+  border-radius: 9px;
+  background-color: #4285F4;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  width: 100%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .btn-google-fallback:hover {
-  background: #f8f9fa;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  transform: translateY(-1px);
-}
-
-.btn-google-fallback i {
-  font-size: 18px;
-  color: #4285f4;
-}
-
-/* Estilos para el botón personalizado (mantener por compatibilidad) */
-.btn-google {
-  width: 100%;
-  padding: 12px 20px;
-  background: #fff;
-  color: #757575;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.btn-google:hover:not(:disabled) {
-  background: #f8f9fa;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  transform: translateY(-1px);
-}
-
-.btn-google:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.btn-google i {
-  font-size: 18px;
-  color: #4285f4;
+  background: linear-gradient(to right, #4285F4, #357ae8);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .divider {
-  position: relative;
+  display: flex;
+  align-items: center;
   text-align: center;
-  margin: 1.5rem 0;
+  width: 100%;
+  color: #b3b7b4;
+  font-size: 0.9rem;
 }
 
-.divider::before {
+.divider::before, .divider::after {
   content: '';
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: #ddd;
+  flex: 1;
+  border-bottom: 1px solid rgba(78, 51, 42, 0.5);
 }
 
-.divider span {
-  background: #fff;
-  padding: 0 15px;
-  color: #666;
-  font-size: 14px;
-  position: relative;
-  z-index: 1;
+.divider:not(:empty)::before {
+  margin-right: 10px;
 }
 
-/* Media Queries para responsividad */
-@media (max-width: 768px) {
-  .login-container {
-    padding: 40px 30px;
-    margin: 20px;
-    border-radius: 20px;
-  }
+.divider:not(:empty)::after {
+  margin-left: 10px;
+}
 
-  .login-container h2 {
-    font-size: 2.4em;
-    margin-bottom: 30px;
-  }
+/* --- Formulario de Login y Campos (con transparencia) --- */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
-  .form-group label {
-    font-size: 1.05em;
-  }
+.form-group {
+  text-align: left;
+}
 
-  .form-group input {
-    padding: 12px 15px;
-    font-size: 1em;
-  }
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: #b3b7b4;
+  font-size: 0.95rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
 
-  .btn-primary {
-    padding: 16px 30px;
-    font-size: 1.2em;
-  }
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(78, 51, 42, 0.5);
+  border-radius: 9px;
+  background-color: rgba(17, 16, 18, 0.6);
+  color: #e0d0b8;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+/* Efecto de resplandor en los inputs al hacer focus */
+input:focus {
+  border-color: #d97849;
+  box-shadow: 0 0 0 3px rgba(217, 120, 73, 0.6);
+}
+
+/* --- Botones del Formulario --- */
+.btn-primary, .btn-salir {
+  background-size: 200% 100%;
+  background-position: right;
+  transition: background-position 0.4s ease-in-out, transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.btn-primary {
+  padding: 15px;
+  border: none;
+  border-radius: 9px;
+  background-image: linear-gradient(to right, #d97849, #f29a73, #d97849);
+  color: #131214;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary:hover {
+  background-position: left;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.error-message {
+  background-color: #cc4034;
+  color: #e0d0b8;
+  padding: 10px;
+  border-radius: 9px;
+  margin-top: -10px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* --- Enlaces y Botón Volver --- */
+p {
+  margin-top: 20px;
+  color: #b3b7b4;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+p a {
+  color: #d97849;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+p a:hover {
+  color: #e0d0b8;
+  text-shadow: 0 0 5px rgba(224, 208, 184, 0.5);
+}
+
 .btn-salir {
-    padding: 10px 20px;
-    font-size: 1em;
-  }
-  .error-message {
-    padding: 12px;
-    font-size: 1em;
-  }
-
-  .login-container p {
-    font-size: 1em;
-  }
+  margin-top: 15px;
+  padding: 10px;
+  border: 1px solid #4e332a;
+  border-radius: 9px;
+  background-color: rgba(78, 51, 42, 0.4);
+  color: #b3b7b4;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-@media (max-width: 480px) {
-  .login-container {
-    padding: 30px 20px;
-    border-radius: 18px;
-  }
-
-  .login-container h2 {
-    font-size: 2em;
-    margin-bottom: 25px;
-  }
-
-  .form-group input {
-    padding: 10px 12px;
-  }
+.btn-salir:hover {
+  background-color: #4e332a;
+  color: #e0d0b8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
