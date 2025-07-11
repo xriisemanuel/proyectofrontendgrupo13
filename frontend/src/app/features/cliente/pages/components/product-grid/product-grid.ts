@@ -15,6 +15,7 @@ export class ProductGrid {
   @Input() loading: boolean = false;
   @Output() productSelected = new EventEmitter<any>();
   @Output() addToCart = new EventEmitter<any>();
+  @Output() buyNow = new EventEmitter<any>();
 
   onProductClick(product: any): void {
     this.productSelected.emit(product);
@@ -22,5 +23,9 @@ export class ProductGrid {
 
   onAddToCart(product: any): void {
     this.addToCart.emit(product);
+  }
+
+  onBuyNow(product: any): void {
+    this.buyNow.emit(product);
   }
 }

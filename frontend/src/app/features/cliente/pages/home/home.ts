@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil, catchError, finalize, firstValueFrom } from 'rxjs';
 import { of } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 
 // Importar servicios existentes
 import { ProductoService } from '../../../../data/services/producto';
@@ -10,6 +11,7 @@ import { CategoriaService } from '../../../../data/services/categoria';
 import { ComboService } from '../../../../data/services/combo';
 import { OfertaService } from '../../../../data/services/oferta';
 import { CartService } from '../../../../core/services/cart.service';
+import { AuthService } from '../../../../core/auth/auth';
 
 // Importar interfaces
 import { IProducto, ICategoria, ICombo } from '../../../../shared/interfaces';
@@ -62,7 +64,9 @@ export class Home implements OnInit, OnDestroy {
     private ofertaService: OfertaService,
     private cartService: CartService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private authService: AuthService,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -280,6 +284,35 @@ export class Home implements OnInit, OnDestroy {
     this.cartService.addToCart(product, 1);
     console.log('Producto agregado al carrito:', product.nombre);
     // Aquí podrías mostrar una notificación de éxito
+  }
+
+  /**
+   * Maneja la compra directa de un producto
+   */
+  onBuyNow(product: any): void {
+    // Verificar si el usuario está autenticado
+    if (!this.authService.isAuthenticated()) {
+      this.toastr.warning('Debes iniciar sesión para realizar una compra', 'Autenticación requerida');
+      this.router.navigate(['/login'], { 
+        queryParams: { 
+          returnUrl: '/cliente/realizar-pedido',
+          productId: product._id 
+        } 
+      });
+      return;
+    }
+
+    // Verificar si el usuario tiene rol de cliente
+    const userRole = this.authService.getRole();
+    if (userRole !== 'cliente') {
+      this.toastr.error('Solo los clientes pueden realizar compras', 'Acceso denegado');
+      return;
+    }
+
+    // Agregar el producto al carrito y redirigir a realizar pedido
+    this.cartService.addToCart(product, 1);
+    this.toastr.success('Producto agregado al carrito', 'Listo para comprar');
+    this.router.navigate(['/cliente/realizar-pedido']);
   }
 
   /**

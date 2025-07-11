@@ -57,9 +57,9 @@
       <button 
         class="add-to-cart-btn"
         [disabled]="!isProductAvailable()"
-        (click)="onAddToCart($event)">
-        <span class="btn-icon">🛒</span>
-        <span class="btn-text">{{ isProductAvailable() ? 'Agregar' : 'Agotado' }}</span>
+        (click)="onBuyNow($event)">
+        <span class="btn-icon">💳</span>
+        <span class="btn-text">{{ isProductAvailable() ? 'Comprar' : 'Agotado' }}</span>
       </button>
     </div>
   </div>

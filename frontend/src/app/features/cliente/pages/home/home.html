@@ -21,7 +21,8 @@
         [products]="filteredProducts" 
         [loading]="isLoadingProducts"
         (productSelected)="onProductSelected($event)"
-        (addToCart)="onAddToCart($event)">
+        (addToCart)="onAddToCart($event)"
+        (buyNow)="onBuyNow($event)">
       </app-product-grid>
     </div>
 
@@ -37,7 +38,8 @@
         [products]="combos" 
         [loading]="isLoadingCombos"
         (productSelected)="onProductSelected($event)"
-        (addToCart)="onAddToCart($event)">
+        (addToCart)="onAddToCart($event)"
+        (buyNow)="onBuyNow($event)">
       </app-product-grid>
     </div>
 
@@ -53,7 +55,8 @@
         [products]="ofertas" 
         [loading]="isLoadingOfertas"
         (productSelected)="onProductSelected($event)"
-        (addToCart)="onAddToCart($event)">
+        (addToCart)="onAddToCart($event)"
+        (buyNow)="onBuyNow($event)">
       </app-product-grid>
     </div>
   </main>

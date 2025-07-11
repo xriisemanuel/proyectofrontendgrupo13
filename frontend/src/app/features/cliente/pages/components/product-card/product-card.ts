@@ -13,6 +13,7 @@ export class ProductCard {
   @Input() product: any;
   @Output() productClick = new EventEmitter<any>();
   @Output() addToCart = new EventEmitter<any>();
+  @Output() buyNow = new EventEmitter<any>();
 
   onCardClick(): void {
     this.productClick.emit(this.product);
@@ -21,6 +22,11 @@ export class ProductCard {
   onAddToCart(event: Event): void {
     event.stopPropagation(); // Evitar que se active el click de la tarjeta
     this.addToCart.emit(this.product);
+  }
+
+  onBuyNow(event: Event): void {
+    event.stopPropagation(); // Evitar que se active el click de la tarjeta
+    this.buyNow.emit(this.product);
   }
 
   onImageError(event: Event): void {

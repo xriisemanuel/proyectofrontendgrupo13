@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../../core/auth/auth'; // Asegúrate de que la ruta sea correcta
-import { Router, RouterLink } from '@angular/router'; // Para la redirección
+import { Router, RouterLink, ActivatedRoute } from '@angular/router'; // Para la redirección
 import { CommonModule } from '@angular/common'; // Necesario para directivas como ngIf, ngFor
 import { FormsModule } from '@angular/forms'; // Necesario para ngModel
 
@@ -17,7 +17,11 @@ export class LoginComponent implements OnInit {
   errorMessage = ''; // Mensaje de error a mostrar en la UI
 
   // Inyecta el AuthService y el Router en el constructor
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(
+    private authService: AuthService, 
+    private router: Router,
+    private route: ActivatedRoute
+  ) { }
 
   ngOnInit(): void {
     console.log('LoginComponent ngOnInit: Verificando autenticación...');
@@ -57,6 +61,14 @@ export class LoginComponent implements OnInit {
   private redirectToDashboardByRole(): void {
     const userRole = this.authService.getRole(); // Obtiene el rol del usuario desde el servicio de autenticación
     console.log('redirectToDashboardByRole: Rol obtenido:', userRole);
+
+    // Verificar si hay una URL de retorno específica
+    const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+    if (returnUrl) {
+      console.log('Redirigiendo a URL de retorno:', returnUrl);
+      this.router.navigate([returnUrl]);
+      return;
+    }
 
     if (userRole === 'admin') {
       console.log('Redirigiendo a: /admin/dashboard');

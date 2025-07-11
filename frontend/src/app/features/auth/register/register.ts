@@ -1,6 +1,6 @@
 // src/app/features/auth/register/register.ts
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterLink } from '@angular/router'; // Para la redirección y RouterLink
+import { Router, RouterLink, ActivatedRoute } from '@angular/router'; // Para la redirección y RouterLink
 import { CommonModule } from '@angular/common'; // Necesario para directivas como ngFor
 import { FormsModule } from '@angular/forms'; // Necesario para ngModel
 import { ToastrService } from 'ngx-toastr'; // <--- Usamos ToastrService para alertas
@@ -39,6 +39,7 @@ export class RegisterComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
+    private route: ActivatedRoute,
     private toastr: ToastrService // <--- Inyecta ToastrService
   ) { }
 
@@ -85,9 +86,15 @@ export class RegisterComponent implements OnInit {
       next: data => {
         console.log('Registro exitoso:', data);
         this.toastr.success('Tu cuenta ha sido creada. Ahora puedes iniciar sesión.', '¡Registro Exitoso!'); // <--- Usando Toastr
-        // Opcional: Redirige al usuario a la página de login después de un registro exitoso
+        // Redirige al usuario a la página de login después de un registro exitoso
         setTimeout(() => {
-          this.router.navigate(['/login']);
+          // Verificar si hay una URL de retorno específica
+          const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+          if (returnUrl) {
+            this.router.navigate(['/login'], { queryParams: { returnUrl: returnUrl } });
+          } else {
+            this.router.navigate(['/login']);
+          }
         }, 2000); // Redirige después de 2 segundos
       },
       error: err => {
