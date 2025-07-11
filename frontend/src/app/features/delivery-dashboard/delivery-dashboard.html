@@ -1,25 +1,21 @@
 <div class="delivery-dashboard-container">
-  <!-- Header del Dashboard (sin botón de cerrar sesión) -->
   <div class="dashboard-header">
     <h2><i class="fas fa-truck"></i> Dashboard del Repartidor</h2>
   </div>
 
-  <!-- Mensajes de Estado -->
-  <div *ngIf="loadingRepartidor || loadingPedidos" class="loading-message">
+  <div *ngIf="loadingRepartidor || loadingPedidos" class="loading-message message-card">
     <i class="fas fa-spinner fa-spin"></i> Cargando datos del dashboard...
   </div>
 
-  <div *ngIf="errorMessage" class="error-message">
+  <div *ngIf="errorMessage" class="error-message message-card">
     <i class="fas fa-exclamation-triangle"></i> {{ errorMessage }}
   </div>
 
-  <div *ngIf="successMessage" class="success-message">
+  <div *ngIf="successMessage" class="success-message message-card">
     <i class="fas fa-check-circle"></i> {{ successMessage }}
   </div>
 
-  <!-- Contenido Principal -->
   <div *ngIf="repartidor && !loadingRepartidor" class="main-content">
-    <!-- Sección de Perfil y Estadísticas -->
     <div class="profile-stats-section">
       <div class="profile-card interactive-card compact-card">
         <h3><i class="fas fa-user-circle"></i> Mi Perfil</h3>
@@ -28,7 +24,8 @@
             <tbody>
               <tr>
                 <td class="info-label"><i class="fas fa-user"></i> Nombre Completo</td>
-                <td class="info-value">{{ repartidor.usuarioId.nombre || 'N/A' }} {{ repartidor.usuarioId.apellido || 'N/A' }}</td>
+                <td class="info-value">{{ repartidor.usuarioId.nombre || 'N/A' }} {{ repartidor.usuarioId.apellido ||
+                  'N/A' }}</td>
               </tr>
               <tr>
                 <td class="info-label"><i class="fas fa-at"></i> Usuario</td>
@@ -60,7 +57,6 @@
         </div>
       </div>
 
-      <!-- Tarjetas de Estadísticas -->
       <div class="stats-grid">
         <div class="stat-card interactive-card compact-card">
           <div class="stat-icon">
@@ -72,10 +68,9 @@
               <div class="rating-display">
                 <span class="rating-number">{{ repartidor.calificacionPromedio | number:'1.1-1' }}</span>
                 <div class="stars-display">
-                  <i *ngFor="let star of [1,2,3,4,5]" 
-                     class="fas fa-star" 
-                     [class.active]="star <= repartidor.calificacionPromedio"
-                     [class.half]="star > repartidor.calificacionPromedio && star <= repartidor.calificacionPromedio + 0.5"></i>
+                  <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star"
+                    [class.active]="star <= repartidor.calificacionPromedio"
+                    [class.half]="star > repartidor.calificacionPromedio && star <= repartidor.calificacionPromedio + 0.5"></i>
                 </div>
               </div>
               <p>{{ getCalificacionesCount() }} calificaciones</p>
@@ -100,7 +95,6 @@
       </div>
     </div>
 
-    <!-- Sección de Estado y Acciones -->
     <div class="status-actions-section">
       <div class="status-card interactive-card compact-card">
         <h3><i class="fas fa-toggle-on"></i> Estado Actual</h3>
@@ -119,37 +113,29 @@
           </div>
         </div>
         <div class="status-actions">
-          <button (click)="changeRepartidorStatus('disponible')" 
-                  [disabled]="repartidor.estado === 'disponible'"
-                  class="btn-action btn-success">
+          <button (click)="changeRepartidorStatus('disponible')" [disabled]="repartidor.estado === 'disponible'"
+            class="btn-action btn-success">
             <i class="fas fa-check-circle"></i> Disponible
           </button>
           <button (click)="changeRepartidorStatus('fuera_de_servicio')"
-                  [disabled]="repartidor.estado === 'fuera_de_servicio'"
-                  class="btn-action btn-danger">
+            [disabled]="repartidor.estado === 'fuera_de_servicio'" class="btn-action btn-danger">
             <i class="fas fa-pause-circle"></i> Fuera de Servicio
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Sección de Mapa y Ubicación -->
     <section class="map-section">
       <div class="map-card interactive-card compact-card">
         <div class="card-header">
           <h2><i class="fas fa-map-marked-alt"></i> Mi Ubicación</h2>
           <div class="map-controls">
-            <button 
-              (click)="startLocationTracking()" 
-              [disabled]="isTrackingLocation || !repartidor"
+            <button (click)="startLocationTracking()" [disabled]="isTrackingLocation || !repartidor"
               class="map-btn start-btn">
               <i class="fas fa-play"></i>
               Iniciar Seguimiento
             </button>
-            <button 
-              (click)="stopLocationTracking()" 
-              [disabled]="!isTrackingLocation"
-              class="map-btn stop-btn">
+            <button (click)="stopLocationTracking()" [disabled]="!isTrackingLocation" class="map-btn stop-btn">
               <i class="fas fa-stop"></i>
               Detener
             </button>
@@ -165,7 +151,6 @@
       </div>
     </section>
 
-    <!-- Sección de Pedidos -->
     <div class="orders-section compact-card" *ngIf="repartidor && !loadingPedidos">
       <div class="section-header">
         <h3><i class="fas fa-shopping-bag"></i> Pedidos Disponibles</h3>
@@ -188,8 +173,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let pedido of pedidosAsignados" 
-                [ngClass]="{'assigned': pedido.repartidorId, 'available': !pedido.repartidorId}">
+            <tr *ngFor="let pedido of pedidosAsignados"
+              [ngClass]="{'assigned': pedido.repartidorId, 'available': !pedido.repartidorId}">
               <td class="order-id">
                 <strong>#{{ pedido._id?.slice(-8) }}</strong>
               </td>
@@ -206,20 +191,20 @@
                 {{ pedido.fechaPedido | date:'short' }}
               </td>
               <td class="order-status">
-                <span class="status-badge" [ngClass]="{'assigned': pedido.repartidorId, 'available': !pedido.repartidorId}">
+                <span class="status-badge"
+                  [ngClass]="{'assigned': pedido.repartidorId, 'available': !pedido.repartidorId}">
                   <i class="fas" [ngClass]="pedido.repartidorId ? 'fa-user-check' : 'fa-clock'"></i>
                   {{ pedido.repartidorId ? 'Asignado' : 'Disponible' }}
                 </span>
               </td>
               <td class="order-actions">
-                <button *ngIf="(pedido.estado === 'confirmado' || pedido.estado === 'en_preparacion' || pedido.estado === 'en_envio') && !pedido.repartidorId"
-                          (click)="takeOrder(pedido._id!)"
-                          class="btn-action btn-primary btn-sm">
+                <button
+                  *ngIf="(pedido.estado === 'confirmado' || pedido.estado === 'en_preparacion' || pedido.estado === 'en_envio') && !pedido.repartidorId"
+                  (click)="takeOrder(pedido._id!)" class="btn-action btn-primary btn-sm">
                   <i class="fas fa-truck"></i> Tomar
                 </button>
-                <button *ngIf="pedido.estado === 'en_envio' && pedido.repartidorId" 
-                          (click)="deliverOrder(pedido)"
-                          class="btn-action btn-success btn-sm">
+                <button *ngIf="pedido.estado === 'en_envio' && pedido.repartidorId" (click)="deliverOrder(pedido)"
+                  class="btn-action btn-success btn-sm">
                   <i class="fas fa-check"></i> Entregar
                 </button>
               </td>
@@ -235,13 +220,14 @@
       </ng-template>
     </div>
 
-    <!-- Historial de Entregas -->
-    <div class="history-section" *ngIf="repartidor.historialEntregas && repartidor.historialEntregas.length > 0">
+    <div class="history-section compact-card"
+      *ngIf="repartidor.historialEntregas && repartidor.historialEntregas.length > 0">
       <div class="section-header">
         <h3><i class="fas fa-history"></i> Historial de Entregas</h3>
-        <span class="history-count">Últimas {{ repartidor.historialEntregas.length > 5 ? 5 : repartidor.historialEntregas.length }} entregas</span>
+        <span class="history-count">Últimas {{ repartidor.historialEntregas.length > 5 ? 5 :
+          repartidor.historialEntregas.length }} entregas</span>
       </div>
-      
+
       <div class="history-table-container">
         <table class="history-table">
           <thead>
@@ -262,9 +248,8 @@
               </td>
               <td class="history-rating" *ngIf="entrega.calificacionCliente">
                 <div class="rating-stars">
-                  <i *ngFor="let star of [1,2,3,4,5]" 
-                     class="fas fa-star" 
-                     [class.filled]="star <= entrega.calificacionCliente"></i>
+                  <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star"
+                    [class.filled]="star <= entrega.calificacionCliente"></i>
                   <span class="rating-score">{{ entrega.calificacionCliente }}/5</span>
                 </div>
               </td>
@@ -278,8 +263,7 @@
     </div>
   </div>
 
-  <!-- Estado de Error -->
-  <div *ngIf="!repartidor && !loadingRepartidor" class="error-state">
+  <div *ngIf="!repartidor && !loadingRepartidor" class="error-state compact-card">
     <i class="fas fa-exclamation-triangle"></i>
     <h3>Error al cargar datos</h3>
     <p>No se pudo cargar la información del repartidor. Por favor, intenta nuevamente.</p>
