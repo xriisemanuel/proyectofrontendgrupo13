@@ -62,10 +62,10 @@ export class CheckoutComponent implements OnInit {
       metodoPago: formValue.metodoPago,
       observaciones: formValue.observaciones,
       detalleProductos: this.cartItems.map(item => ({
-        productoId: item.product._id,
-        nombreProducto: item.product.nombre,
-        cantidad: item.quantity,
-        precioUnitario: item.product.precio || item.product.precioCombo || item.product.precioFinal || 0
+        productoId: item.item._id,
+        nombreProducto: this.getItemName(item),
+        cantidad: item.cantidad,
+        precioUnitario: this.getItemPrice(item)
       }))
     };
     this.pedidoService.createPedido(pedidoPayload).subscribe({
@@ -84,5 +84,17 @@ export class CheckoutComponent implements OnInit {
         this.isSubmitting = false;
       }
     });
+  }
+
+  getItemName(item: CartItem) {
+    return item.tipo === 'producto' ? item.item.nombre : item.item.titulo;
+  }
+
+  getItemPrice(item: CartItem): number {
+    if (item.tipo === 'producto') {
+      return item.item.precio || 0;
+    } else {
+      return item.item.precioCombo || item.item.precioFinal || 0;
+    }
   }
 } 

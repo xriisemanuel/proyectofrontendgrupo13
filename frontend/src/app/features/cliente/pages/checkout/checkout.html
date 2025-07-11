@@ -25,8 +25,10 @@
     <div class="cart-summary">
       <h2>Resumen del Carrito</h2>
       <div *ngFor="let item of cartItems">
-        <span>{{ item.product.nombre }} x{{ item.quantity }}</span>
-        <span>${{ (item.product.precio || item.product.precioCombo || item.product.precioFinal || 0) * item.quantity | number:'1.2-2' }}</span>
+        <span>{{ getItemName(item) }} x{{ item.cantidad }}</span>
+        <span>
+          ${{ (getItemPrice(item) * item.cantidad) | number:'1.2-2' }}
+        </span>
       </div>
       <div class="total">
         <strong>Total: ${{ cartTotal | number:'1.2-2' }}</strong>

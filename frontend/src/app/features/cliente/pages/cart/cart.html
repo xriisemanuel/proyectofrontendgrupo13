@@ -18,20 +18,16 @@
   <div *ngIf="!isCartEmpty()" class="cart-content">
     <!-- Lista de productos -->
     <div class="cart-items">
-      <div class="cart-item" *ngFor="let item of cartItems; trackBy: trackByProductId">
+      <div class="cart-item" *ngFor="let item of cartItems">
         <div class="item-image">
-          <img [src]="item.product.imagen || 'assets/images/default-product.jpg'" 
-               [alt]="item.product.nombre" 
-               class="product-image">
+          <img [src]="item.item.imagen || 'assets/images/default.png'" [alt]="getItemName(item)">
         </div>
         
         <div class="item-details">
-          <h3 class="item-name">{{ item.product.nombre }}</h3>
-          <p class="item-description" *ngIf="item.product.descripcion">
-            {{ item.product.descripcion }}
-          </p>
+          <h3 class="item-name">{{ getItemName(item) }}</h3>
+          <p class="item-description" *ngIf="item.item.descripcion">{{ item.item.descripcion }}</p>
           <div class="item-price">
-            <span class="price">${{ getProductPrice(item.product) | number:'1.2-2' }}</span>
+            <span class="price">${{ getItemPrice(item) | number:'1.2-2' }}</span>
             <span class="price-unit">por unidad</span>
           </div>
         </div>
@@ -39,13 +35,13 @@
         <div class="item-quantity">
           <div class="quantity-controls">
             <button class="quantity-btn" 
-                    (click)="updateQuantity(item.product._id, item.quantity - 1)"
-                    [disabled]="item.quantity <= 1">
+                    (click)="updateQuantity(item, item.cantidad - 1)"
+                    [disabled]="item.cantidad <= 1">
               -
             </button>
-            <span class="quantity-display">{{ item.quantity }}</span>
+            <span class="quantity-display">{{ item.cantidad }}</span>
             <button class="quantity-btn" 
-                    (click)="updateQuantity(item.product._id, item.quantity + 1)">
+                    (click)="updateQuantity(item, item.cantidad + 1)">
               +
             </button>
           </div>
@@ -57,7 +53,7 @@
 
         <div class="item-actions">
           <button class="remove-btn" 
-                  (click)="removeItem(item.product._id)"
+                  (click)="removeItem(item)"
                   title="Eliminar del carrito">
             🗑️
           </button>

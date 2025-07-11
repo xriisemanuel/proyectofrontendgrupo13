@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
@@ -13,7 +13,7 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './cart.html',
   styleUrl: './cart.css'
 })
-export class CartComponent implements OnInit, OnDestroy {
+export class CartComponent implements OnInit {
   cartItems: CartItem[] = [];
   cartTotal: number = 0;
   totalItems: number = 0;
@@ -66,22 +66,27 @@ export class CartComponent implements OnInit, OnDestroy {
   /**
    * Actualiza la cantidad de un producto
    */
-  updateQuantity(productId: string, newQuantity: number): void {
-    if (newQuantity < 1) {
-      this.removeItem(productId);
+  updateQuantity(item: CartItem, cantidad: number): void {
+    if (cantidad < 1) {
+      this.removeItem(item);
       return;
     }
     
-    this.cartService.updateQuantity(productId, newQuantity);
-    this.toastr.success('Cantidad actualizada', 'Carrito actualizado');
+    // Actualiza la cantidad en el array
+    const idx = this.cartItems.findIndex(i => i.tipo === item.tipo && i.item._id === item.item._id);
+    if (idx > -1) {
+      this.cartItems[idx].cantidad = cantidad;
+      this.cartService.updateItemQuantity(item.tipo, item.item._id, cantidad);
+      // No necesitas actualizar manualmente cartItems, el subscribe lo hace
+    }
   }
 
   /**
    * Elimina un producto del carrito
    */
-  removeItem(productId: string): void {
-    this.cartService.removeFromCart(productId);
-    this.toastr.success('Producto eliminado del carrito', 'Carrito actualizado');
+  removeItem(item: CartItem): void {
+    this.cartService.removeFromCart(item.item._id);
+    // No necesitas actualizar manualmente cartItems, el subscribe lo hace
   }
 
   /**
@@ -122,8 +127,8 @@ export class CartComponent implements OnInit, OnDestroy {
    * Obtiene el precio total de un item
    */
   getItemTotal(item: CartItem): number {
-    const price = this.getProductPrice(item.product);
-    return price * item.quantity;
+    const price = this.getProductPrice(item.item);
+    return price * item.cantidad;
   }
 
   /**
@@ -137,6 +142,20 @@ export class CartComponent implements OnInit, OnDestroy {
    * TrackBy function para optimizar el rendimiento del ngFor
    */
   trackByProductId(index: number, item: CartItem): string {
-    return item.product._id;
+    return item.item._id;
+  }
+
+  getItemName(item: CartItem) {
+    // Si es producto, usa nombre; si es oferta, usa titulo
+    return item.tipo === 'producto' ? item.item.nombre : item.item.titulo;
+  }
+
+  getItemPrice(item: CartItem): number {
+    // Si es producto, usa precio; si es oferta, usa precioCombo o precioFinal
+    if (item.tipo === 'producto') {
+      return item.item.precio || 0;
+    } else {
+      return item.item.precioCombo || item.item.precioFinal || 0;
+    }
   }
 } 

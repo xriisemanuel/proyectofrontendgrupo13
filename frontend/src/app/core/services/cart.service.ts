@@ -3,8 +3,9 @@ import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface CartItem {
-  product: any;
-  quantity: number;
+  tipo: 'producto' | 'oferta';
+  item: any; // Producto | Oferta
+  cantidad: number;
 }
 
 @Injectable({
@@ -55,15 +56,15 @@ export class CartService {
    */
   addToCart(product: any, quantity: number = 1): void {
     const currentItems = this.cartItems.value;
-    const existingItem = currentItems.find(item => item.product._id === product._id);
+    const existingItem = currentItems.find(item => item.item._id === product._id);
 
     if (existingItem) {
       // Si el producto ya existe, incrementar la cantidad
-      existingItem.quantity += quantity;
+      existingItem.cantidad += quantity;
       this.updateCart([...currentItems]);
     } else {
       // Si es un producto nuevo, agregarlo
-      const newItem: CartItem = { product, quantity };
+      const newItem: CartItem = { tipo: 'producto', item: product, cantidad: quantity };
       this.updateCart([...currentItems, newItem]);
     }
   }
@@ -73,7 +74,7 @@ export class CartService {
    */
   updateQuantity(productId: string, quantity: number): void {
     const currentItems = this.cartItems.value;
-    const itemIndex = currentItems.findIndex(item => item.product._id === productId);
+    const itemIndex = currentItems.findIndex(item => item.item._id === productId);
 
     if (itemIndex !== -1) {
       if (quantity <= 0) {
@@ -81,7 +82,7 @@ export class CartService {
         currentItems.splice(itemIndex, 1);
       } else {
         // Actualizar la cantidad
-        currentItems[itemIndex].quantity = quantity;
+        currentItems[itemIndex].cantidad = quantity;
       }
       this.updateCart([...currentItems]);
     }
@@ -92,7 +93,7 @@ export class CartService {
    */
   removeFromCart(productId: string): void {
     const currentItems = this.cartItems.value;
-    const filteredItems = currentItems.filter(item => item.product._id !== productId);
+    const filteredItems = currentItems.filter(item => item.item._id !== productId);
     this.updateCart(filteredItems);
   }
 
@@ -108,8 +109,8 @@ export class CartService {
    */
   getItemQuantity(productId: string): number {
     const currentItems = this.cartItems.value;
-    const item = currentItems.find(item => item.product._id === productId);
-    return item ? item.quantity : 0;
+    const item = currentItems.find(item => item.item._id === productId);
+    return item ? item.cantidad : 0;
   }
 
   /**
@@ -117,7 +118,7 @@ export class CartService {
    */
   getTotalItems(): number {
     const currentItems = this.cartItems.value;
-    return currentItems.reduce((total, item) => total + item.quantity, 0);
+    return currentItems.reduce((total, item) => total + item.cantidad, 0);
   }
 
   /**
@@ -134,8 +135,8 @@ export class CartService {
    */
   private calculateTotal(items: CartItem[]): void {
     const total = items.reduce((sum, item) => {
-      const price = item.product.precio || item.product.precioCombo || item.product.precioFinal || 0;
-      return sum + (price * item.quantity);
+      const price = item.item.precio || item.item.precioCombo || item.item.precioFinal || 0;
+      return sum + (price * item.cantidad);
     }, 0);
     this.cartTotal.next(total);
   }
@@ -183,13 +184,21 @@ export class CartService {
    */
   getCartSummary(): { totalItems: number; totalPrice: number; itemCount: number } {
     const items = this.cartItems.value;
-    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+    const totalItems = items.reduce((sum, item) => sum + item.cantidad, 0);
     const totalPrice = items.reduce((sum, item) => {
-      const price = item.product.precio || item.product.precioCombo || item.product.precioFinal || 0;
-      return sum + (price * item.quantity);
+      const price = item.item.precio || item.item.precioCombo || item.item.precioFinal || 0;
+      return sum + (price * item.cantidad);
     }, 0);
     const itemCount = items.length;
 
     return { totalItems, totalPrice, itemCount };
+  }
+
+  updateItemQuantity(tipo: 'producto' | 'oferta', id: string, cantidad: number) {
+    const idx = this.cartItems.value.findIndex(i => i.tipo === tipo && i.item._id === id);
+    if (idx > -1) {
+      this.cartItems.value[idx].cantidad = cantidad;
+      this.updateCart(this.cartItems.value);
+    }
   }
 } 
