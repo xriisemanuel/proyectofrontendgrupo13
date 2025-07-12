@@ -1,7 +1,10 @@
 services:
   - type: web
-    name: mi-app-angular
+    name: subte-app-frontend
     env: node
     buildCommand: npm install && npm run build
-    startCommand: npx serve -s dist/nombre-de-tu-app
+    startCommand: npx serve -s dist/frontend/browser
     plan: free
+    envVars:
+      - key: API_BASE_URL
+        value: https://tu-backend-app.onrender.com/api
